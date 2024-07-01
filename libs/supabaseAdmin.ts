@@ -30,8 +30,8 @@ const upsertProductRecord = async (product: Stripe.Product) => {
         throw error;
     }
 
-    console.log(`Product inserted/updated ${product.id}`);
-}
+    console.log(`Product inserted/updated: ${product.id}`);
+};
 
 const upsertPriceRecord = async (price: Stripe.Price) => {
     const priceData: Price = {
@@ -58,12 +58,13 @@ const upsertPriceRecord = async (price: Stripe.Price) => {
 
     console.log(`Price inserted/updated ${price.id}`);
 }
-const createOrRetrieveACustomer = async ({
+
+const createOrRetrieveCustomer = async ({
     email,
     uuid
 }: {
     email: string,
-    uuid:string
+    uuid: string
 }) => {
     const { data, error } = await supabaseAdmin
     .from('customers')
@@ -78,6 +79,7 @@ const createOrRetrieveACustomer = async ({
                 supabaseUUID: uuid 
             }
         };
+
         if (email) customerData.email = email;
 
         const customer = await stripe.customers.create(customerData);
@@ -165,7 +167,7 @@ const manageSubscriptionStatusChange = async (
 
     if (error) throw error;
 
-    console.log(`Subscription inserted/updated ${subscription.id} for ${uuid}`);
+    console.log(`Subscription inserted / updated ${subscription.id} for ${uuid}`);
 
     if (createAction && subscription.default_payment_method && uuid) {
         await copyBillingDetailsToCustomer(
@@ -173,5 +175,12 @@ const manageSubscriptionStatusChange = async (
             subscription.default_payment_method as Stripe.PaymentMethod
         );
     }
+};
+
+export {
+    upsertProductRecord,
+    upsertPriceRecord,
+    createOrRetrieveCustomer,
+    manageSubscriptionStatusChange
 }
 
