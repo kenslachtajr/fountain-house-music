@@ -1,11 +1,10 @@
 import { Price } from "@/types";
-import { url } from "inspector";
 
 export const getURL = () => {
     let url = 
         process.env.NEXT_PUBLIC_SITE_URL ?? 
         process.env.NEXT_PUBLIC_VERCEL_URL ??
-        'http://localhost:3001/';
+        'http://localhost:3000/';
 
         url = url.includes('http') ? url : `https://${url}`;
         url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
@@ -22,12 +21,13 @@ export const postData = async ({
 }) => {
     console.log('POST REQUEST:', url, data);
 
-    const res = await fetch(url, {
+    const res: Response = await fetch(url, {
         method: 'POST',
         headers: new Headers({ 'Content-Type': 'application/json' }),
         credentials: 'same-origin',
         body: JSON.stringify(data)
     });
+    
     if (!res.ok) {
         console.log('Error in POST', { url, data, res });
 
