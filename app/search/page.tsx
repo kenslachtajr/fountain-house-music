@@ -1,18 +1,28 @@
-import getSongsByTitle from '../actions/getSongsByTitle';
+import getSongsByTitleOrAuthor from '../actions/getSongsByTitleOrAuthor';
 import Header from '../components/Header';
 import SearchInput from '../components/SearchInput';
 import SearchContent from './components/SearchContent';
 
 interface SearchProps {
   searchParams: {
-    title: string;
+    title?: string;
+    author?: string | null;
   };
 }
-
 export const revalidate = 0;
 
+// const Search = async ({ searchParams }: SearchProps) => {
+//   const songs = await getSongsByTitleAndAuthor(searchParams.title ?? '', searchParams.author ?? '');
+
 const Search = async ({ searchParams }: SearchProps) => {
-  const songs = await getSongsByTitle(searchParams.title);
+  let songs: any[] = [];
+
+  if (searchParams.title) {
+    songs = await getSongsByTitleOrAuthor(searchParams.title);
+  } else if (searchParams.author) {
+    // Fetch songs by author
+    songs = await getSongsByTitleOrAuthor(searchParams.author || '');
+  }
 
   return (
     <div
