@@ -8,8 +8,8 @@ import ModalProvider from '~/providers/ModalProvider';
 import SupabaseProvider from '~/providers/SupabaseProvider';
 import ToasterProvider from '~/providers/ToasterProvider';
 import UserProvider from '~/providers/UserProvider';
-import getActiveProductsWithPrices from './actions/getActiveProductsWithPrices';
-import getSongsByUserId from './actions/getSongsByUserId';
+import getActiveProductsWithPrices from '~/server/actions/getActiveProductsWithPrices';
+import getSongsByUserId from '~/server/actions/getSongsByUserId';
 
 const font = Figtree({ subsets: ['latin'] });
 
