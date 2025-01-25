@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 
 import { Price, Product } from '~/types';
 import { Database } from '~/types_db';
-import { toDateTime } from './helpers';
+import { toDateTime } from '../utils/helpers';
 import { stripe } from './stripe';
 
 export const supabaseAdmin = createClient<Database>(
