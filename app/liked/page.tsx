@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import Header from '~/components/Header';
 import getLikedSongs from '~/server/actions/getLikedSongs';
-import LikedContent from './components/LikedContent';
+import LikedContent from './_components/LikedContent';
 
 export const revalidate = 0;
 
