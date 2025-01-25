@@ -6,7 +6,7 @@ import { BsPauseFill, BsPlayFill } from 'react-icons/bs';
 import { HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
 import { useSound } from 'use-sound';
 
-import usePlayer from '~/app/hooks/usePlayer';
+import usePlayer from '~/hooks/usePlayer';
 import { Song } from '~/types';
 import LikeButton from './LikeButton';
 import MediaItem from './MediaItem';

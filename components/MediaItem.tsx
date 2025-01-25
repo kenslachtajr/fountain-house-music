@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import useLoadImage from '~/app/hooks/useLoadImage';
+import useLoadImage from '~/hooks/useLoadImage';
 import { Song } from '~/types';
 
 interface MediaItemProps {

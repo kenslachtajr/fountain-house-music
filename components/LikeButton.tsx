@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 
-import useAuthModal from '~/app/hooks/useAuthModal';
-import { useUser } from '~/app/hooks/useUser';
+import useAuthModal from '~/hooks/useAuthModal';
+import { useUser } from '~/hooks/useUser';
 
 interface LikeButtonProps {
   songId: string;

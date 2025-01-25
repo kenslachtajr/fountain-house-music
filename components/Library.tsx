@@ -3,10 +3,10 @@
 import { AiOutlinePlus } from 'react-icons/ai';
 import { TbPlaylist } from 'react-icons/tb';
 
-import useAuthModal from '~/app/hooks/useAuthModal';
-import useOnPlay from '~/app/hooks/useOnPlay';
-import useUploadModal from '~/app/hooks/useUploadModal';
-import { useUser } from '~/app/hooks/useUser';
+import useAuthModal from '~/hooks/useAuthModal';
+import useOnPlay from '~/hooks/useOnPlay';
+import useUploadModal from '~/hooks/useUploadModal';
+import { useUser } from '~/hooks/useUser';
 import { Song } from '~/types';
 import MediaItem from './MediaItem';
 

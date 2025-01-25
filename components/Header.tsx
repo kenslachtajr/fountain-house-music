@@ -9,8 +9,8 @@ import { HiHome } from 'react-icons/hi';
 import { RxCaretLeft, RxCaretRight } from 'react-icons/rx';
 import { twMerge } from 'tailwind-merge';
 
-import useAuthModal from '~/app/hooks/useAuthModal';
-import { useUser } from '~/app/hooks/useUser';
+import useAuthModal from '~/hooks/useAuthModal';
+import { useUser } from '~/hooks/useUser';
 import Button from './Button';
 
 interface HeaderProps {
