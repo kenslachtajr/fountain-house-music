@@ -1,4 +1,4 @@
-import { Song } from '@/types';
+import { Song } from '~/types';
 import useAuthModal from './useAuthModal';
 import usePlayer from './usePlayer';
 import { useUser } from './useUser';

@@ -2,13 +2,12 @@
 
 import { useSessionContext } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/navigation';
-import useAuthModal from '../hooks/useAuthModal';
-import { useUser } from '../hooks/useUser';
 import { useEffect, useState } from 'react';
-import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
-import { supabase } from '@supabase/auth-ui-shared';
 import toast from 'react-hot-toast';
-import { error } from 'console';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+
+import useAuthModal from '~/app/hooks/useAuthModal';
+import { useUser } from '~/app/hooks/useUser';
 
 interface LikeButtonProps {
   songId: string;
@@ -80,7 +79,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ songId }) => {
   };
 
   return (
-    <button onClick={handleLike} className="hover:opacity-75 transition">
+    <button onClick={handleLike} className="transition hover:opacity-75">
       <Icon color={isLiked ? '#0096FF' : 'white'} size={25} />
     </button>
   );

@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 
-import { Song } from '@/types';
-import useLoadImage from '../hooks/useLoadImage';
+import useLoadImage from '~/app/hooks/useLoadImage';
+import { Song } from '~/types';
 
 interface MediaItemProps {
   data: Song;
@@ -22,16 +22,7 @@ const MediaItem: React.FC<MediaItemProps> = ({ data, onClick }) => {
   return (
     <div
       onClick={handleClick}
-      className="
-        flex
-        items-center
-        gap-x-3
-        cursor-pointer
-        hover:bg-neutral-800/50
-        w-full
-        p-2
-        rounded-md
-        "
+      className="flex items-center w-full p-2 rounded-md cursor-pointer  gap-x-3 hover:bg-neutral-800/50"
     >
       <div
         className="
@@ -49,9 +40,9 @@ const MediaItem: React.FC<MediaItemProps> = ({ data, onClick }) => {
           className="object-cover"
         />
       </div>
-      <div className="flex flex-col gap-y-1 overflow-hidden">
+      <div className="flex flex-col overflow-hidden gap-y-1">
         <p className="text-white truncate">{data.title}</p>
-        <p className="text-neutral-400 text-sm truncate">{data.author}</p>
+        <p className="text-sm truncate text-neutral-400">{data.author}</p>
       </div>
     </div>
   );

@@ -1,16 +1,17 @@
 'use client';
 
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { BiSearch } from 'react-icons/bi';
+import { FaUserAlt } from 'react-icons/fa';
 import { HiHome } from 'react-icons/hi';
 import { RxCaretLeft, RxCaretRight } from 'react-icons/rx';
 import { twMerge } from 'tailwind-merge';
+
+import useAuthModal from '~/app/hooks/useAuthModal';
+import { useUser } from '~/app/hooks/useUser';
 import Button from './Button';
-import useAuthModal from '../hooks/useAuthModal';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import { useUser } from '../hooks/useUser';
-import { FaUserAlt } from 'react-icons/fa';
-import toast from 'react-hot-toast';
 
 interface HeaderProps {
   children: React.ReactNode;
@@ -48,63 +49,33 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
         className,
       )}
     >
-      <div className="w-full mb-4 flex items-center justify-between">
-        <div className="hidden md:flex gap-x-2 items-center">
+      <div className="flex items-center justify-between w-full mb-4">
+        <div className="items-center hidden md:flex gap-x-2">
           <button
             onClick={() => router.back()}
-            className="
-                rounded-full 
-                bg-black 
-                flex 
-                items-center 
-                justify-center 
-                hover:opacity-75 
-                transition
-                "
+            className="flex items-center justify-center transition bg-black rounded-full hover:opacity-75"
           >
             <RxCaretLeft className="text-white" size={35} />
           </button>
           <button
             onClick={() => router.back()}
-            className="
-                rounded-full 
-                bg-black 
-                flex 
-                items-center 
-                justify-center 
-                hover:opacity-75 
-                transition
-                "
+            className="flex items-center justify-center transition bg-black rounded-full hover:opacity-75"
           >
             <RxCaretRight className="text-white" size={35} />
           </button>
         </div>
-        <div
-          className="
-            flex 
-            md:hidden 
-            gap-x-2 
-            items-center
-            "
-        >
-          <button className="rounded-full p-2 bg-white flex items-center justify-center hover:opacity-75 transition">
+        <div className="flex items-center md:hidden gap-x-2">
+          <button className="flex items-center justify-center p-2 transition bg-white rounded-full hover:opacity-75">
             <HiHome className="text-black" size={20} />
           </button>
-          <button className="rounded-full p-2 bg-white flex items-center justify-center hover:opacity-75 transition">
+          <button className="flex items-center justify-center p-2 transition bg-white rounded-full hover:opacity-75">
             <BiSearch className="text-black" size={20} />
           </button>
         </div>
-        <div
-          className="
-        flex 
-        justify-between 
-        items-center 
-        gap-x-4
-        "
-        >
+        <div className="flex items-center justify-between gap-x-4">
           {user ? (
-            <div className="flex gap-x-4 items-center">
-              <Button onClick={handleLogout} className="bg-white px-6 py-2">
+            <div className="flex items-center gap-x-4">
+              <Button onClick={handleLogout} className="px-6 py-2 bg-white">
                 Logout
               </Button>
               <Button
@@ -119,11 +90,7 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
               <div>
                 <Button
                   onClick={authModal.onOpen}
-                  className="
-                    bg-tranpsparent 
-                    text-neutral-300 
-                    font-medium
-                    "
+                  className="font-medium bg-tranpsparent text-neutral-300"
                 >
                   Sign Up
                 </Button>
@@ -131,7 +98,7 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
               <div>
                 <Button
                   onClick={authModal.onOpen}
-                  className="bg-white px-6 py-2"
+                  className="px-6 py-2 bg-white"
                 >
                   Log In
                 </Button>

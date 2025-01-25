@@ -1,12 +1,13 @@
 'use client';
 
-import LikeButton from '@/app/components/LikeButton';
-import MediaItem from '@/app/components/MediaItem';
-import useOnPlay from '@/app/hooks/useOnPlay';
-import { useUser } from '@/app/hooks/useUser';
-import { Song } from '@/types';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+
+import useOnPlay from '~/app/hooks/useOnPlay';
+import { useUser } from '~/app/hooks/useUser';
+import LikeButton from '~/components/LikeButton';
+import MediaItem from '~/components/MediaItem';
+import { Song } from '~/types';
 
 interface LikedContentProps {
   songs: Song[];
@@ -26,14 +27,7 @@ const LikedContent: React.FC<LikedContentProps> = ({ songs }) => {
   if (songs.length === 0) {
     return (
       <div
-        className="
-        flex
-        flex-col
-        gap-y-2
-        w-full
-        px-6
-        text-neutral-400
-        "
+        className="flex flex-col w-full px-6  gap-y-2 text-neutral-400"
       >
         No liked songs.
       </div>
@@ -41,9 +35,9 @@ const LikedContent: React.FC<LikedContentProps> = ({ songs }) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-2 w-full p-6">
+    <div className="flex flex-col w-full p-6 gap-y-2">
       {songs.map((song) => (
-        <div key={song.id} className="flex items-center gap-x-4 w-full">
+        <div key={song.id} className="flex items-center w-full gap-x-4">
           <div className="flex-1">
             <MediaItem onClick={(id: string) => onplay(id)} data={song} />
           </div>
