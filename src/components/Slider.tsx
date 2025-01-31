@@ -1,27 +1,24 @@
 'use client';
 
 import * as RadixSlider from '@radix-ui/react-slider';
+import { cn } from '~/lib/cn';
 
 interface SliderProps {
+  className?: string;
   value?: number;
   onChange?: (value: number) => void;
 }
 
-const Slider: React.FC<SliderProps> = ({ value = 1, onChange }) => {
+const Slider: React.FC<SliderProps> = ({ className, value = 1, onChange }) => {
   const handleChange = (newValue: number[]) => {
     onChange?.(newValue[0]);
   };
   return (
     <RadixSlider.Root
-      className="
-        relative
-        flex
-        items-center
-        select-none
-        touch-none
-        w-full
-        h-10
-        "
+      className={cn(
+        'relative flex items-center select-none touch-none w-full h-10',
+        className,
+      )}
       defaultValue={[1]}
       value={[value]}
       onValueChange={handleChange}
@@ -38,14 +35,7 @@ const Slider: React.FC<SliderProps> = ({ value = 1, onChange }) => {
             h-[3px]
             "
       >
-        <RadixSlider.Range
-          className="
-                absolute
-                bg-white
-                rounded-full
-                h-full
-                "
-        />
+        <RadixSlider.Range className="absolute h-full bg-white rounded-full " />
       </RadixSlider.Track>
     </RadixSlider.Root>
   );
