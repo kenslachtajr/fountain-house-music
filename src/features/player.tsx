@@ -6,7 +6,7 @@ import { SimpleSlider } from '~/components/ui/slider';
 import useLoadSongUrl from '~/hooks/useLoadSongUrl';
 import { PlayerControls } from './components/player-controls';
 import { PlayerDetails } from './components/player-details';
-import { PlayerVolume } from './components/player-volume';
+import { PlayerSettings } from './components/player-settings';
 import { useAudioTime } from './hooks/use-audio-time';
 import {
   usePlayerCurrentSongSelect,
@@ -39,7 +39,7 @@ export function PlayerFeature() {
         <div className="grid h-full grid-cols-2 md:grid-cols-3">
           <PlayerDetails />
           <PlayerControls />
-          <PlayerVolume />
+          <PlayerSettings />
         </div>
       </div>
     </div>
