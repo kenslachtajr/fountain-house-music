@@ -2,7 +2,7 @@
 
 import LikeButton from '~/components/LikeButton';
 import MediaItem from '~/components/MediaItem';
-import { usePlayerStore } from '~/features/store/player.store';
+import { usePlayerStoreActions } from '~/features/store/player.store';
 import { Song } from '~/types/types';
 
 interface SearchContentProps {
@@ -10,7 +10,7 @@ interface SearchContentProps {
 }
 
 const SearchContent: React.FC<SearchContentProps> = ({ songs }) => {
-  const { setCurrentSong } = usePlayerStore();
+  const { setCurrentSong } = usePlayerStoreActions();
 
   if (songs.length === 0) {
     return (

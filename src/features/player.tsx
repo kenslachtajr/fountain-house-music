@@ -8,13 +8,16 @@ import { PlayerControls } from './components/player-controls';
 import { PlayerDetails } from './components/player-details';
 import { PlayerVolume } from './components/player-volume';
 import { useAudioTime } from './hooks/use-audio-time';
-import { usePlayerStore } from './store/player.store';
+import {
+  usePlayerCurrentSongSelect,
+  usePlayerStoreActions,
+} from './store/player.store';
 
 export function PlayerFeature() {
   const { load } = useGlobalAudioPlayer();
-  const { nextSong } = usePlayerStore();
+  const { nextSong } = usePlayerStoreActions();
 
-  const currentSong = usePlayerStore((state) => state.currentSong);
+  const currentSong = usePlayerCurrentSongSelect();
   const songUrl = useLoadSongUrl(currentSong);
 
   useEffect(() => {

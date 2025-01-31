@@ -5,7 +5,10 @@ import { useEffect } from 'react';
 
 import LikeButton from '~/components/LikeButton';
 import MediaItem from '~/components/MediaItem';
-import { useSafePlayerStore } from '~/features/hooks/use-safe-player-store';
+import {
+  usePlayerSongsSelect,
+  usePlayerStoreActions,
+} from '~/features/store/player.store';
 import { useUser } from '~/hooks/useUser';
 import { Song } from '~/types/types';
 
@@ -16,8 +19,8 @@ interface LikedContentProps {
 const LikedContent: React.FC<LikedContentProps> = ({ songs: likedSongs }) => {
   const router = useRouter();
   const { isLoading, user } = useUser();
-  const { setCurrentSong, setSongs } = useSafePlayerStore();
-  const { songs } = useSafePlayerStore();
+  const { setCurrentSong, setSongs } = usePlayerStoreActions();
+  const songs = usePlayerSongsSelect();
 
   useEffect(() => {
     if (likedSongs.length > 0) {

@@ -1,11 +1,11 @@
 import { AiFillStepBackward, AiFillStepForward } from 'react-icons/ai';
 import { BsPauseFill, BsPlayFill } from 'react-icons/bs';
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
-import { usePlayerStore } from '../store/player.store';
+import { usePlayerStoreActions } from '../store/player.store';
 
 export function PlayerControls() {
-  const { nextSong, previousSong } = usePlayerStore();
   const { getPosition, seek } = useGlobalAudioPlayer();
+  const { nextSong, previousSong } = usePlayerStoreActions();
 
   const handlePreviousSong = () => {
     const position = getPosition();

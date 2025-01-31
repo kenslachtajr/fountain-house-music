@@ -4,12 +4,12 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import useLoadImage from '~/hooks/useLoadImage';
-import { usePlayerStore } from '../store/player.store';
+import { usePlayerCurrentSongSelect } from '../store/player.store';
 
 export function PlayerDetails() {
   const [isLiked, setIsLiked] = useState(false);
 
-  const currentSong = usePlayerStore((state) => state.currentSong);
+  const currentSong = usePlayerCurrentSongSelect();
   const imagePath = useLoadImage(currentSong);
 
   const Icon = isLiked ? AiFillHeart : AiOutlineHeart;

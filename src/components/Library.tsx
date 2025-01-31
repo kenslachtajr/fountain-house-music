@@ -3,7 +3,7 @@
 import { AiOutlinePlus } from 'react-icons/ai';
 import { TbPlaylist } from 'react-icons/tb';
 
-import { usePlayerStore } from '~/features/store/player.store';
+import { usePlayerStoreActions } from '~/features/store/player.store';
 import useAuthModal from '~/hooks/useAuthModal';
 import useUploadModal from '~/hooks/useUploadModal';
 import { useUser } from '~/hooks/useUser';
@@ -18,7 +18,7 @@ const Library: React.FC<LibraryProps> = ({ songs }) => {
   const authModal = useAuthModal();
   const uploadModal = useUploadModal();
   const { user } = useUser();
-  const { setCurrentSong } = usePlayerStore();
+  const { setCurrentSong } = usePlayerStoreActions();
 
   const onClick = () => {
     if (!user) {

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import SongItem from '~/components/SongItem';
-import { useSafePlayerStore } from '~/features/hooks/use-safe-player-store';
+import { usePlayerStoreActions } from '~/features/store/player.store';
 import { Song } from '~/types/types';
 
 interface PageContentProps {
@@ -10,7 +10,7 @@ interface PageContentProps {
 }
 
 const PageContent: React.FC<PageContentProps> = ({ songs }) => {
-  const { setCurrentSong, setSongs } = useSafePlayerStore();
+  const { setCurrentSong, setSongs } = usePlayerStoreActions();
 
   useEffect(() => {
     setSongs(songs);
