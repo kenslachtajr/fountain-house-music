@@ -6,7 +6,6 @@ import { BiSearch } from 'react-icons/bi';
 import { HiHome } from 'react-icons/hi';
 import { twMerge } from 'tailwind-merge';
 
-import usePlayer from '~/hooks/usePlayer';
 import { Song } from '~/types/types';
 import Box from './Box';
 import Library from './Library';
@@ -19,7 +18,6 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
   const pathname = usePathname();
-  const player = usePlayer();
   const routes = useMemo(
     () => [
       {
@@ -44,8 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
         flex
         h-screen
         overflow-hidden
-       `,
-        player.activeId && 'h-[calc(100vh-80px)]',
+      `,
       )}
     >
       <div className="hidden md:flex flex-col gap-y-2 bg-black h-full w-[300px] p-2 overflow-y-auto">
