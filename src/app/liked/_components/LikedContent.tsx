@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 
 import LikeButton from '~/components/LikeButton';
 import MediaItem from '~/components/MediaItem';
+import { useSetSongsToState } from '~/features/hooks/use-set-songs-to-state';
 import {
   usePlayerSongsSelect,
   usePlayerStoreActions,
@@ -22,11 +23,7 @@ const LikedContent: React.FC<LikedContentProps> = ({ songs: likedSongs }) => {
   const { setCurrentSong, setSongs } = usePlayerStoreActions();
   const songs = usePlayerSongsSelect();
 
-  useEffect(() => {
-    if (likedSongs.length > 0) {
-      setSongs(likedSongs);
-    }
-  }, [likedSongs, setSongs]);
+  useSetSongsToState(likedSongs);
 
   useEffect(() => {
     if (!isLoading && !user) {

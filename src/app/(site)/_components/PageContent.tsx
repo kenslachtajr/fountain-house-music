@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import SongItem from '~/components/SongItem';
+import { useSetSongsToState } from '~/features/hooks/use-set-songs-to-state';
 import { usePlayerStoreActions } from '~/features/store/player.store';
 import { Song } from '~/types/types';
 
@@ -10,11 +10,9 @@ interface PageContentProps {
 }
 
 const PageContent: React.FC<PageContentProps> = ({ songs }) => {
-  const { setCurrentSong, setSongs } = usePlayerStoreActions();
+  const { setCurrentSong } = usePlayerStoreActions();
 
-  useEffect(() => {
-    setSongs(songs);
-  }, [setSongs, songs]);
+  useSetSongsToState(songs);
 
   if (songs.length === 0) {
     return <div className="mt-4 text-neutral-400">No songs available.</div>;
