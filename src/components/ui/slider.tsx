@@ -26,4 +26,30 @@ const Slider = React.forwardRef<
 
 Slider.displayName = SliderPrimitive.Root.displayName;
 
-export { Slider };
+type SimpleSliderProps = Omit<
+  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>,
+  'value' | 'defaultValue' | 'onValueCommit' | 'onValueChange'
+> & {
+  value?: number;
+  defaultValue?: number;
+  onValueCommit?: (value: number) => void;
+  onValueChange?: (value: number) => void;
+};
+
+const SimpleSlider = React.forwardRef<
+  React.ElementRef<typeof SliderPrimitive.Root>,
+  SimpleSliderProps
+>(({ ...props }, ref) => (
+  <Slider
+    ref={ref}
+    {...props}
+    value={props.value ? [props.value] : undefined}
+    defaultValue={props.defaultValue ? [props.defaultValue] : undefined}
+    onValueCommit={([value]) => props.onValueCommit?.(value)}
+    onValueChange={([value]) => props.onValueChange?.(value)}
+  />
+));
+
+SimpleSlider.displayName = `Simple${SliderPrimitive.Root.displayName}`;
+
+export { SimpleSlider, Slider };

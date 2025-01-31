@@ -1,6 +1,6 @@
 import { HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
-import { Slider } from '~/components/ui/slider';
+import { SimpleSlider } from '~/components/ui/slider';
 import { TimeLabel } from './player-time-label';
 
 export function PlayerVolume() {
@@ -18,12 +18,12 @@ export function PlayerVolume() {
           size={34}
           onClick={() => mute(!muted)}
         />
-        <Slider
+        <SimpleSlider
           max={1}
           step={0.1}
-          defaultValue={[1]}
-          value={[muted ? 0 : volume]}
-          onValueChange={([value]) => setVolume(value)}
+          defaultValue={1}
+          value={muted ? 0 : volume}
+          onValueChange={(value) => setVolume(value)}
         />
       </div>
     </div>

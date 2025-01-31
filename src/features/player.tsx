@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
-import { Slider } from '~/components/ui/slider';
+import { SimpleSlider } from '~/components/ui/slider';
 import useLoadSongUrl from '~/hooks/useLoadSongUrl';
 import { PlayerControls } from './components/player-controls';
 import { PlayerDetails } from './components/player-details';
@@ -51,16 +51,16 @@ function SeekSlider() {
   const { duration, pause, seek, togglePlayPause } = useGlobalAudioPlayer();
 
   return (
-    <Slider
+    <SimpleSlider
       max={100}
       step={0.1}
       minStepsBetweenThumbs={1}
-      defaultValue={[1]}
-      value={[(time / duration) * 100]}
+      defaultValue={1}
+      value={(time / duration) * 100}
       onValueCommit={togglePlayPause}
-      onValueChange={([val]) => {
+      onValueChange={(value) => {
         pause();
-        seek(val * (duration / 100));
+        seek(value * (duration / 100));
       }}
     />
   );
