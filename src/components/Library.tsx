@@ -3,8 +3,8 @@
 import { AiOutlinePlus } from 'react-icons/ai';
 import { TbPlaylist } from 'react-icons/tb';
 
+import { usePlayerStoreActions } from '~/features/store/player.store';
 import useAuthModal from '~/hooks/useAuthModal';
-import useOnPlay from '~/hooks/useOnPlay';
 import useUploadModal from '~/hooks/useUploadModal';
 import { useUser } from '~/hooks/useUser';
 import { Song } from '~/types/types';
@@ -18,7 +18,7 @@ const Library: React.FC<LibraryProps> = ({ songs }) => {
   const authModal = useAuthModal();
   const uploadModal = useUploadModal();
   const { user } = useUser();
-  const onPlay = useOnPlay(songs);
+  const { setCurrentSong } = usePlayerStoreActions();
 
   const onClick = () => {
     if (!user) {
@@ -26,7 +26,6 @@ const Library: React.FC<LibraryProps> = ({ songs }) => {
     }
 
     // TODO: Check for subscription
-
     return uploadModal.onOpen();
   };
 
@@ -45,11 +44,7 @@ const Library: React.FC<LibraryProps> = ({ songs }) => {
       </div>
       <div className="flex flex-col px-3 mt-4 gap-y-2">
         {songs.map((item) => (
-          <MediaItem
-            onClick={(id: string) => onPlay(id)}
-            key={item.id}
-            data={item}
-          />
+          <MediaItem onClick={setCurrentSong} key={item.id} data={item} />
         ))}
       </div>
     </div>

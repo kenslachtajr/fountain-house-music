@@ -5,7 +5,11 @@ import { useEffect } from 'react';
 
 import LikeButton from '~/components/LikeButton';
 import MediaItem from '~/components/MediaItem';
-import useOnPlay from '~/hooks/useOnPlay';
+import { useSetSongsToState } from '~/features/hooks/use-set-songs-to-state';
+import {
+  usePlayerSongsSelect,
+  usePlayerStoreActions,
+} from '~/features/store/player.store';
 import { useUser } from '~/hooks/useUser';
 import { Song } from '~/types/types';
 
@@ -13,10 +17,13 @@ interface LikedContentProps {
   songs: Song[];
 }
 
-const LikedContent: React.FC<LikedContentProps> = ({ songs }) => {
+const LikedContent: React.FC<LikedContentProps> = ({ songs: likedSongs }) => {
   const router = useRouter();
   const { isLoading, user } = useUser();
-  const onplay = useOnPlay(songs);
+  const { setCurrentSong, setSongs } = usePlayerStoreActions();
+  const songs = usePlayerSongsSelect();
+
+  useSetSongsToState(likedSongs);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -37,7 +44,7 @@ const LikedContent: React.FC<LikedContentProps> = ({ songs }) => {
       {songs.map((song) => (
         <div key={song.id} className="flex items-center w-full gap-x-4">
           <div className="flex-1">
-            <MediaItem onClick={(id: string) => onplay(id)} data={song} />
+            <MediaItem onClick={setCurrentSong} data={song} />
           </div>
           <LikeButton songId={song.id} />
         </div>

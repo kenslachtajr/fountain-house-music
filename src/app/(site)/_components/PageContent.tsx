@@ -1,7 +1,8 @@
 'use client';
 
 import SongItem from '~/components/SongItem';
-import useOnPlay from '~/hooks/useOnPlay';
+import { useSetSongsToState } from '~/features/hooks/use-set-songs-to-state';
+import { usePlayerStoreActions } from '~/features/store/player.store';
 import { Song } from '~/types/types';
 
 interface PageContentProps {
@@ -9,7 +10,9 @@ interface PageContentProps {
 }
 
 const PageContent: React.FC<PageContentProps> = ({ songs }) => {
-  const onPlay = useOnPlay(songs);
+  const { setCurrentSong } = usePlayerStoreActions();
+
+  useSetSongsToState(songs);
 
   if (songs.length === 0) {
     return <div className="mt-4 text-neutral-400">No songs available.</div>;
@@ -17,11 +20,7 @@ const PageContent: React.FC<PageContentProps> = ({ songs }) => {
   return (
     <div className="grid grid-cols-2 gap-4 mt-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-8">
       {songs.map((item) => (
-        <SongItem
-          key={item.id}
-          onClick={(id: string) => onPlay(id)}
-          data={item}
-        />
+        <SongItem key={item.id} onClick={setCurrentSong} data={item} />
       ))}
     </div>
   );

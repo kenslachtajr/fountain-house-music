@@ -7,7 +7,7 @@ import { Song } from '~/types/types';
 
 interface MediaItemProps {
   data: Song;
-  onClick?: (id: string) => void;
+  onClick?: (song: Song) => void;
 }
 
 const MediaItem: React.FC<MediaItemProps> = ({ data, onClick }) => {
@@ -15,7 +15,7 @@ const MediaItem: React.FC<MediaItemProps> = ({ data, onClick }) => {
 
   const handleClick = () => {
     if (onClick) {
-      return onClick(data.id);
+      return onClick(data);
     }
     // TODO: Default turn on player
   };
