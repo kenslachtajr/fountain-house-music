@@ -38,7 +38,7 @@ export function PlayerSettings() {
           defaultValue={1}
           value={muted ? prevVolume : volume}
           onValueChange={(value) => {
-            setPrevVolume(value || 1);
+            setPrevVolume(value || 0);
             setVolume(value);
           }}
         />
