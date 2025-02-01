@@ -1,5 +1,20 @@
 import Stripe from 'stripe';
 
+export type Album = SupaAlbum & {
+  duration: number;
+  songs_count: number;
+};
+
+export interface SupaAlbum {
+  id: string;
+  name: string;
+  author: string;
+  image_path?: string;
+  release_date?: string;
+  created_at: string;
+  songs: Song[];
+}
+
 export interface Song {
   id: string;
   user_id: string;
@@ -7,6 +22,7 @@ export interface Song {
   title: string;
   song_path: string;
   image_path: string;
+  duration: number;
 }
 
 export interface UserDetails {
