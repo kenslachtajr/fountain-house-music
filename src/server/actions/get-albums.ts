@@ -20,7 +20,7 @@ export const getAlbums = async () => {
   return (albums || []).map(convertToAlbum);
 };
 
-function convertToAlbum(album: SupaAlbum): Album {
+export function convertToAlbum(album: SupaAlbum): Album {
   return {
     ...album,
     duration: album.songs.reduce((acc, song) => acc + song.duration, 0),
