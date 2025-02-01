@@ -11,16 +11,12 @@ interface SearchProps {
 }
 export const revalidate = 0;
 
-// const Search = async ({ searchParams }: SearchProps) => {
-//   const songs = await getSongsByTitleAndAuthor(searchParams.title ?? '', searchParams.author ?? '');
-
-const Search = async ({ searchParams }: SearchProps) => {
+export default async function Search({ searchParams }: SearchProps) {
   let songs: any[] = [];
 
   if (searchParams.title) {
     songs = await getSongsByTitleOrAuthor(searchParams.title);
   } else if (searchParams.author) {
-    // Fetch songs by author
     songs = await getSongsByTitleOrAuthor(searchParams.author || '');
   }
 
@@ -35,6 +31,4 @@ const Search = async ({ searchParams }: SearchProps) => {
       <SearchContent songs={songs} />
     </div>
   );
-};
-
-export default Search;
+}

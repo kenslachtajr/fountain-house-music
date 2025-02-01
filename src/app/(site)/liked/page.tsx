@@ -6,8 +6,9 @@ import LikedContent from './_components/LikedContent';
 
 export const revalidate = 0;
 
-const Liked = async () => {
+export default async function Liked() {
   const songs = await getLikedSongs();
+
   return (
     <div className="w-full h-full overflow-hidden overflow-y-auto rounded-lg bg-neutral-900">
       <Header>
@@ -33,6 +34,4 @@ const Liked = async () => {
       <LikedContent songs={songs} />
     </div>
   );
-};
-
-export default Liked;
+}

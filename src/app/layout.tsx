@@ -3,6 +3,7 @@ import './globals.css';
 
 import { Figtree } from 'next/font/google';
 
+import { PropsWithChildren } from 'react';
 import Sidebar from '~/components/Sidebar';
 import { PlayerFeature } from '~/features/player';
 import ModalProvider from '~/providers/ModalProvider';
@@ -59,11 +60,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 0;
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: PropsWithChildren) {
   const userSongs = await getSongsByUserId();
   const products = await getActiveProductsWithPrices();
 
