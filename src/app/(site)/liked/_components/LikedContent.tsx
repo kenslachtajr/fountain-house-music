@@ -5,11 +5,11 @@ import { useEffect } from 'react';
 
 import LikeButton from '~/components/LikeButton';
 import MediaItem from '~/components/MediaItem';
-import { useSetSongsToState } from '~/features/hooks/use-set-songs-to-state';
+import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import {
   usePlayerSongsSelect,
   usePlayerStoreActions,
-} from '~/features/store/player.store';
+} from '~/features/player/store/player.store';
 import { useUser } from '~/hooks/useUser';
 import { Song } from '~/types/types';
 

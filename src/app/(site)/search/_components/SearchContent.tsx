@@ -2,7 +2,7 @@
 
 import LikeButton from '~/components/LikeButton';
 import MediaItem from '~/components/MediaItem';
-import { usePlayerStoreActions } from '~/features/store/player.store';
+import { usePlayerStoreActions } from '~/features/player/store/player.store';
 import { Song } from '~/types/types';
 
 interface SearchContentProps {

@@ -5,7 +5,7 @@ import { Figtree } from 'next/font/google';
 
 import { PropsWithChildren } from 'react';
 import Sidebar from '~/components/Sidebar';
-import { PlayerFeature } from '~/features/player';
+import { PlayerFeature } from '~/features/player/player';
 import ModalProvider from '~/providers/ModalProvider';
 import SupabaseProvider from '~/providers/SupabaseProvider';
 import ToasterProvider from '~/providers/ToasterProvider';

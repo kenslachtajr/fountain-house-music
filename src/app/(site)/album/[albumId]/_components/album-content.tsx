@@ -2,8 +2,8 @@
 
 import LikeButton from '~/components/LikeButton';
 import MediaItem from '~/components/MediaItem';
-import { useSetSongsToState } from '~/features/hooks/use-set-songs-to-state';
-import { usePlayerStoreActions } from '~/features/store/player.store';
+import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
+import { usePlayerStoreActions } from '~/features/player/store/player.store';
 import { Song } from '~/types/types';
 
 interface AlbumContentProps {
