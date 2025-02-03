@@ -56,8 +56,25 @@ export function AlbumCard({ album, onPlayAlbum }: AlbumCardProps) {
   );
 }
 
-function formatDuration(seconds: number) {
-  const minutes = Math.floor(seconds / 60);
+function formatDuration(seconds: number): string {
+  if (seconds < 0) return '--';
+
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+
+  if (seconds < 60) {
+    return `0:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+
+  if (seconds < 3600) {
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+
+  if (seconds < 86400) {
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  }
+
+  return `${days}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
 }
