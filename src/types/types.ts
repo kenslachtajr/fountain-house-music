@@ -1,29 +1,56 @@
 import Stripe from 'stripe';
+import { Tables } from './supabase';
 
-export type Album = SupaAlbum & {
-  duration: number;
-  songs_count: number;
-};
+// supabase types
+export type SupaAlbum = Tables<'albums'>;
+export type SupaAlbumWithSongs = Prettify<
+  SupaAlbum & {
+    songs: SupaSong[];
+  }
+>;
 
-export interface SupaAlbum {
-  id: string;
-  name: string;
-  author: string;
-  image_path?: string;
-  release_date?: string;
-  created_at: string;
-  songs: Song[];
-}
+export type SupaCustomer = Tables<'customers'>;
+export type SupaLikedSong = Tables<'liked_songs'>;
+export type SupaPrice = Tables<'prices'>;
+export type SupaProduct = Tables<'products'>;
+export type SupaSong = Tables<'songs'>;
+export type SupaSubscription = Tables<'subscriptions'>;
+export type SupaUser = Tables<'users'>;
 
-export interface Song {
-  id: string;
-  user_id: string;
-  author: string;
-  title: string;
-  song_path: string;
-  image_path: string;
-  duration: number;
-}
+// client types
+export type Album = Prettify<
+  SupaAlbumWithSongs & {
+    duration: number;
+    songs_count: number;
+  }
+>;
+
+export type Song = SupaSong;
+
+export type Product = SupaProduct;
+
+export type Price = Prettify<
+  Omit<SupaPrice, 'interval' | 'metadata' | 'products' | 'type'> & {
+    interval?: Stripe.Price.Recurring.Interval;
+    metadata?: Stripe.Metadata;
+    products?: Product;
+    type?: Stripe.Price.Type;
+  }
+>;
+
+export type ProductWithPrice = Prettify<
+  Product & {
+    prices?: Price[];
+  }
+>;
+
+export type Subscription = Prettify<
+  Omit<SupaSubscription, 'metadata' | 'status'> & {
+    metadata?: Stripe.Metadata;
+    status?: Stripe.Subscription.Status;
+    prices?: Price;
+  }
+>;
 
 export interface UserDetails {
   id: string;
@@ -33,51 +60,9 @@ export interface UserDetails {
   avatar_url?: string;
   billing_address?: Stripe.Address;
   payment_method?: Stripe.PaymentMethod[Stripe.PaymentMethod.Type];
+  role: 'admin' | 'user';
 }
 
-export interface Product {
-  id: string;
-  active?: boolean;
-  name?: string;
-  description?: string;
-  image?: string;
-  metadata?: Stripe.Metadata;
-}
-
-export interface Price {
-  id: string;
-  product_id?: string;
-  active?: boolean;
-  description?: string;
-  unit_amount?: number;
-  currency?: string;
-  type?: Stripe.Price.Type;
-  interval?: Stripe.Price.Recurring.Interval;
-  interval_count?: number;
-  trial_period_days?: number | null;
-  metadata?: Stripe.Metadata;
-  products?: Product;
-}
-
-export interface ProductWithPrice extends Product {
-  prices?: Price[];
-}
-
-export interface Subscription {
-  id: string;
-  user_id: string;
-  status?: Stripe.Subscription.Status;
-  metadata?: Stripe.Metadata;
-  price_id?: string;
-  quantity?: number;
-  cancel_at_period_end?: boolean;
-  created: string;
-  current_period_start: string;
-  current_period_end: string;
-  ended_at?: string;
-  cancel_at?: string;
-  canceled_at?: string;
-  trial_start?: string;
-  trial_end?: string;
-  prices?: Price;
-}
+type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};

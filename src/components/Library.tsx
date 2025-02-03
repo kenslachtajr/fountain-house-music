@@ -17,7 +17,7 @@ interface LibraryProps {
 const Library: React.FC<LibraryProps> = ({ songs }) => {
   const authModal = useAuthModal();
   const uploadModal = useUploadModal();
-  const { user } = useUser();
+  const { user, userDetails } = useUser();
   const { setCurrentSong } = usePlayerStoreActions();
 
   const onClick = () => {
@@ -28,6 +28,8 @@ const Library: React.FC<LibraryProps> = ({ songs }) => {
     // TODO: Check for subscription
     return uploadModal.onOpen();
   };
+
+  if (!userDetails || userDetails.role === 'user') return null;
 
   return (
     <div className="flex flex-col">

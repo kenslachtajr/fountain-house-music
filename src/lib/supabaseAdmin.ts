@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 
+import { Database } from '~/types/supabase';
 import { Price, Product } from '~/types/types';
-import { Database } from '~/types/types_db';
 import { toDateTime } from '../utils/helpers';
 import { stripe } from './stripe';
 
@@ -16,7 +16,7 @@ const upsertProductRecord = async (product: Stripe.Product) => {
     id: product.id,
     active: product.active,
     name: product.name,
-    description: product.description ?? undefined,
+    description: product.description,
     image: product.images?.[0] ?? null,
     metadata: product.metadata,
   };
@@ -36,12 +36,12 @@ const upsertPriceRecord = async (price: Stripe.Price) => {
     product_id: typeof price.product === 'string' ? price.product : '',
     active: price.active,
     currency: price.currency,
-    description: price.nickname ?? undefined,
+    description: price.nickname,
     type: price.type,
-    unit_amount: price.unit_amount ?? undefined,
+    unit_amount: price.unit_amount,
     interval: price.recurring?.interval,
-    interval_count: price.recurring?.interval_count,
-    trial_period_days: price.recurring?.trial_period_days,
+    interval_count: price.recurring?.interval_count ?? null,
+    trial_period_days: price.recurring?.trial_period_days ?? null,
     metadata: price.metadata,
   };
 

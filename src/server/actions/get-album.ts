@@ -1,10 +1,11 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { SupaAlbum } from '~/types/types';
+import { Database } from '~/types/supabase';
+import { SupaAlbumWithSongs } from '~/types/types';
 import { convertToAlbum } from './get-albums';
 
 export const getAlbum = async (id: string) => {
-  const supabase = createServerComponentClient({
+  const supabase = createServerComponentClient<Database>({
     cookies,
   });
 
@@ -12,7 +13,7 @@ export const getAlbum = async (id: string) => {
     .from('albums')
     .select('*, songs(*)')
     .eq('id', id)
-    .returns<SupaAlbum[]>()
+    .returns<SupaAlbumWithSongs[]>()
     .single();
 
   if (error) {
