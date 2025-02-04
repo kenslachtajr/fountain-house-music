@@ -22,5 +22,8 @@ export const getAlbum = async (id: string) => {
 
   if (!data) return null;
 
-  return convertToAlbum(data);
+  return {
+    ...convertToAlbum(data),
+    // songs: data.songs.sort((a, b) => a.created_at.localeCompare(b.created_at)),
+  };
 };
