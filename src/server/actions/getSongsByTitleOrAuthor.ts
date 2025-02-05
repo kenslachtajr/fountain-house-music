@@ -13,14 +13,15 @@ const getSongsByTitleOrAuthor = async (searchTerm: string): Promise<Song[]> => {
     .select('*')
     .or(`title.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%`)
     .order('created_at', { ascending: false })
-    .limit(20);
+    .limit(20)
+    .returns<Song[]>();
 
   if (error) {
     console.error('Error fetching songs:', error);
     return [];
   }
 
-  return data as Song[];
+  return data;
 };
 
 export default getSongsByTitleOrAuthor;

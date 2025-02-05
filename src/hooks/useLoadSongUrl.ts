@@ -4,9 +4,10 @@ import { Song } from '~/types/types';
 const useLoadSongUrl = (song?: Song) => {
   const supabaseClient = useSupabaseClient();
 
-  if (!song) {
+  if (!song?.song_path) {
     return '';
   }
+
   const { data: songData } = supabaseClient.storage
     .from('songs')
     .getPublicUrl(song.song_path);

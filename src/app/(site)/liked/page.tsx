@@ -6,13 +6,14 @@ import LikedContent from './_components/LikedContent';
 
 export const revalidate = 0;
 
-const Liked = async () => {
+export default async function Liked() {
   const songs = await getLikedSongs();
+
   return (
     <div className="w-full h-full overflow-hidden overflow-y-auto rounded-lg bg-neutral-900">
       <Header>
         <div className="mt-20">
-          <div className="flex flex-col items-center md:flew-row gap-x-5">
+          <div className="flex flex-col items-center md:flex-row gap-x-5">
             <div className="relative w-32 h-32 lg:h-44 lg:w-44">
               <Image
                 fill
@@ -33,6 +34,4 @@ const Liked = async () => {
       <LikedContent songs={songs} />
     </div>
   );
-};
-
-export default Liked;
+}

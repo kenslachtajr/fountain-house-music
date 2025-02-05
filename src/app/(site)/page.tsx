@@ -1,14 +1,12 @@
 import Header from '~/components/Header';
 import ListItem from '~/components/ListItem';
-import getSongs from '~/server/actions/getSongs';
+import { getAlbums } from '~/server/actions/get-albums';
 import PageContent from './_components/PageContent';
 
 export const revalidate = 0;
 
 export default async function Home() {
-  const songs = await getSongs();
-
-  // throw new Error("Test");
+  const albums = await getAlbums();
 
   return (
     <div className="w-full h-full overflow-hidden overflow-y-auto rounded-lg bg-neutral-900">
@@ -28,9 +26,9 @@ export default async function Home() {
       </Header>
       <div className="px-6 mt-2 mb-7">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-white">Newest Songs!</h1>
+          <h1 className="text-2xl font-semibold text-white">Newest Albums!</h1>
         </div>
-        <PageContent songs={songs} />
+        <PageContent albums={albums} />
       </div>
     </div>
   );

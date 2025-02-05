@@ -1,26 +1,31 @@
 'use client';
 
-import SongItem from '~/components/SongItem';
-import { useSetSongsToState } from '~/features/hooks/use-set-songs-to-state';
-import { usePlayerStoreActions } from '~/features/store/player.store';
-import { Song } from '~/types/types';
+import { AlbumCard } from '~/components/album-card';
+import { usePlayerStoreActions } from '~/features/player/store/player.store';
+import { Album } from '~/types/types';
 
 interface PageContentProps {
-  songs: Song[];
+  albums: Album[];
 }
 
-const PageContent: React.FC<PageContentProps> = ({ songs }) => {
-  const { setCurrentSong } = usePlayerStoreActions();
+const PageContent: React.FC<PageContentProps> = ({ albums }) => {
+  const { setCurrentSong, setSongs } = usePlayerStoreActions();
 
-  useSetSongsToState(songs);
-
-  if (songs.length === 0) {
-    return <div className="mt-4 text-neutral-400">No songs available.</div>;
+  if (albums.length === 0) {
+    return <div className="mt-4 text-neutral-400">No albums available.</div>;
   }
+
   return (
-    <div className="grid grid-cols-2 gap-4 mt-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-8">
-      {songs.map((item) => (
-        <SongItem key={item.id} onClick={setCurrentSong} data={item} />
+    <div className="grid grid-cols-2 gap-4 mt-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
+      {albums.map((album) => (
+        <AlbumCard
+          key={album.id}
+          album={album}
+          onPlayAlbum={() => {
+            setSongs(album.songs);
+            setCurrentSong(album.songs[0]);
+          }}
+        />
       ))}
     </div>
   );
