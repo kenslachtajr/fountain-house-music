@@ -1,10 +1,10 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { Database } from '~/types/supabase';
-import { SupaAlbumWithSongs } from '~/types/types';
+import { Album, SupaAlbumWithSongs } from '~/types/types';
 import { convertToAlbum } from './get-albums';
 
-export const getAlbum = async (id: string) => {
+export const getAlbum = async (id: string): Promise<Album | null> => {
   const supabase = createServerComponentClient<Database>({
     cookies,
   });

@@ -2,6 +2,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { Database } from '~/types/supabase';
 import { Album, SupaAlbumWithSongs } from '~/types/types';
+import { formatDuration } from '~/utils/format-duration';
 
 export const getAlbums = async () => {
   const supabase = createServerComponentClient<Database>({
@@ -22,9 +23,15 @@ export const getAlbums = async () => {
 };
 
 export function convertToAlbum(album: SupaAlbumWithSongs): Album {
+  const duration = album.songs.reduce(
+    (acc, song) => acc + (song.duration ?? 0),
+    0,
+  );
+
   return {
     ...album,
-    duration: album.songs.reduce((acc, song) => acc + (song.duration ?? 0), 0),
+    duration: formatDuration(duration),
+    readable_duration: formatDuration(duration, true),
     songs_count: album.songs?.length || 0,
   };
 }

@@ -6,6 +6,8 @@ import { BiSearch } from 'react-icons/bi';
 import { HiHome } from 'react-icons/hi';
 import { twMerge } from 'tailwind-merge';
 
+import { usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
+import { cn } from '~/lib/cn';
 import { Song } from '~/types/types';
 import Box from './Box';
 import Library from './Library';
@@ -17,6 +19,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
+  const currentSong = usePlayerCurrentSongSelect();
   const pathname = usePathname();
   const routes = useMemo(
     () => [
@@ -57,7 +60,14 @@ const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
           <Library songs={songs} />
         </Box>
       </div>
-      <main className="flex-1 h-full py-2 overflow-y-auto">{children}</main>
+      <main
+        className={cn(
+          'flex-1 h-full py-2 overflow-y-auto',
+          currentSong ? 'h-[calc(100%-64px)]' : 'h-full',
+        )}
+      >
+        {children}
+      </main>
     </div>
   );
 };

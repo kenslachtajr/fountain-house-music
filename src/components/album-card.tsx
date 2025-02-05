@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { BiDisc } from 'react-icons/bi';
 import useLoadImage from '~/hooks/useLoadImage';
 import { Album } from '~/types/types';
+import { formatDate } from '~/utils/format-date';
 import PlayButton from './PlayButton';
 
 interface AlbumCardProps {
@@ -13,10 +14,7 @@ interface AlbumCardProps {
 
 export function AlbumCard({ album, onPlayAlbum }: AlbumCardProps) {
   const imageUrl = useLoadImage(album);
-  const releaseDate = new Date(album.release_date!).toLocaleDateString(
-    'en-US',
-    { year: 'numeric' },
-  );
+  const releaseDate = formatDate(album.release_date!, { year: 'numeric' });
 
   const handlePlayAlbum = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -41,40 +39,20 @@ export function AlbumCard({ album, onPlayAlbum }: AlbumCardProps) {
           </p>
           <span className="inline-flex justify-between w-full text-gray-500">
             <span className="text-xs font-semibold truncate">
-              {formatDuration(album.duration)} &middot; {releaseDate}
+              {album.duration} &middot; {releaseDate}
             </span>
             <span className="inline-flex items-center gap-1 text-xs font-semibold truncate">
               <BiDisc /> {album.songs_count} songs
             </span>
           </span>
         </div>
-        <div className="absolute bottom-24 right-5" onClick={handlePlayAlbum}>
+        <div
+          className="absolute hidden bottom-24 right-5 md:block"
+          onClick={handlePlayAlbum}
+        >
           <PlayButton />
         </div>
       </div>
     </Link>
   );
-}
-
-function formatDuration(seconds: number): string {
-  if (seconds < 0) return '--';
-
-  const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
-
-  if (seconds < 60) {
-    return `0:${remainingSeconds.toString().padStart(2, '0')}`;
-  }
-
-  if (seconds < 3600) {
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  }
-
-  if (seconds < 86400) {
-    return `${hours}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-  }
-
-  return `${days}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
 }

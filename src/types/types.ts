@@ -20,7 +20,8 @@ export type SupaUser = Tables<'users'>;
 // client types
 export type Album = Prettify<
   SupaAlbumWithSongs & {
-    duration: number;
+    duration: number | string;
+    readable_duration: string;
     songs_count: number;
   }
 >;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { BiSearch } from 'react-icons/bi';
@@ -39,15 +40,7 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
 
   return (
     <div
-      className={twMerge(
-        `
-    h-fit
-    bg-gradient-to-b
-    from-blue-800
-    p-6
-    `,
-        className,
-      )}
+      className={twMerge(`h-fit bg-gradient-to-b from-blue-800 p-6`, className)}
     >
       <div className="flex items-center justify-between w-full mb-4">
         <div className="items-center hidden md:flex gap-x-2">
@@ -58,19 +51,23 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
             <RxCaretLeft className="text-white" size={35} />
           </button>
           <button
-            onClick={() => router.back()}
+            onClick={() => router.forward()}
             className="flex items-center justify-center transition bg-black rounded-full hover:opacity-75"
           >
             <RxCaretRight className="text-white" size={35} />
           </button>
         </div>
         <div className="flex items-center md:hidden gap-x-2">
-          <button className="flex items-center justify-center p-2 transition bg-white rounded-full hover:opacity-75">
-            <HiHome className="text-black" size={20} />
-          </button>
-          <button className="flex items-center justify-center p-2 transition bg-white rounded-full hover:opacity-75">
-            <BiSearch className="text-black" size={20} />
-          </button>
+          <Link href="/">
+            <button className="flex items-center justify-center p-2 transition bg-white rounded-full hover:opacity-75">
+              <HiHome className="text-black" size={20} />
+            </button>
+          </Link>
+          <Link href="/search">
+            <button className="flex items-center justify-center p-2 transition bg-white rounded-full hover:opacity-75">
+              <BiSearch className="text-black" size={20} />
+            </button>
+          </Link>
         </div>
         <div className="flex items-center justify-between gap-x-4">
           {user ? (

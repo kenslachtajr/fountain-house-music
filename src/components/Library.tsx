@@ -3,7 +3,6 @@
 import { AiOutlinePlus } from 'react-icons/ai';
 import { TbPlaylist } from 'react-icons/tb';
 
-import { usePlayerStoreActions } from '~/features/player/store/player.store';
 import useAuthModal from '~/hooks/useAuthModal';
 import useUploadModal from '~/hooks/useUploadModal';
 import { useUser } from '~/hooks/useUser';
@@ -18,7 +17,6 @@ const Library: React.FC<LibraryProps> = ({ songs }) => {
   const authModal = useAuthModal();
   const uploadModal = useUploadModal();
   const { user, userDetails } = useUser();
-  const { setCurrentSong } = usePlayerStoreActions();
 
   const onClick = () => {
     if (!user) {
@@ -46,7 +44,7 @@ const Library: React.FC<LibraryProps> = ({ songs }) => {
       </div>
       <div className="flex flex-col px-3 mt-4 gap-y-2">
         {songs.map((item) => (
-          <MediaItem onClick={setCurrentSong} key={item.id} data={item} />
+          <MediaItem key={item.id} data={item} />
         ))}
       </div>
     </div>
