@@ -1,7 +1,7 @@
 'use client';
 
 import { useIsMounted } from '~/hooks/use-is-mounted';
-import { AccountProfile } from './profile/account-profile';
+import { AccountProfile } from './account-profile';
 import { SubscriptionBilling } from './subscription-billing';
 
 export function AccountSections() {

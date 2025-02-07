@@ -82,15 +82,20 @@ export function AccountProfile() {
         `Some updates failed: ${failed.map((f) => f.message).join(', ')}`,
       );
     }
+
+    form.reset({
+      email: form.getValues('email'),
+      full_name: form.getValues('full_name'),
+    });
   };
 
   useEffect(() => {
     // ! Super jank
     const userFullName = user.userDetails?.full_name || '';
     const userEmail = user.user?.email || '';
-    const hasNoUserState = !(userFullName || userEmail);
+    const hasNoUserState = !userFullName || !userEmail;
 
-    if (userFullNameSet.current && hasNoUserState) return;
+    if (userFullNameSet.current || hasNoUserState) return;
 
     form.reset({ full_name: userFullName, email: userEmail });
 
