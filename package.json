@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-label": "^2.1.1",
     "@radix-ui/react-slider": "^1.2.0",
     "@serwist/next": "^9.0.11",
     "@stripe/stripe-js": "^4.0.0",
