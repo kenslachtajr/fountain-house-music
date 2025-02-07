@@ -1,7 +1,7 @@
 import { AiFillStepBackward, AiFillStepForward } from 'react-icons/ai';
-import { BsPauseFill, BsPlayFill } from 'react-icons/bs';
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
 import { usePlayerStoreActions } from '../store/player.store';
+import { HiPause, HiPlay } from 'react-icons/hi';
 
 export function PlayerControls() {
   const { getPosition, seek } = useGlobalAudioPlayer();
@@ -27,17 +27,19 @@ export function PlayerControls() {
 
       {/* Desktop controls */}
       <div className="hidden h-full md:flex justify-center items-center w-full max-w-[722px] gap-x-6">
-        <AiFillStepBackward
-          onClick={handlePreviousSong}
-          size={30}
-          className="transition cursor-pointer text-neutral-400 hover:text-white"
-        />
+        <button aria-label="navigate to previous song" onClick={handlePreviousSong}>
+          <AiFillStepBackward
+            size={30}
+            className="transition cursor-pointer text-neutral-400 hover:text-white"
+          />
+        </button>
         <PlayIcon />
-        <AiFillStepForward
-          onClick={nextSong}
-          size={30}
-          className="transition cursor-pointer text-neutral-400 hover:text-white"
-        />
+        <button aria-label="navigate to next song" onClick={nextSong}>
+          <AiFillStepForward
+            size={30}
+            className="transition cursor-pointer text-neutral-400 hover:text-white"
+          />
+        </button>
       </div>
     </>
   );
@@ -45,15 +47,11 @@ export function PlayerControls() {
 
 function PlayIcon() {
   const { pause, play, playing } = useGlobalAudioPlayer();
-  const Icon = playing ? BsPauseFill : BsPlayFill;
+  const Icon = playing ? HiPause : HiPlay;
 
   return (
-    <div className="flex items-center justify-center w-10 h-10 p-1 bg-white rounded-full cursor-pointer ">
-      <Icon
-        onClick={() => (playing ? pause() : play())}
-        size={30}
-        className="text-black"
-      />
-    </div>
+    <button aria-label="control play and pause button" onClick={() => (playing ? pause() : play())}>
+      <Icon size={50} />
+    </button>
   );
 }
