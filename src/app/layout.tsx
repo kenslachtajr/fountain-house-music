@@ -6,6 +6,7 @@ import { Figtree } from 'next/font/google';
 import { PropsWithChildren } from 'react';
 import Sidebar from '~/components/Sidebar';
 import { PlayerFeature } from '~/features/player/player';
+import { cn } from '~/lib/cn';
 import ModalProvider from '~/providers/ModalProvider';
 import SupabaseProvider from '~/providers/SupabaseProvider';
 import ToasterProvider from '~/providers/ToasterProvider';
@@ -67,7 +68,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
       <head />
-      <body className={font.className}>
+      <body className={cn('dark', font.className)}>
         <ToasterProvider />
         <SupabaseProvider>
           <UserProvider>
