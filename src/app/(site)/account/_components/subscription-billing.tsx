@@ -14,8 +14,8 @@ export function SubscriptionBilling() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Profile Information</CardTitle>
-        <CardDescription>Update your profile information</CardDescription>
+        <CardTitle>Subscription Billing</CardTitle>
+        <CardDescription>Manage your subscription</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
