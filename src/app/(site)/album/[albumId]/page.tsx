@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Header from '~/components/Header';
-import { getAlbum } from '~/server/actions/get-album';
+import { getAlbumAction } from '~/server/actions/album/get-album';
 import { Album } from '~/types/types';
 import { formatDate } from '~/utils/format-date';
 import { AlbumContent } from './_components/album-content';
@@ -15,7 +15,7 @@ interface AlbumProps {
 export const revalidate = 0;
 
 export default async function AlbumPage({ params }: AlbumProps) {
-  const album = await getAlbum(params.albumId);
+  const album = await getAlbumAction(params.albumId);
 
   if (!album) {
     notFound();

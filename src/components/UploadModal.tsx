@@ -4,13 +4,14 @@ import uniqid from 'uniqid';
 
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
+import { useAsync } from '~/hooks/use-async';
 import useUploadModal from '~/hooks/useUploadModal';
-import { useUser } from '~/hooks/useUser';
+import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
+import { createClient } from '~/utils/supabase/client';
 import Button from './Button';
 import Input from './Input';
 import Modal from './Modal';
@@ -18,8 +19,8 @@ import Modal from './Modal';
 const uploadModal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const uploadModal = useUploadModal();
-  const { user } = useUser();
-  const supabaseClient = useSupabaseClient();
+  const { data: user } = useAsync(getCurrentUserAuth);
+  const supabaseClient = createClient();
   const router = useRouter();
 
   const { register, handleSubmit, reset } = useForm<FieldValues>({

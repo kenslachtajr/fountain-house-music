@@ -6,7 +6,8 @@ import { useEffect } from 'react';
 import MediaItem from '~/components/MediaItem';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import { usePlayerSongsSelect } from '~/features/player/store/player.store';
-import { useUser } from '~/hooks/useUser';
+import { useAsync } from '~/hooks/use-async';
+import { getCurrentUser } from '~/server/actions/user/get-current-user';
 import { Song } from '~/types/types';
 
 interface LikedContentProps {
@@ -15,7 +16,7 @@ interface LikedContentProps {
 
 const LikedContent: React.FC<LikedContentProps> = ({ songs: likedSongs }) => {
   const router = useRouter();
-  const { isLoading, user } = useUser();
+  const { data: user, isLoading } = useAsync(getCurrentUser);
 
   const songs = usePlayerSongsSelect();
 

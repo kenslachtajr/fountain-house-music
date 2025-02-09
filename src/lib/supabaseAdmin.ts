@@ -1,17 +1,13 @@
-import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 
 import { Database } from '~/types/supabase';
 import { Price, Product } from '~/types/types';
+import { createClient } from '~/utils/supabase/client';
 import { toDateTime } from '../utils/helpers';
 import { stripe } from './stripe';
 
-export const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-);
-
 const upsertProductRecord = async (product: Stripe.Product) => {
+  const supabaseAdmin = createClient();
   const productData: Product = {
     id: product.id,
     active: product.active,
@@ -31,6 +27,7 @@ const upsertProductRecord = async (product: Stripe.Product) => {
 };
 
 const upsertPriceRecord = async (price: Stripe.Price) => {
+  const supabaseAdmin = createClient();
   const priceData: Price = {
     id: price.id,
     product_id: typeof price.product === 'string' ? price.product : '',
@@ -61,6 +58,7 @@ const createOrRetrieveCustomer = async ({
   email: string;
   uuid: string;
 }) => {
+  const supabaseAdmin = createClient();
   const { data, error } = await supabaseAdmin
     .from('customers')
     .select('stripe_customer_id')
@@ -97,6 +95,7 @@ const copyBillingDetailsToCustomer = async (
   uuid: string,
   payment_method: Stripe.PaymentMethod,
 ) => {
+  const supabaseAdmin = createClient();
   const customer = payment_method.customer as string;
   const { name, phone, address } = payment_method.billing_details;
   if (!name || !phone || !address) return;
@@ -119,6 +118,7 @@ const manageSubscriptionStatusChange = async (
   customerId: string,
   createAction = false,
 ) => {
+  const supabaseAdmin = createClient();
   const { data: customerData, error: noCustomerError } = await supabaseAdmin
     .from('customers')
     .select('id')

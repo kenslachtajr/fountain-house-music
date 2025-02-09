@@ -1,13 +1,13 @@
 'use client';
 
-import { useSessionContext } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-
-import { useUser } from '~/hooks/useUser';
+import { useAsync } from '~/hooks/use-async';
+import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
+import { createClient } from '~/utils/supabase/client';
 
 interface LikeButtonProps {
   songId: string;
@@ -15,10 +15,10 @@ interface LikeButtonProps {
 
 const LikeButton: React.FC<LikeButtonProps> = ({ songId }) => {
   const router = useRouter();
-  const { supabaseClient } = useSessionContext();
+  const supabaseClient = createClient();
 
   const { openDialog } = useAuthenticationModal();
-  const { user } = useUser();
+  const { data: user } = useAsync(getCurrentUserAuth);
 
   const [isLiked, setIsLiked] = useState(false);
 

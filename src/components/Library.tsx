@@ -4,8 +4,10 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { TbPlaylist } from 'react-icons/tb';
 
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
+import { useAsync } from '~/hooks/use-async';
 import useUploadModal from '~/hooks/useUploadModal';
-import { useUser } from '~/hooks/useUser';
+import { getCurrentUser } from '~/server/actions/user/get-current-user';
+import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
 import { Song } from '~/types/types';
 import MediaItem from './MediaItem';
 
@@ -16,7 +18,10 @@ interface LibraryProps {
 const Library: React.FC<LibraryProps> = ({ songs }) => {
   const { openDialog } = useAuthenticationModal();
   const uploadModal = useUploadModal();
-  const { user, userDetails } = useUser();
+  const { data: user } = useAsync(getCurrentUserAuth);
+  const { data: userDetails } = useAsync(getCurrentUser);
+
+  // console.log(user);
 
   const onClick = () => {
     if (!user) {

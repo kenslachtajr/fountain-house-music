@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { useUser } from '~/hooks/useUser';
+import { useAsync } from '~/hooks/use-async';
+import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
 import { Song } from '~/types/types';
 
 interface PlayerStore {
@@ -52,7 +53,7 @@ export const usePlayerSongsSelect = () =>
   usePlayerStore((state) => state.songs);
 
 export const usePlayerStoreActions = () => {
-  const { user } = useUser();
+  const { data: user } = useAsync(getCurrentUserAuth);
   const { openDialog } = useAuthenticationModal();
   const { setCurrentSong, ...actions } = usePlayerStore(
     (state) => state.actions,

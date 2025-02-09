@@ -1,9 +1,8 @@
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
-
 import { Album, Song } from '~/types/types';
+import { createClient } from '~/utils/supabase/client';
 
 const useLoadImage = (song?: Album | Song) => {
-  const supabaseClient = useSupabaseClient();
+  const supabaseClient = createClient();
 
   if (!song?.image_path) {
     return null;

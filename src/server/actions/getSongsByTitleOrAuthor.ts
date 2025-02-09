@@ -1,12 +1,10 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+'use server';
 
 import { Song } from '~/types/types';
+import { createClient } from '~/utils/supabase/server';
 
 const getSongsByTitleOrAuthor = async (searchTerm: string): Promise<Song[]> => {
-  const supabase = createServerComponentClient({
-    cookies: cookies,
-  });
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('songs')

@@ -3,7 +3,9 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
-    request,
+    request: {
+      headers: request.headers,
+    },
   });
 
   const supabase = createServerClient(
@@ -39,11 +41,13 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // console.log(user);
+
   if (!user && request.nextUrl.pathname.startsWith('/account')) {
     // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone();
-    url.pathname = '/';
-    return NextResponse.redirect(url);
+    // const url = request.nextUrl.clone();
+    // url.pathname = '/';
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

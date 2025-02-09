@@ -8,11 +8,10 @@ import Sidebar from '~/components/Sidebar';
 import { PlayerFeature } from '~/features/player/player';
 import { cn } from '~/lib/cn';
 import ModalProvider from '~/providers/ModalProvider';
-import SupabaseProvider from '~/providers/SupabaseProvider';
 import ToasterProvider from '~/providers/ToasterProvider';
-import UserProvider from '~/providers/UserProvider';
 import getActiveProductsWithPrices from '~/server/actions/getActiveProductsWithPrices';
 import getSongsByUserId from '~/server/actions/getSongsByUserId';
+import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
 
 const font = Figtree({ subsets: ['latin'] });
 
@@ -64,19 +63,18 @@ export const revalidate = 0;
 export default async function RootLayout({ children }: PropsWithChildren) {
   const userSongs = await getSongsByUserId();
   const products = await getActiveProductsWithPrices();
+  const auth = await getCurrentUserAuth();
+
+  console.log({ auth });
 
   return (
     <html suppressHydrationWarning lang="en">
       <head />
       <body suppressHydrationWarning className={cn('dark', font.className)}>
         <ToasterProvider />
-        <SupabaseProvider>
-          <UserProvider>
-            <ModalProvider products={products} />
-            <Sidebar songs={userSongs}>{children}</Sidebar>
-            <PlayerFeature />
-          </UserProvider>
-        </SupabaseProvider>
+        <ModalProvider products={products} />
+        <Sidebar songs={userSongs}>{children}</Sidebar>
+        <PlayerFeature />
       </body>
     </html>
   );

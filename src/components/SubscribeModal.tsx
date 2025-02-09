@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
+import { useAsync } from '~/hooks/use-async';
 import useSubscribeModal from '~/hooks/useSubscribeModal';
-import { useUser } from '~/hooks/useUser';
 import { getStripe } from '~/lib/stripeClient';
+import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
+import { getCurrentUsersSubscription } from '~/server/actions/user/get-current-users-subscription';
 import { Price, ProductWithPrice } from '~/types/types';
 import { postData } from '~/utils/helpers';
 import Button from './Button';
@@ -27,8 +29,13 @@ const formatPrice = (price: Price) => {
 
 const SubscribeModal: React.FC<SubscribeModalProps> = ({ products }) => {
   const subscribeModal = useSubscribeModal();
-  const { user, isLoading, subscription } = useUser();
   const [priceIdLoading, setPriceIdLoading] = useState<string>();
+  const { data: user, isLoading: isAuthLoading } = useAsync(getCurrentUserAuth);
+  const { isLoading: isSubscriptionLoading, data: subscription } = useAsync(
+    getCurrentUsersSubscription,
+  );
+
+  const isLoading = isAuthLoading || isSubscriptionLoading;
 
   const onChange = (open: boolean) => {
     if (!open) {

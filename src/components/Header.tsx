@@ -1,6 +1,5 @@
 'use client';
 
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -11,7 +10,9 @@ import { RxCaretLeft, RxCaretRight } from 'react-icons/rx';
 import { twMerge } from 'tailwind-merge';
 
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { useUser } from '~/hooks/useUser';
+import { useAsync } from '~/hooks/use-async';
+import { getCurrentUser } from '~/server/actions/user/get-current-user';
+import { createClient } from '~/utils/supabase/client';
 import Button from './Button';
 
 interface HeaderProps {
@@ -23,8 +24,8 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
   const { openDialog } = useAuthenticationModal();
   const router = useRouter();
 
-  const supabaseClient = useSupabaseClient();
-  const { user } = useUser();
+  const supabaseClient = createClient();
+  const { data: user } = useAsync(getCurrentUser);
 
   const handleLogout = async () => {
     const { error } = await supabaseClient.auth.signOut();
