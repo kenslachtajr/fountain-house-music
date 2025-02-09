@@ -7,6 +7,7 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Separator } from '~/components/ui/separator';
 import { useCreateQueryString } from '~/utils/create-query-string';
+import { signIn } from '../actions/sign-in';
 import { AuthSocials } from './auth-socials';
 
 export function SignIn() {
@@ -23,7 +24,7 @@ export function SignIn() {
         <Separator className="flex-1 bg-[#2E3439]" />
       </div>
 
-      <div className="flex flex-col gap-4">
+      <form action={signIn} className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="email" className="text-sm text-muted-foreground">
             Email address
@@ -31,6 +32,7 @@ export function SignIn() {
           <Input
             id="email"
             type="email"
+            name="email"
             placeholder="name@example.com"
             className="bg-[#2E3439]"
           />
@@ -39,30 +41,38 @@ export function SignIn() {
           <Label htmlFor="password" className="text-sm text-muted-foreground">
             Your Password
           </Label>
-          <Input id="password" type="password" className="bg-[#2E3439]" />
+          <Input
+            id="password"
+            type="password"
+            name="password"
+            className="bg-[#2E3439]"
+          />
         </div>
 
-        <Button className="w-full bg-[#404040] text-white hover:bg-[#404040]/70">
+        <Button
+          type="submit"
+          className="w-full bg-[#404040] text-white hover:bg-[#404040]/70"
+        >
           Sign in
         </Button>
+      </form>
 
-        <div className="flex flex-col gap-2 text-sm text-center">
-          <Link
-            href={{
-              pathname,
-              query: createQueryString('action', 'forgot-password'),
-            }}
-            className="text-muted-foreground hover:text-primary"
-          >
-            Forgot your password?
-          </Link>
-          <Link
-            href={{ pathname, query: createQueryString('action', 'sign-up') }}
-            className="text-muted-foreground hover:text-primary"
-          >
-            Don&apos;t have an account? Sign up
-          </Link>
-        </div>
+      <div className="flex flex-col gap-2 text-sm text-center">
+        <Link
+          href={{
+            pathname,
+            query: createQueryString('action', 'forgot-password'),
+          }}
+          className="text-muted-foreground hover:text-primary"
+        >
+          Forgot your password?
+        </Link>
+        <Link
+          href={{ pathname, query: createQueryString('action', 'sign-up') }}
+          className="text-muted-foreground hover:text-primary"
+        >
+          Don&apos;t have an account? Sign up
+        </Link>
       </div>
     </div>
   );
