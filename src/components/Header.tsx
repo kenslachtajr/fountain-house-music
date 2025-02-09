@@ -10,7 +10,7 @@ import { HiHome } from 'react-icons/hi';
 import { RxCaretLeft, RxCaretRight } from 'react-icons/rx';
 import { twMerge } from 'tailwind-merge';
 
-import useAuthModal from '~/hooks/useAuthModal';
+import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
 import { useUser } from '~/hooks/useUser';
 import Button from './Button';
 
@@ -20,7 +20,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ children, className }) => {
-  const authModal = useAuthModal();
+  const { openDialog } = useAuthenticationModal();
   const router = useRouter();
 
   const supabaseClient = useSupabaseClient();
@@ -86,17 +86,14 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
             <>
               <div>
                 <Button
-                  onClick={authModal.onOpen}
+                  onClick={openDialog}
                   className="font-medium bg-tranpsparent text-neutral-300"
                 >
                   Sign Up
                 </Button>
               </div>
               <div>
-                <Button
-                  onClick={authModal.onOpen}
-                  className="px-6 py-2 bg-white"
-                >
+                <Button onClick={openDialog} className="px-6 py-2 bg-white">
                   Log In
                 </Button>
               </div>

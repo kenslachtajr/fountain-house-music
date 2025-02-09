@@ -1,8 +1,8 @@
 'use client';
 
-import AuthModal from '~/components/AuthModal';
 import SubscribeModal from '~/components/SubscribeModal';
 import UploadModal from '~/components/UploadModal';
+import { AuthenticationFeature } from '~/features/authentication/authentication';
 import { useIsMounted } from '~/hooks/use-is-mounted';
 import { ProductWithPrice } from '~/types/types';
 
@@ -19,9 +19,9 @@ const ModalProvider: React.FC<ModalProviderProps> = ({ products }) => {
 
   return (
     <>
-      <AuthModal />
       <UploadModal />
       <SubscribeModal products={products} />
+      <AuthenticationFeature />
     </>
   );
 };

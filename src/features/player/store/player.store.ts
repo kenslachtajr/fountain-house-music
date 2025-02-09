@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import useAuthModal from '~/hooks/useAuthModal';
+import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
 import { useUser } from '~/hooks/useUser';
 import { Song } from '~/types/types';
 
@@ -53,14 +53,14 @@ export const usePlayerSongsSelect = () =>
 
 export const usePlayerStoreActions = () => {
   const { user } = useUser();
-  const authModal = useAuthModal();
+  const { openDialog } = useAuthenticationModal();
   const { setCurrentSong, ...actions } = usePlayerStore(
     (state) => state.actions,
   );
 
   const handleCurrentSong = (song: Song) => {
     if (!user) {
-      authModal.onOpen();
+      openDialog();
       return;
     }
 

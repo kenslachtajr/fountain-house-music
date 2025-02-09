@@ -3,7 +3,7 @@
 import { AiOutlinePlus } from 'react-icons/ai';
 import { TbPlaylist } from 'react-icons/tb';
 
-import useAuthModal from '~/hooks/useAuthModal';
+import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
 import useUploadModal from '~/hooks/useUploadModal';
 import { useUser } from '~/hooks/useUser';
 import { Song } from '~/types/types';
@@ -14,13 +14,13 @@ interface LibraryProps {
 }
 
 const Library: React.FC<LibraryProps> = ({ songs }) => {
-  const authModal = useAuthModal();
+  const { openDialog } = useAuthenticationModal();
   const uploadModal = useUploadModal();
   const { user, userDetails } = useUser();
 
   const onClick = () => {
     if (!user) {
-      return authModal.onOpen();
+      return openDialog();
     }
 
     // TODO: Check for subscription

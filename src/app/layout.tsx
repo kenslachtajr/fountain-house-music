@@ -5,7 +5,6 @@ import { Figtree } from 'next/font/google';
 
 import { PropsWithChildren } from 'react';
 import Sidebar from '~/components/Sidebar';
-import { AuthenticationFeature } from '~/features/authentication/authentication';
 import { PlayerFeature } from '~/features/player/player';
 import { cn } from '~/lib/cn';
 import ModalProvider from '~/providers/ModalProvider';
@@ -76,7 +75,6 @@ export default async function RootLayout({ children }: PropsWithChildren) {
             <ModalProvider products={products} />
             <Sidebar songs={userSongs}>{children}</Sidebar>
             <PlayerFeature />
-            <AuthenticationFeature />
           </UserProvider>
         </SupabaseProvider>
       </body>
