@@ -66,9 +66,9 @@ export default async function RootLayout({ children }: PropsWithChildren) {
   const products = await getActiveProductsWithPrices();
 
   return (
-    <html lang="en">
+    <html suppressHydrationWarning lang="en">
       <head />
-      <body className={cn('dark', font.className)}>
+      <body suppressHydrationWarning className={cn('dark', font.className)}>
         <ToasterProvider />
         <SupabaseProvider>
           <UserProvider>
