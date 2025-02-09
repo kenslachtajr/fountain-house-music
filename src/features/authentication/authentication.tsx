@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -12,20 +12,22 @@ import { useCreateQueryString } from '~/utils/create-query-string';
 import { ForgotPassword } from './components/forgot-password';
 import { SignIn } from './components/sign-in';
 import { SignUp } from './components/sign-up';
+import { useAuthenticationModal } from './hooks/use-authentication-dialog';
 
 export function AuthenticationFeature() {
+  const router = useRouter();
+  const pathname = usePathname();
   const createQueryString = useCreateQueryString();
-  const params = useSearchParams();
-  const actionParam = params.get('action');
+  const { isOpen, closeDialog } = useAuthenticationModal();
 
-  const onOpenChange = (open: boolean) => {
-    if (!open) {
-      params;
-    }
+  const handleOpenChange = (open: boolean) => {
+    if (open) return;
+    router.replace(`${pathname}/${createQueryString('action')}`);
+    closeDialog();
   };
 
   return (
-    <Dialog defaultOpen onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="border border-neutral-700 bg-neutral-800 sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Welcome back!</DialogTitle>

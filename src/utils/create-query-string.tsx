@@ -10,7 +10,7 @@ export function useCreateQueryString() {
 
       if (value === undefined) {
         params.delete(name);
-        return;
+        return '';
       }
 
       params.set(name, value);
