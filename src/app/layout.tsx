@@ -11,7 +11,6 @@ import ModalProvider from '~/providers/ModalProvider';
 import ToasterProvider from '~/providers/ToasterProvider';
 import getActiveProductsWithPrices from '~/server/actions/getActiveProductsWithPrices';
 import getSongsByUserId from '~/server/actions/getSongsByUserId';
-import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
 
 const font = Figtree({ subsets: ['latin'] });
 
@@ -63,9 +62,6 @@ export const revalidate = 0;
 export default async function RootLayout({ children }: PropsWithChildren) {
   const userSongs = await getSongsByUserId();
   const products = await getActiveProductsWithPrices();
-  const auth = await getCurrentUserAuth();
-
-  console.log({ auth });
 
   return (
     <html suppressHydrationWarning lang="en">

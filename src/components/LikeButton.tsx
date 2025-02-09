@@ -2,10 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useAsync } from 'react-async';
 import toast from 'react-hot-toast';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { useAsync } from '~/hooks/use-async';
 import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
 import { createClient } from '~/utils/supabase/client';
 

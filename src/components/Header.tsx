@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAsync } from 'react-async';
 import toast from 'react-hot-toast';
 import { BiSearch } from 'react-icons/bi';
 import { FaUserAlt } from 'react-icons/fa';
@@ -10,7 +11,6 @@ import { RxCaretLeft, RxCaretRight } from 'react-icons/rx';
 import { twMerge } from 'tailwind-merge';
 
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { useAsync } from '~/hooks/use-async';
 import { getCurrentUser } from '~/server/actions/user/get-current-user';
 import { createClient } from '~/utils/supabase/client';
 import Button from './Button';

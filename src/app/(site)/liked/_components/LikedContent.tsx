@@ -3,10 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { useAsync } from 'react-async';
 import MediaItem from '~/components/MediaItem';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import { usePlayerSongsSelect } from '~/features/player/store/player.store';
-import { useAsync } from '~/hooks/use-async';
 import { getCurrentUser } from '~/server/actions/user/get-current-user';
 import { Song } from '~/types/types';
 

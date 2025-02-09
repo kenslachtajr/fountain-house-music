@@ -4,14 +4,15 @@ import getSongsByTitleOrAuthor from '~/server/actions/getSongsByTitleOrAuthor';
 import SearchContent from './_components/SearchContent';
 
 interface SearchProps {
-  searchParams: {
+  searchParams: Promise<{
     title?: string;
     author?: string | null;
-  };
+  }>;
 }
 export const revalidate = 0;
 
-export default async function Search({ searchParams }: SearchProps) {
+export default async function Search(props: SearchProps) {
+  const searchParams = await props.searchParams;
   let songs: any[] = [];
 
   if (searchParams.title) {

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
-import { useAsync } from '~/hooks/use-async';
+import { useAsync } from 'react-async';
 import useSubscribeModal from '~/hooks/useSubscribeModal';
 import { getStripe } from '~/lib/stripeClient';
 import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';

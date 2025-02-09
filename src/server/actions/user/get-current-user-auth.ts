@@ -9,7 +9,5 @@ export const getCurrentUserAuth = async () => {
     console.log(error);
   }
 
-  // console.log('Watermelon', data);
-
   return data.user;
 };

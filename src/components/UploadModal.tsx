@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
-import { useAsync } from '~/hooks/use-async';
+import { useAsync } from 'react-async';
 import useUploadModal from '~/hooks/useUploadModal';
 import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
 import { createClient } from '~/utils/supabase/client';

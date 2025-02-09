@@ -1,6 +1,6 @@
+import { useAsync } from 'react-async';
 import { create } from 'zustand';
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { useAsync } from '~/hooks/use-async';
 import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
 import { Song } from '~/types/types';
 

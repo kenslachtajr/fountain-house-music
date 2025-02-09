@@ -7,14 +7,15 @@ import { AlbumContent } from './_components/album-content';
 import { AlbumImage } from './_components/album-image';
 
 interface AlbumProps {
-  params: {
+  params: Promise<{
     albumId: string;
-  };
+  }>;
 }
 
 export const revalidate = 0;
 
-export default async function AlbumPage({ params }: AlbumProps) {
+export default async function AlbumPage(props: AlbumProps) {
+  const params = await props.params;
   const album = await getAlbumAction(params.albumId);
 
   if (!album) {

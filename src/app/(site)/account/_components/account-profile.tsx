@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useAsync } from 'react-async';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import Button from '~/components/Button';
@@ -14,7 +15,6 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { Label } from '~/components/ui/label';
-import { useAsync } from '~/hooks/use-async';
 import { getCurrentUser } from '~/server/actions/user/get-current-user';
 import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
 import { UserDetails } from '~/types/types';
