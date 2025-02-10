@@ -39,7 +39,11 @@ export async function updateSession(request: NextRequest) {
 
   // console.log(user);
 
-  if (!user && request.nextUrl.pathname.startsWith('/account')) {
+  if (
+    !user &&
+    request.nextUrl.pathname.startsWith('/account') &&
+    request.nextUrl.pathname.startsWith('/liked')
+  ) {
     // no user, potentially respond by redirecting the user to the login page
     // const url = request.nextUrl.clone();
     // url.pathname = '/';

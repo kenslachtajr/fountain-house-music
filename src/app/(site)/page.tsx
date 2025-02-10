@@ -15,13 +15,12 @@ export default async function Home() {
           <h1 className="text-3xl font-semibold text-white">
             Fountain House Music
           </h1>
-          <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-            <ListItem
-              image="/images/liked.jpeg"
-              name="Liked Songs"
-              href="liked"
-            />
-          </div>
+
+          <ListItem
+            image="/images/liked.jpeg"
+            name="Liked Songs"
+            href="liked"
+          />
         </div>
       </Header>
       <div className="px-6 mt-2 mb-7">
