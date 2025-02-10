@@ -1,8 +1,8 @@
 'use client';
 
-import { AlbumCard } from '~/components/album-card';
 import { usePlayerStoreActions } from '~/features/player/store/player.store';
 import { Album } from '~/types/types';
+import { AlbumCard } from './album-card';
 
 interface PageContentProps {
   albums: Album[];
