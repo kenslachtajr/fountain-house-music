@@ -45,7 +45,7 @@ export function AuthenticationDialogFeature() {
     } else {
       closeDialog();
     }
-  }, [action, user, closeDialog]);
+  }, [action, user, openDialog, closeDialog]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
