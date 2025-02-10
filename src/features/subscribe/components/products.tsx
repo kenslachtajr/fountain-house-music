@@ -1,40 +1,18 @@
-'use client';
-
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-
+import Button from '~/components/Button';
 import { useCurrentUserFromStore } from '~/hooks/use-current-user';
-import useSubscribeModal from '~/hooks/useSubscribeModal';
 import { getStripe } from '~/lib/stripeClient';
 import { Price, ProductWithPrice } from '~/types/types';
 import { postData } from '~/utils/helpers';
-import Button from './Button';
-import Modal from './Modal';
 
-interface SubscribeModalProps {
+interface ProductsProps {
   products: ProductWithPrice[];
 }
 
-const formatPrice = (price: Price) => {
-  const priceString = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: price.currency || undefined,
-    minimumFractionDigits: 0,
-  }).format((price?.unit_amount || 0) / 100);
-
-  return priceString;
-};
-
-const SubscribeModal: React.FC<SubscribeModalProps> = ({ products }) => {
-  const subscribeModal = useSubscribeModal();
-  const [priceIdLoading, setPriceIdLoading] = useState<string>();
+export function Products({ products }: ProductsProps) {
   const user = useCurrentUserFromStore();
-
-  const onChange = (open: boolean) => {
-    if (!open) {
-      subscribeModal.onClose();
-    }
-  };
+  const [priceIdLoading, setPriceIdLoading] = useState<string>();
 
   const handleCheckout = async (price: Price) => {
     setPriceIdLoading(price.id);
@@ -44,7 +22,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ products }) => {
       return toast.error('Must be logged in');
     }
 
-    if (user?.subscription) {
+    if (user?.subscriptions) {
       setPriceIdLoading(undefined);
       return toast('Already subscribed!');
     }
@@ -64,10 +42,12 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ products }) => {
     }
   };
 
-  let content = <div className="text-center">No products available!</div>;
+  if (user?.subscriptions) {
+    return <div className="text-center">Already subscribed!</div>;
+  }
 
   if (products.length) {
-    content = (
+    return (
       <div className="text-center">
         {products.map((product) => {
           if (!product.prices?.length) {
@@ -89,20 +69,15 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ products }) => {
     );
   }
 
-  if (user?.subscription) {
-    content = <div className="text-center">Already subscribed!</div>;
-  }
+  return <div className="text-center">No products available!</div>;
+}
 
-  return (
-    <Modal
-      title="Only for premium users"
-      description="Listen with a paid subscription."
-      isOpen={subscribeModal.isOpen}
-      onChange={onChange}
-    >
-      {content}
-    </Modal>
-  );
-};
+function formatPrice(price: Price) {
+  const priceString = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: price.currency || undefined,
+    minimumFractionDigits: 0,
+  }).format((price?.unit_amount || 0) / 100);
 
-export default SubscribeModal;
+  return priceString;
+}

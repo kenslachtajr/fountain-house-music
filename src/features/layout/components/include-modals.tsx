@@ -1,17 +1,14 @@
-import SubscribeModal from '~/components/SubscribeModal';
 import { AuthenticationDialogFeature } from '~/features/authentication/authentication-dialog';
+import { SubscribeDialogFeature } from '~/features/subscribe/subscribe-dialog';
 import { UploadDialogFeature } from '~/features/upload/upload-dialog';
-import { ProductWithPrice } from '~/types/types';
+import getActiveProductsWithPrices from '~/server/actions/getActiveProductsWithPrices';
 
-interface IncludeModalsProps {
-  products: ProductWithPrice[];
-}
-
-export function IncludeModals({ products }: IncludeModalsProps) {
+export async function IncludeModals() {
+  const products = await getActiveProductsWithPrices();
   return (
     <>
       <AuthenticationDialogFeature />
-      <SubscribeModal products={products} />
+      <SubscribeDialogFeature />
       <UploadDialogFeature />
     </>
   );

@@ -1,5 +1,4 @@
 import { PropsWithChildren } from 'react';
-import getActiveProductsWithPrices from '~/server/actions/getActiveProductsWithPrices';
 import getSongsByUserId from '~/server/actions/getSongsByUserId';
 import { getCurrentUser } from '~/server/actions/user/get-current-user';
 import { UserDetails } from '~/types/types';
@@ -9,7 +8,6 @@ import { IncludeModals } from './components/include-modals';
 import { Sidebar } from './components/sidebar';
 
 export async function LayoutFeature({ children }: PropsWithChildren<unknown>) {
-  const products = await getActiveProductsWithPrices();
   const user = await getCurrentUser();
   const userSongs = await getSongsByUserId();
 
@@ -21,7 +19,7 @@ export async function LayoutFeature({ children }: PropsWithChildren<unknown>) {
 
       <GlobalToaster />
       <PlayerFeature />
-      <IncludeModals products={products} />
+      <IncludeModals />
     </>
   );
 }
