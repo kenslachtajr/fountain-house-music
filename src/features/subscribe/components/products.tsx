@@ -6,7 +6,7 @@ import Button from '~/components/Button';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { getStripe } from '~/lib/stripeClient';
 import { Price, ProductWithPrice } from '~/types/types';
-import { postData } from '~/utils/helpers';
+import { postData } from '~/utils/post-data';
 
 interface ProductsProps {
   products: ProductWithPrice[];

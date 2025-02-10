@@ -7,7 +7,7 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Separator } from '~/components/ui/separator';
-import { useCreateQueryString } from '~/utils/create-query-string';
+import { useCreateQueryString } from '~/hooks/use-create-query-string';
 import { signIn } from '../actions/sign-in';
 import { AuthSocials } from './auth-socials';
 

@@ -3,7 +3,6 @@ import Stripe from 'stripe';
 import { Database } from '~/types/supabase';
 import { Price, Product } from '~/types/types';
 import { createClient } from '~/utils/supabase/client';
-import { toDateTime } from '../utils/helpers';
 import { stripe } from './stripe';
 
 const upsertProductRecord = async (product: Stripe.Product) => {
@@ -182,6 +181,12 @@ const manageSubscriptionStatusChange = async (
       subscription.default_payment_method as Stripe.PaymentMethod,
     );
   }
+};
+
+const toDateTime = (secs: number) => {
+  var t = new Date('1970-01-01T00:30:00Z');
+  t.setSeconds(secs);
+  return t;
 };
 
 export {

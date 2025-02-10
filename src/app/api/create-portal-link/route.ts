@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { stripe } from '~/lib/stripe';
 import { createOrRetrieveCustomer } from '~/lib/supabaseAdmin';
-import { getURL } from '~/utils/helpers';
+import { getURL } from '~/utils/get-url';
 import { createClient } from '~/utils/supabase/server';
 
 export async function POST() {

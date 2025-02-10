@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
-import { useCreateQueryString } from '~/utils/create-query-string';
+import { useCreateQueryString } from '~/hooks/use-create-query-string';
 
 export function ForgotPassword() {
   const pathname = usePathname();

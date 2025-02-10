@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
-import { useCreateQueryString } from '~/utils/create-query-string';
+import { useCreateQueryString } from '~/hooks/use-create-query-string';
 import { AuthenticationFeature } from './authentication';
 import {
   useAuthenticationDialogActions,
