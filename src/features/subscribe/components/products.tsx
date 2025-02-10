@@ -52,9 +52,7 @@ export function Products({ products }: ProductsProps) {
     return (
       <div className="text-center">
         {products.map((product) => {
-          if (!product.prices?.length) {
-            return <div key={product.id}>No prices available</div>;
-          }
+          if (!product.prices?.length) return;
 
           return product.prices.map((price) => (
             <Button
@@ -63,7 +61,8 @@ export function Products({ products }: ProductsProps) {
               disabled={!user}
               className="mb-4"
             >
-              {`Subscribe for ${formatPrice(price)} a ${price.interval}`}
+              {product.name} <br />
+              Subscribe for {formatPrice(price)} a {price.interval}
             </Button>
           ));
         })}
