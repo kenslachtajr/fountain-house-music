@@ -3,7 +3,7 @@
 import { Song } from '~/types/types';
 import { createClient } from '~/utils/supabase/server';
 
-const getSongsByUserId = async (): Promise<Song[]> => {
+const getSongsByUserId = async () => {
   const supabase = await createClient();
 
   const {
@@ -26,7 +26,7 @@ const getSongsByUserId = async (): Promise<Song[]> => {
     console.log(error.message);
   }
 
-  return data || [];
+  return (data || []) as Song[];
 };
 
 export default getSongsByUserId;

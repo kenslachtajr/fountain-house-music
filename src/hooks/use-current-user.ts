@@ -1,16 +1,17 @@
 import { create } from 'zustand';
+import { UserDetails } from '~/types/types';
 
 interface CurrentUserStore {
-  user: any;
+  user: UserDetails | null;
   actions: {
-    setUser: (user: any) => void;
+    setUser: (user?: UserDetails | null) => void;
   };
 }
 
 const useCurrentUserState = create<CurrentUserStore>((set) => ({
   user: null,
   actions: {
-    setUser: (user: any) => {
+    setUser: (user?: UserDetails | null) => {
       set({ user });
     },
   },

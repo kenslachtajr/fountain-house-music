@@ -1,8 +1,6 @@
-'use client';
-
 import { Toaster } from 'react-hot-toast';
 
-const ToasterProvider = () => {
+export function GlobalToaster() {
   return (
     <Toaster
       toastOptions={{
@@ -13,6 +11,4 @@ const ToasterProvider = () => {
       }}
     />
   );
-};
-
-export default ToasterProvider;
+}

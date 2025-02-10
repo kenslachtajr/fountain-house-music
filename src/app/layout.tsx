@@ -4,11 +4,9 @@ import './globals.css';
 import { Figtree } from 'next/font/google';
 
 import { PropsWithChildren } from 'react';
-import { SidebarUser } from '~/components/sidebar-user';
+import { LayoutFeature } from '~/features/layout/layout';
 import { PlayerFeature } from '~/features/player/player';
 import { cn } from '~/lib/cn';
-import ModalProvider from '~/providers/ModalProvider';
-import ToasterProvider from '~/providers/ToasterProvider';
 import getActiveProductsWithPrices from '~/server/actions/getActiveProductsWithPrices';
 
 const font = Figtree({ subsets: ['latin'] });
@@ -65,9 +63,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
     <html suppressHydrationWarning lang="en">
       <head />
       <body suppressHydrationWarning className={cn('dark', font.className)}>
-        <ToasterProvider />
-        <ModalProvider products={products} />
-        <SidebarUser>{children}</SidebarUser>
+        <LayoutFeature>{children}</LayoutFeature>
         <PlayerFeature />
       </body>
     </html>
