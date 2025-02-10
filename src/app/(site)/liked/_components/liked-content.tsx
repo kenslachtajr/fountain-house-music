@@ -13,7 +13,9 @@ interface LikedContentProps {
   songs: Song[];
 }
 
-const LikedContent: React.FC<LikedContentProps> = ({ songs: likedSongs }) => {
+export const LikedContent: React.FC<LikedContentProps> = ({
+  songs: likedSongs,
+}) => {
   const user = useCurrentUserSelect();
   const router = useRouter();
 
@@ -43,5 +45,3 @@ const LikedContent: React.FC<LikedContentProps> = ({ songs: likedSongs }) => {
     </div>
   );
 };
-
-export default LikedContent;

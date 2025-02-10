@@ -1,7 +1,7 @@
 import { Header } from '~/components/header';
 import { getSongsByTitleOrAuthor } from '~/server/actions/songs/get-songs-by-title-or-author';
-import SearchInput from './_components/search-input';
-import SearchContent from './_components/SearchContent';
+import { SearchContent } from './_components/search-content';
+import { SearchInput } from './_components/search-input';
 
 interface SearchProps {
   searchParams: Promise<{

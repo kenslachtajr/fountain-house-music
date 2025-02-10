@@ -1,7 +1,7 @@
 import { Header } from '~/components/header';
 import { getAlbums } from '~/server/actions/album/get-albums';
-import PageContent from './_components/PageContent';
-import ListItem from './_components/list-item';
+import { ListItem } from './_components/list-item';
+import { PageContent } from './_components/page-content';
 
 export const revalidate = 0;
 

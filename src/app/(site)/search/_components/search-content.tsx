@@ -7,7 +7,7 @@ interface SearchContentProps {
   songs: Song[];
 }
 
-const SearchContent: React.FC<SearchContentProps> = ({ songs }) => {
+export const SearchContent: React.FC<SearchContentProps> = ({ songs }) => {
   if (songs.length === 0) {
     return (
       <div className="flex flex-col w-full px-6 gap-y-2 text-neutral-400">
@@ -24,5 +24,3 @@ const SearchContent: React.FC<SearchContentProps> = ({ songs }) => {
     </div>
   );
 };
-
-export default SearchContent;

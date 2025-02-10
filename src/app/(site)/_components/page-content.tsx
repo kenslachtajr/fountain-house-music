@@ -8,7 +8,7 @@ interface PageContentProps {
   albums: Album[];
 }
 
-const PageContent: React.FC<PageContentProps> = ({ albums }) => {
+export const PageContent: React.FC<PageContentProps> = ({ albums }) => {
   const { setCurrentSong, setSongs } = usePlayerStoreActions();
 
   if (albums.length === 0) {
@@ -30,5 +30,3 @@ const PageContent: React.FC<PageContentProps> = ({ albums }) => {
     </div>
   );
 };
-
-export default PageContent;

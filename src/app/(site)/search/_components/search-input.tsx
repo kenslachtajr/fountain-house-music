@@ -7,7 +7,7 @@ import { Input } from '~/components/ui/legacy/input';
 
 import { useDebounce } from '~/hooks/use-debounce';
 
-const SearchInput = () => {
+export const SearchInput = () => {
   const router = useRouter();
   const [value, setValue] = useState<string>('');
 
@@ -33,5 +33,3 @@ const SearchInput = () => {
     />
   );
 };
-
-export default SearchInput;

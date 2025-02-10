@@ -5,7 +5,7 @@ import { BiDisc } from 'react-icons/bi';
 import { useLoadImage } from '~/hooks/use-load-image';
 import { Album } from '~/types/types';
 import { formatDate } from '~/utils/format-date';
-import PlayButton from './play-button';
+import { PlayButton } from './play-button';
 
 interface AlbumCardProps {
   album: Album;
