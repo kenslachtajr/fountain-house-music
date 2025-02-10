@@ -1,12 +1,13 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { BiSearch } from 'react-icons/bi';
 import { HiHome } from 'react-icons/hi';
 import { twMerge } from 'tailwind-merge';
 
 import { usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
+import { useCurrentUserActions } from '~/hooks/use-current-user';
 import { cn } from '~/lib/cn';
 import { Song } from '~/types/types';
 import Box from './Box';
@@ -16,9 +17,11 @@ import SidebarItem from './SidebarItem';
 interface SidebarProps {
   children: React.ReactNode;
   songs: Song[];
+  user: any;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
+const Sidebar: React.FC<SidebarProps> = ({ children, songs, user }) => {
+  const userActions = useCurrentUserActions();
   const currentSong = usePlayerCurrentSongSelect();
   const pathname = usePathname();
   const routes = useMemo(
@@ -38,6 +41,11 @@ const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
     ],
     [pathname],
   );
+
+  useEffect(() => {
+    userActions.setUser(user);
+  }, [songs, userActions]);
+
   return (
     <div
       className={twMerge(

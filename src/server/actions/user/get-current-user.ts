@@ -1,9 +1,11 @@
-import { createClient } from '~/utils/supabase/client';
+import { createClient } from '~/utils/supabase/server';
 import { getCurrentUserAuth } from './get-current-user-auth';
+import { getCurrentUsersSubscription } from './get-current-users-subscription';
 
 export const getCurrentUser = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const authenticatedUser = await getCurrentUserAuth();
+  const authenticatedUserSubscription = await getCurrentUsersSubscription();
 
   if (!authenticatedUser) return;
 
@@ -17,5 +19,9 @@ export const getCurrentUser = async () => {
     console.log(error);
   }
 
-  return data;
+  return {
+    ...data,
+    email: authenticatedUser.email,
+    subscription: authenticatedUserSubscription,
+  };
 };

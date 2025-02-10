@@ -8,9 +8,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
-import { useAsync } from 'react-async';
+import { useCurrentUserFromStore } from '~/hooks/use-current-user';
 import useUploadModal from '~/hooks/useUploadModal';
-import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
 import { createClient } from '~/utils/supabase/client';
 import Button from './Button';
 import Input from './Input';
@@ -19,7 +18,7 @@ import Modal from './Modal';
 const uploadModal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const uploadModal = useUploadModal();
-  const { data: user } = useAsync(getCurrentUserAuth);
+  const user = useCurrentUserFromStore();
   const supabaseClient = createClient();
   const router = useRouter();
 

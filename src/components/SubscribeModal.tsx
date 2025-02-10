@@ -3,11 +3,9 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
-import { useAsync } from 'react-async';
+import { useCurrentUserFromStore } from '~/hooks/use-current-user';
 import useSubscribeModal from '~/hooks/useSubscribeModal';
 import { getStripe } from '~/lib/stripeClient';
-import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
-import { getCurrentUsersSubscription } from '~/server/actions/user/get-current-users-subscription';
 import { Price, ProductWithPrice } from '~/types/types';
 import { postData } from '~/utils/helpers';
 import Button from './Button';
@@ -30,12 +28,7 @@ const formatPrice = (price: Price) => {
 const SubscribeModal: React.FC<SubscribeModalProps> = ({ products }) => {
   const subscribeModal = useSubscribeModal();
   const [priceIdLoading, setPriceIdLoading] = useState<string>();
-  const { data: user, isLoading: isAuthLoading } = useAsync(getCurrentUserAuth);
-  const { isLoading: isSubscriptionLoading, data: subscription } = useAsync(
-    getCurrentUsersSubscription,
-  );
-
-  const isLoading = isAuthLoading || isSubscriptionLoading;
+  const user = useCurrentUserFromStore();
 
   const onChange = (open: boolean) => {
     if (!open) {
@@ -51,7 +44,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ products }) => {
       return toast.error('Must be logged in');
     }
 
-    if (subscription) {
+    if (user?.subscription) {
       setPriceIdLoading(undefined);
       return toast('Already subscribed!');
     }
@@ -85,7 +78,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ products }) => {
             <Button
               key={price.id}
               onClick={() => handleCheckout(price)}
-              disabled={isLoading || price.id === priceIdLoading}
+              disabled={!user}
               className="mb-4"
             >
               {`Subscribe for ${formatPrice(price)} a ${price.interval}`}
@@ -96,7 +89,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ products }) => {
     );
   }
 
-  if (subscription) {
+  if (user?.subscription) {
     content = <div className="text-center">Already subscribed!</div>;
   }
 

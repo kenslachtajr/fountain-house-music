@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
+import { useCurrentUserFromStore } from '~/hooks/use-current-user';
 import { useCreateQueryString } from '~/utils/create-query-string';
 import { ForgotPassword } from './components/forgot-password';
 import { SignIn } from './components/sign-in';
@@ -17,6 +19,7 @@ import { useAuthenticationModal } from './hooks/use-authentication-dialog';
 export function AuthenticationFeature() {
   const router = useRouter();
   const pathname = usePathname();
+  const user = useCurrentUserFromStore();
   const createQueryString = useCreateQueryString();
   const { isOpen, closeDialog } = useAuthenticationModal();
 
@@ -25,6 +28,12 @@ export function AuthenticationFeature() {
     router.replace(`${pathname}/${createQueryString('action')}`);
     closeDialog();
   };
+
+  useEffect(() => {
+    if (!user) return;
+
+    closeDialog();
+  }, [user, closeDialog]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>

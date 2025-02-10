@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useAsync } from 'react-async';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import Button from '~/components/Button';
@@ -15,8 +14,7 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { Label } from '~/components/ui/label';
-import { getCurrentUser } from '~/server/actions/user/get-current-user';
-import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
+import { useCurrentUserFromStore } from '~/hooks/use-current-user';
 import { UserDetails } from '~/types/types';
 import { createClient } from '~/utils/supabase/client';
 
@@ -25,9 +23,8 @@ type UserDetailsForm = Pick<UserDetails, 'full_name'> & {
 };
 
 export function AccountProfile() {
+  const user = useCurrentUserFromStore();
   const supabase = createClient();
-  const { data: userAuth } = useAsync(getCurrentUserAuth);
-  const { data: userDetails } = useAsync(getCurrentUser);
   const userFullNameSet = useRef(false);
   const form = useForm<UserDetailsForm>({
     defaultValues: {
@@ -40,7 +37,7 @@ export function AccountProfile() {
     email,
     full_name,
   }) => {
-    if (!userDetails) return toast.error('User not authenticated.');
+    if (!user) return toast.error('User not authenticated.');
 
     const updates = [];
 
@@ -63,7 +60,7 @@ export function AccountProfile() {
         supabase
           .from('users')
           .update({ full_name })
-          .eq('id', userDetails.id)
+          .eq('id', user.id)
           .then(({ error }) => ({
             success: !error,
             message: error?.message,
@@ -93,8 +90,8 @@ export function AccountProfile() {
 
   useEffect(() => {
     // ! Super jank
-    const userFullName = userDetails?.full_name || '';
-    const userEmail = userAuth?.email || '';
+    const userFullName = user?.full_name || '';
+    const userEmail = user?.email || '';
     const hasNoUserState = !userFullName || !userEmail;
 
     if (userFullNameSet.current || hasNoUserState) return;
@@ -102,7 +99,7 @@ export function AccountProfile() {
     form.reset({ full_name: userFullName, email: userEmail });
 
     userFullNameSet.current = true;
-  }, [form, userAuth?.email, userDetails?.full_name]);
+  }, [form, user?.email, user?.full_name]);
 
   return (
     <Card>

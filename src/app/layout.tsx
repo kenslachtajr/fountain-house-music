@@ -4,13 +4,12 @@ import './globals.css';
 import { Figtree } from 'next/font/google';
 
 import { PropsWithChildren } from 'react';
-import Sidebar from '~/components/Sidebar';
+import { SidebarUser } from '~/components/sidebar-user';
 import { PlayerFeature } from '~/features/player/player';
 import { cn } from '~/lib/cn';
 import ModalProvider from '~/providers/ModalProvider';
 import ToasterProvider from '~/providers/ToasterProvider';
 import getActiveProductsWithPrices from '~/server/actions/getActiveProductsWithPrices';
-import getSongsByUserId from '~/server/actions/getSongsByUserId';
 
 const font = Figtree({ subsets: ['latin'] });
 
@@ -60,7 +59,6 @@ export const metadata: Metadata = {
 export const revalidate = 0;
 
 export default async function RootLayout({ children }: PropsWithChildren) {
-  const userSongs = await getSongsByUserId();
   const products = await getActiveProductsWithPrices();
 
   return (
@@ -69,7 +67,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
       <body suppressHydrationWarning className={cn('dark', font.className)}>
         <ToasterProvider />
         <ModalProvider products={products} />
-        <Sidebar songs={userSongs}>{children}</Sidebar>
+        <SidebarUser>{children}</SidebarUser>
         <PlayerFeature />
       </body>
     </html>

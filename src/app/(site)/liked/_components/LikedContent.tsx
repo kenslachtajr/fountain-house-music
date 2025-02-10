@@ -3,11 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { useAsync } from 'react-async';
 import MediaItem from '~/components/MediaItem';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import { usePlayerSongsSelect } from '~/features/player/store/player.store';
-import { getCurrentUser } from '~/server/actions/user/get-current-user';
+import { useCurrentUserFromStore } from '~/hooks/use-current-user';
 import { Song } from '~/types/types';
 
 interface LikedContentProps {
@@ -15,18 +14,18 @@ interface LikedContentProps {
 }
 
 const LikedContent: React.FC<LikedContentProps> = ({ songs: likedSongs }) => {
+  const user = useCurrentUserFromStore();
   const router = useRouter();
-  const { data: user, isLoading } = useAsync(getCurrentUser);
 
   const songs = usePlayerSongsSelect();
 
   useSetSongsToState(likedSongs);
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!user) {
       router.replace('/');
     }
-  }, [isLoading, user, router]);
+  }, [user, router]);
 
   if (songs.length === 0) {
     return (

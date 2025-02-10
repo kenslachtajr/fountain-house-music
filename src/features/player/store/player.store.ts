@@ -1,7 +1,7 @@
-import { useAsync } from 'react-async';
+import { useGlobalAudioPlayer } from 'react-use-audio-player';
 import { create } from 'zustand';
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { getCurrentUserAuth } from '~/server/actions/user/get-current-user-auth';
+import { useCurrentUserFromStore } from '~/hooks/use-current-user';
 import { Song } from '~/types/types';
 
 interface PlayerStore {
@@ -12,6 +12,7 @@ interface PlayerStore {
     previousSong: () => void;
     setSongs: (songs: Song[]) => void;
     setCurrentSong: (song: Song) => void;
+    reset: () => void;
   };
 }
 
@@ -43,6 +44,9 @@ const usePlayerStore = create<PlayerStore>()((set, get) => ({
       );
       set({ currentSong: songs.at(currentIndex - 1) });
     },
+    reset: () => {
+      set({ currentSong: undefined, songs: [] });
+    },
   },
 }));
 
@@ -53,9 +57,10 @@ export const usePlayerSongsSelect = () =>
   usePlayerStore((state) => state.songs);
 
 export const usePlayerStoreActions = () => {
-  const { data: user } = useAsync(getCurrentUserAuth);
+  const user = useCurrentUserFromStore();
+  const { stop } = useGlobalAudioPlayer();
   const { openDialog } = useAuthenticationModal();
-  const { setCurrentSong, ...actions } = usePlayerStore(
+  const { setCurrentSong, reset, ...actions } = usePlayerStore(
     (state) => state.actions,
   );
 
@@ -68,8 +73,14 @@ export const usePlayerStoreActions = () => {
     setCurrentSong(song);
   };
 
+  const handleReset = () => {
+    stop();
+    reset();
+  };
+
   return {
     ...actions,
     setCurrentSong: handleCurrentSong,
+    reset: handleReset,
   };
 };

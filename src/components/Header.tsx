@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAsync } from 'react-async';
 import toast from 'react-hot-toast';
 import { BiSearch } from 'react-icons/bi';
 import { FaUserAlt } from 'react-icons/fa';
@@ -11,7 +10,8 @@ import { RxCaretLeft, RxCaretRight } from 'react-icons/rx';
 import { twMerge } from 'tailwind-merge';
 
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { getCurrentUser } from '~/server/actions/user/get-current-user';
+import { usePlayerStoreActions } from '~/features/player/store/player.store';
+import { useCurrentUserFromStore } from '~/hooks/use-current-user';
 import { createClient } from '~/utils/supabase/client';
 import Button from './Button';
 
@@ -21,16 +21,17 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ children, className }) => {
-  const { openDialog } = useAuthenticationModal();
   const router = useRouter();
+  const player = usePlayerStoreActions();
+  const userDetails = useCurrentUserFromStore();
+  const { openDialog } = useAuthenticationModal();
 
   const supabaseClient = createClient();
-  const { data: user } = useAsync(getCurrentUser);
 
   const handleLogout = async () => {
     const { error } = await supabaseClient.auth.signOut();
-    // TODO: reset any playing songs
     router.refresh();
+    player.reset();
 
     if (error) {
       toast.error(error.message);
@@ -71,7 +72,7 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
           </Link>
         </div>
         <div className="flex items-center justify-between gap-x-4">
-          {user ? (
+          {userDetails ? (
             <div className="flex items-center gap-x-4">
               <Button onClick={handleLogout} className="px-6 py-2 bg-white">
                 Logout
@@ -84,21 +85,11 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
               </Button>
             </div>
           ) : (
-            <>
-              <div>
-                <Button
-                  onClick={openDialog}
-                  className="font-medium bg-tranpsparent text-neutral-300"
-                >
-                  Sign Up
-                </Button>
-              </div>
-              <div>
-                <Button onClick={openDialog} className="px-6 py-2 bg-white">
-                  Log In
-                </Button>
-              </div>
-            </>
+            <div>
+              <Button onClick={openDialog} className="px-6 py-2 bg-white">
+                Log In
+              </Button>
+            </div>
           )}
         </div>
       </div>
