@@ -3,11 +3,9 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 import { stripe } from '~/lib/stripe';
-import {
-  manageSubscriptionStatusChange,
-  upsertPriceRecord,
-  upsertProductRecord,
-} from '~/lib/supabaseAdmin';
+import { manageSubscriptionStatusChange } from '~/lib/supabaseAdmin';
+import { upsertPriceRecord } from '~/server/actions/stripe/upsert-price-record';
+import { upsertProductRecord } from '~/server/actions/stripe/upsert-product-record';
 
 const relevantEvents = new Set([
   'product.created',

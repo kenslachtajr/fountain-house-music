@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { stripe } from '~/lib/stripe';
-import { createOrRetrieveCustomer } from '~/lib/supabaseAdmin';
+import { createOrRetrieveCustomer } from '~/server/actions/stripe/create-or-retrieve-customer';
 import { getURL } from '~/utils/get-url';
 import { createClient } from '~/utils/supabase/server';
 
