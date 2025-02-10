@@ -7,12 +7,12 @@ import { HiHome } from 'react-icons/hi';
 import { twMerge } from 'tailwind-merge';
 
 import Box from '~/components/Box';
-import Library from '~/components/Library';
-import SidebarItem from '~/components/SidebarItem';
 import { usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
 import { cn } from '~/lib/cn';
 import { Song, UserDetails } from '~/types/types';
 import { useSetUser } from '../hooks/set-user';
+import { Library } from './library';
+import { SidebarItem } from './sidebar-item';
 
 interface SidebarProps {
   children: React.ReactNode;

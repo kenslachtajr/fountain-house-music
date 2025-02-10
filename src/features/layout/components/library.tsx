@@ -2,18 +2,18 @@
 
 import { AiOutlinePlus } from 'react-icons/ai';
 import { TbPlaylist } from 'react-icons/tb';
+import MediaItem from '~/components/MediaItem';
 
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
 import { useUploadDialog } from '~/features/upload/hooks/use-upload-modal';
 import { useCurrentUserFromStore } from '~/hooks/use-current-user';
 import { Song } from '~/types/types';
-import MediaItem from './MediaItem';
 
 interface LibraryProps {
   songs: Song[];
 }
 
-const Library: React.FC<LibraryProps> = ({ songs }) => {
+export function Library({ songs }: LibraryProps) {
   const userDetails = useCurrentUserFromStore();
   const { openDialog: openAuthenticationDialog } = useAuthenticationModal();
   const { openDialog: openUploadDialog } = useUploadDialog();
@@ -49,6 +49,4 @@ const Library: React.FC<LibraryProps> = ({ songs }) => {
       </div>
     </div>
   );
-};
-
-export default Library;
+}
