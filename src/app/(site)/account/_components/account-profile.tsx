@@ -3,8 +3,6 @@
 import { useEffect, useRef } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { Button } from '~/components/button';
-import { Input } from '~/components/input';
 import {
   Card,
   CardContent,
@@ -14,6 +12,8 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { Label } from '~/components/ui/label';
+import { Button } from '~/components/ui/legacy/button';
+import { Input } from '~/components/ui/legacy/input';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { UserDetails } from '~/types/types';
 import { createClient } from '~/utils/supabase/client';

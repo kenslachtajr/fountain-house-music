@@ -1,7 +1,6 @@
 'use client';
 
 import { BiCreditCard, BiLinkExternal } from 'react-icons/bi';
-import { Button } from '~/components/button';
 import {
   Card,
   CardContent,
@@ -9,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
+import { Button } from '~/components/ui/legacy/button';
 
 export function SubscriptionBilling() {
   return (

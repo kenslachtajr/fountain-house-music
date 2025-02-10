@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Button } from '~/components/button';
+import { Button } from '~/components/ui/legacy/button';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { getStripe } from '~/lib/get-stripe';
 import { Price, ProductWithPrice } from '~/types/types';

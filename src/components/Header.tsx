@@ -13,7 +13,7 @@ import { useAuthenticationDialogActions } from '~/features/authentication/stores
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { usePlayerStoreActions } from '~/features/player/store/player.store';
 import { createClient } from '~/utils/supabase/client';
-import { Button } from './button';
+import { Button } from './ui/legacy/button';
 
 interface HeaderProps {
   children: React.ReactNode;

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import qs from 'query-string';
 import { useEffect, useState } from 'react';
-import { Input } from '~/components/input';
+import { Input } from '~/components/ui/legacy/input';
 
 import { useDebounce } from '~/hooks/use-debounce';
 

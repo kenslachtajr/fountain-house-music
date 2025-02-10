@@ -1,6 +1,6 @@
 'use client';
 
-import { Modal } from '~/components/modal';
+import { Modal } from '~/components/ui/legacy/modal';
 import {
   useIsUploadDialogOpenSelect,
   useUploadDialogActions,

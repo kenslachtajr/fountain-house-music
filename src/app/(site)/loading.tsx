@@ -2,7 +2,7 @@
 
 import { BounceLoader } from 'react-spinners';
 
-import { Box } from '~/components/box';
+import { Box } from '~/components/ui/legacy/box';
 
 const Loading = () => {
   return (
