@@ -3,7 +3,7 @@
 import { Song } from '~/types/types';
 import { createClient } from '~/utils/supabase/server';
 
-const getLikedSongs = async (): Promise<Song[]> => {
+export const getLikedSongs = async (): Promise<Song[]> => {
   const supabase = await createClient();
 
   const {
@@ -29,5 +29,3 @@ const getLikedSongs = async (): Promise<Song[]> => {
     ...item.songs,
   }));
 };
-
-export default getLikedSongs;

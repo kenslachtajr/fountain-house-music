@@ -1,3 +1,5 @@
+'use server';
+
 import { createClient } from '~/utils/supabase/server';
 import { getCurrentUserAuth } from './get-current-user-auth';
 import { getCurrentUsersSubscription } from './get-current-users-subscription';

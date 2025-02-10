@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import getSongsByUserId from '~/server/actions/getSongsByUserId';
+import { getSongsByUserId } from '~/server/actions/songs/get-songs-by-user-id';
 import { getCurrentUser } from '~/server/actions/user/get-current-user';
 import { UserDetails } from '~/types/types';
 import { PlayerFeature } from '../player/player';

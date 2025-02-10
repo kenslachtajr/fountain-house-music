@@ -3,7 +3,9 @@
 import { Song } from '~/types/types';
 import { createClient } from '~/utils/supabase/server';
 
-const getSongsByTitleOrAuthor = async (searchTerm: string): Promise<Song[]> => {
+export const getSongsByTitleOrAuthor = async (
+  searchTerm: string,
+): Promise<Song[]> => {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -21,5 +23,3 @@ const getSongsByTitleOrAuthor = async (searchTerm: string): Promise<Song[]> => {
 
   return data;
 };
-
-export default getSongsByTitleOrAuthor;
