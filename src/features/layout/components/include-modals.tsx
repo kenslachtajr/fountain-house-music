@@ -1,6 +1,6 @@
 import SubscribeModal from '~/components/SubscribeModal';
 import UploadModal from '~/components/UploadModal';
-import { AuthenticationFeature } from '~/features/authentication/authentication';
+import { AuthenticationDialogFeature } from '~/features/authentication/authentication-dialog';
 import { ProductWithPrice } from '~/types/types';
 
 interface IncludeModalsProps {
@@ -12,7 +12,7 @@ export function IncludeModals({ products }: IncludeModalsProps) {
     <>
       <UploadModal />
       <SubscribeModal products={products} />
-      <AuthenticationFeature />
+      <AuthenticationDialogFeature />
     </>
   );
 }
