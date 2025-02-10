@@ -3,7 +3,7 @@
 import Image from 'next/image';
 
 import { usePlayerStoreActions } from '~/features/player/store/player.store';
-import useLoadImage from '~/hooks/useLoadImage';
+import { useLoadImage } from '~/hooks/use-load-image';
 import { Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
 import LikeButton from './LikeButton';

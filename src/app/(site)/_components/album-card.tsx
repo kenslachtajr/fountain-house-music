@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import Link from 'next/link';
 import { BiDisc } from 'react-icons/bi';
-import useLoadImage from '~/hooks/useLoadImage';
+import { useLoadImage } from '~/hooks/use-load-image';
 import { Album } from '~/types/types';
 import { formatDate } from '~/utils/format-date';
 import PlayButton from './play-button';

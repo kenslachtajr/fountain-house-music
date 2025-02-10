@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
-import useLoadImage from '~/hooks/useLoadImage';
+import { useLoadImage } from '~/hooks/use-load-image';
 import { usePlayerCurrentSongSelect } from '../store/player.store';
 
 export function PlayerDetails() {

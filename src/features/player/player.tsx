@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
 import { SimpleSlider } from '~/components/ui/slider';
-import useLoadImage from '~/hooks/useLoadImage';
+import { useLoadImage } from '~/hooks/use-load-image';
 import { PlayerControls } from './components/player-controls';
 import { PlayerDetails } from './components/player-details';
 import { PlayerSettings } from './components/player-settings';

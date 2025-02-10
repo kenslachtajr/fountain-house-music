@@ -5,7 +5,7 @@ import qs from 'query-string';
 import { useEffect, useState } from 'react';
 import Input from '~/components/Input';
 
-import useDebounce from '~/hooks/useDebounce';
+import { useDebounce } from '~/hooks/use-debounce';
 
 const SearchInput = () => {
   const router = useRouter();

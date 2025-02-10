@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import useLoadImage from '~/hooks/useLoadImage';
+import { useLoadImage } from '~/hooks/use-load-image';
 import { Album } from '~/types/types';
 
 interface AlbumImageProps {
