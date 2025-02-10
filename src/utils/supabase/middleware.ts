@@ -37,16 +37,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // console.log(user);
+  const protectedRoutes = ['/account', '/liked'];
 
-  if (
-    !user &&
-    request.nextUrl.pathname.startsWith('/account') &&
-    request.nextUrl.pathname.startsWith('/liked')
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
-    // const url = request.nextUrl.clone();
-    // url.pathname = '/';
+  if (!user && protectedRoutes.includes(request.nextUrl.pathname)) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
