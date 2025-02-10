@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { BiSearch } from 'react-icons/bi';
 import { FaUserAlt } from 'react-icons/fa';
@@ -12,6 +12,7 @@ import { twMerge } from 'tailwind-merge';
 import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { usePlayerStoreActions } from '~/features/player/store/player.store';
+import { useCreateQueryString } from '~/hooks/use-create-query-string';
 import { createClient } from '~/utils/supabase/client';
 import { Button } from './ui/legacy/button';
 
@@ -22,8 +23,10 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ children, className }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const player = usePlayerStoreActions();
   const userDetails = useCurrentUserSelect();
+  const createQueryString = useCreateQueryString();
   const { openDialog } = useAuthenticationDialogActions();
 
   const supabaseClient = createClient();
@@ -85,10 +88,27 @@ export const Header: React.FC<HeaderProps> = ({ children, className }) => {
               </Button>
             </div>
           ) : (
-            <div>
-              <Button onClick={openDialog} className="px-6 py-2 bg-white">
-                Log In
-              </Button>
+            <div className="flex items-center gap-x-4">
+              <Link
+                href={{
+                  pathname,
+                  query: createQueryString('action', 'sign-up'),
+                }}
+              >
+                <Button className="px-6 py-2 text-white bg-transparent">
+                  Sign Up
+                </Button>
+              </Link>
+              <Link
+                href={{
+                  pathname,
+                  query: createQueryString('action', 'sign-in'),
+                }}
+              >
+                <Button onClick={openDialog} className="px-6 py-2 bg-white">
+                  Sign In
+                </Button>
+              </Link>
             </div>
           )}
         </div>

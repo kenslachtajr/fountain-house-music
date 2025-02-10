@@ -10,6 +10,7 @@ import { Separator } from '~/components/ui/separator';
 import { useCreateQueryString } from '~/hooks/use-create-query-string';
 import { signIn } from '../actions/sign-in';
 import { AuthSocials } from './auth-socials';
+import { FormMessage } from './form-message';
 
 export function SignIn() {
   const pathname = usePathname();
@@ -56,9 +57,17 @@ export function SignIn() {
         >
           Sign in
         </Button>
+
+        <FormMessage />
       </form>
 
       <div className="flex flex-col gap-2 text-sm text-center">
+        <Link
+          href={{ pathname, query: createQueryString('action', 'sign-up') }}
+          className="text-muted-foreground hover:text-primary"
+        >
+          Don&apos;t have an account? Sign up
+        </Link>
         <Link
           href={{
             pathname,
@@ -67,12 +76,6 @@ export function SignIn() {
           className="text-muted-foreground hover:text-primary"
         >
           Forgot your password?
-        </Link>
-        <Link
-          href={{ pathname, query: createQueryString('action', 'sign-up') }}
-          className="text-muted-foreground hover:text-primary"
-        >
-          Don&apos;t have an account? Sign up
         </Link>
       </div>
     </div>

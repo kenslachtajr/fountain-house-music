@@ -89,14 +89,15 @@ export function AccountProfile() {
   };
 
   useEffect(() => {
-    // ! Super jank
     const userFullName = user?.full_name || '';
     const userEmail = user?.email || '';
-    const hasNoUserState = !userFullName || !userEmail;
+    const hasNoUserState = !userFullName && !userEmail;
 
     if (userFullNameSet.current || hasNoUserState) return;
 
-    form.reset({ full_name: userFullName, email: userEmail });
+    setTimeout(() => {
+      form.reset({ full_name: userFullName, email: userEmail });
+    }, 100);
 
     userFullNameSet.current = true;
   }, [form, user?.email, user?.full_name]);
