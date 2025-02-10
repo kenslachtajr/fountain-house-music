@@ -10,15 +10,19 @@ import toast from 'react-hot-toast';
 
 import Button from '~/components/Button';
 import Input from '~/components/Input';
-import { useCurrentUserFromStore } from '~/store/current-user';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { createClient } from '~/utils/supabase/client';
-import { useUploadDialog } from '../hooks/use-upload-modal';
+import {
+  useIsUploadDialogOpenSelect,
+  useUploadDialogActions,
+} from '../stores/use-upload-modal';
 
 export function UploadForm() {
   const router = useRouter();
   const supabaseClient = createClient();
-  const user = useCurrentUserFromStore();
-  const { isOpen, closeDialog } = useUploadDialog();
+  const user = useCurrentUserSelect();
+  const isOpen = useIsUploadDialogOpenSelect();
+  const { closeDialog } = useUploadDialogActions();
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm<FieldValues>({
     defaultValues: {

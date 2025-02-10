@@ -9,9 +9,9 @@ import { HiHome } from 'react-icons/hi';
 import { RxCaretLeft, RxCaretRight } from 'react-icons/rx';
 import { twMerge } from 'tailwind-merge';
 
-import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
+import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { usePlayerStoreActions } from '~/features/player/store/player.store';
-import { useCurrentUserFromStore } from '~/store/current-user';
 import { createClient } from '~/utils/supabase/client';
 import Button from './Button';
 
@@ -23,8 +23,8 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ children, className }) => {
   const router = useRouter();
   const player = usePlayerStoreActions();
-  const userDetails = useCurrentUserFromStore();
-  const { openDialog } = useAuthenticationModal();
+  const userDetails = useCurrentUserSelect();
+  const { openDialog } = useAuthenticationDialogActions();
 
   const supabaseClient = createClient();
 

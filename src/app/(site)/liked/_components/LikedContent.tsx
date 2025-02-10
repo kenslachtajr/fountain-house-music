@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 import MediaItem from '~/components/MediaItem';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import { usePlayerSongsSelect } from '~/features/player/store/player.store';
-import { useCurrentUserFromStore } from '~/store/current-user';
 import { Song } from '~/types/types';
 
 interface LikedContentProps {
@@ -14,7 +14,7 @@ interface LikedContentProps {
 }
 
 const LikedContent: React.FC<LikedContentProps> = ({ songs: likedSongs }) => {
-  const user = useCurrentUserFromStore();
+  const user = useCurrentUserSelect();
   const router = useRouter();
 
   const songs = usePlayerSongsSelect();

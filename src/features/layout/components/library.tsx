@@ -3,10 +3,10 @@
 import { AiOutlinePlus } from 'react-icons/ai';
 import { TbPlaylist } from 'react-icons/tb';
 import MediaItem from '~/components/MediaItem';
+import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
 
-import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { useUploadDialog } from '~/features/upload/hooks/use-upload-modal';
-import { useCurrentUserFromStore } from '~/store/current-user';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
+import { useUploadDialogActions } from '~/features/upload/stores/use-upload-modal';
 import { Song } from '~/types/types';
 
 interface LibraryProps {
@@ -14,9 +14,10 @@ interface LibraryProps {
 }
 
 export function Library({ songs }: LibraryProps) {
-  const userDetails = useCurrentUserFromStore();
-  const { openDialog: openAuthenticationDialog } = useAuthenticationModal();
-  const { openDialog: openUploadDialog } = useUploadDialog();
+  const userDetails = useCurrentUserSelect();
+  const { openDialog: openAuthenticationDialog } =
+    useAuthenticationDialogActions();
+  const { openDialog: openUploadDialog } = useUploadDialogActions();
 
   const onClick = () => {
     if (!userDetails) {

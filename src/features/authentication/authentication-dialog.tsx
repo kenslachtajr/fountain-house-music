@@ -9,17 +9,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
-import { useCurrentUserFromStore } from '~/store/current-user';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { useCreateQueryString } from '~/utils/create-query-string';
 import { AuthenticationFeature } from './authentication';
-import { useAuthenticationModal } from './hooks/use-authentication-dialog';
+import {
+  useAuthenticationDialogActions,
+  useIsAuthenticationDialogOpenSelect,
+} from './stores/use-authentication-dialog';
 
 export function AuthenticationDialogFeature() {
   const router = useRouter();
   const pathname = usePathname();
-  const user = useCurrentUserFromStore();
+  const user = useCurrentUserSelect();
   const createQueryString = useCreateQueryString();
-  const { isOpen, closeDialog } = useAuthenticationModal();
+  const isOpen = useIsAuthenticationDialogOpenSelect();
+  const { closeDialog } = useAuthenticationDialogActions();
 
   const handleOpenChange = (open: boolean) => {
     if (open) return;

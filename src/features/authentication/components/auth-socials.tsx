@@ -1,4 +1,5 @@
 import { FaFacebookF, FaGoogle, FaSpotify } from 'react-icons/fa';
+
 import { Button } from '~/components/ui/button';
 
 const socials = [

@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
-import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { useCurrentUserFromStore } from '~/store/current-user';
+import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { createClient } from '~/utils/supabase/client';
 
 interface LikeButtonProps {
@@ -16,8 +16,8 @@ const LikeButton: React.FC<LikeButtonProps> = ({ songId }) => {
   const router = useRouter();
   const supabaseClient = createClient();
 
-  const { openDialog } = useAuthenticationModal();
-  const user = useCurrentUserFromStore();
+  const { openDialog } = useAuthenticationDialogActions();
+  const user = useCurrentUserSelect();
 
   const [isLiked, setIsLiked] = useState(false);
 

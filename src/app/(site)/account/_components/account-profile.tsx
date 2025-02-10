@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { Label } from '~/components/ui/label';
-import { useCurrentUserFromStore } from '~/store/current-user';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { UserDetails } from '~/types/types';
 import { createClient } from '~/utils/supabase/client';
 
@@ -23,7 +23,7 @@ type UserDetailsForm = Pick<UserDetails, 'full_name'> & {
 };
 
 export function AccountProfile() {
-  const user = useCurrentUserFromStore();
+  const user = useCurrentUserSelect();
   const supabase = createClient();
   const userFullNameSet = useRef(false);
   const form = useForm<UserDetailsForm>({

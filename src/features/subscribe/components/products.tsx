@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import Button from '~/components/Button';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { getStripe } from '~/lib/stripeClient';
-import { useCurrentUserFromStore } from '~/store/current-user';
 import { Price, ProductWithPrice } from '~/types/types';
 import { postData } from '~/utils/helpers';
 
@@ -13,7 +13,7 @@ interface ProductsProps {
 }
 
 export function Products({ products }: ProductsProps) {
-  const user = useCurrentUserFromStore();
+  const user = useCurrentUserSelect();
   const [priceIdLoading, setPriceIdLoading] = useState<string>();
 
   const handleCheckout = async (price: Price) => {

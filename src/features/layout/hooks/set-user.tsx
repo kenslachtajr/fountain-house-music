@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useCurrentUserActions } from '~/store/current-user';
+import { useCurrentUserActions } from '~/features/layout/store/current-user';
 import { UserDetails } from '~/types/types';
 
 export const useSetUser = (user?: UserDetails | null) => {

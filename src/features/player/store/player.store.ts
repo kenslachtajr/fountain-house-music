@@ -1,8 +1,8 @@
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
 import { create } from 'zustand';
-import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { useSubscribeDialog } from '~/features/subscribe/hooks/use-subscribe-dialog';
-import { useCurrentUserFromStore } from '~/store/current-user';
+import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
+import { useSubscribeDialogActions } from '~/features/subscribe/stores/use-subscribe-dialog';
 import { Song } from '~/types/types';
 
 interface PlayerStore {
@@ -58,10 +58,11 @@ export const usePlayerSongsSelect = () =>
   usePlayerStore((state) => state.songs);
 
 export const usePlayerStoreActions = () => {
-  const user = useCurrentUserFromStore();
+  const user = useCurrentUserSelect();
   const { stop } = useGlobalAudioPlayer();
-  const { openDialog: openAuthenticationDialog } = useAuthenticationModal();
-  const { openDialog: openSubscribeDialog } = useSubscribeDialog();
+  const { openDialog: openAuthenticationDialog } =
+    useAuthenticationDialogActions();
+  const { openDialog: openSubscribeDialog } = useSubscribeDialogActions();
   const { setCurrentSong, reset, ...actions } = usePlayerStore(
     (state) => state.actions,
   );
