@@ -1,7 +1,7 @@
 import { Song } from '~/types/types';
 import { createClient } from '~/utils/supabase/client';
 
-const useLoadSongUrl = (song?: Song) => {
+export const useLoadSongUrl = (song?: Song) => {
   const supabaseClient = createClient();
 
   if (!song?.song_path) {
@@ -14,5 +14,3 @@ const useLoadSongUrl = (song?: Song) => {
 
   return songData.publicUrl;
 };
-
-export default useLoadSongUrl;
