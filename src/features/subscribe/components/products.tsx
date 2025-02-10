@@ -4,7 +4,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import Button from '~/components/Button';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
-import { getStripe } from '~/lib/stripeClient';
+import { getStripe } from '~/lib/get-stripe';
 import { Price, ProductWithPrice } from '~/types/types';
 import { postData } from '~/utils/post-data';
 
