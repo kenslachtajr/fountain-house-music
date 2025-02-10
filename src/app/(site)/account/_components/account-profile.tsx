@@ -3,8 +3,8 @@
 import { useEffect, useRef } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import Button from '~/components/Button';
-import Input from '~/components/Input';
+import { Button } from '~/components/button';
+import { Input } from '~/components/input';
 import {
   Card,
   CardContent,

@@ -6,13 +6,13 @@ import { usePlayerStoreActions } from '~/features/player/store/player.store';
 import { useLoadImage } from '~/hooks/use-load-image';
 import { Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
-import LikeButton from './LikeButton';
+import { LikeButton } from './like-button';
 
 interface MediaItemProps {
   data: Song;
 }
 
-const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
+export const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
   const { setCurrentSong } = usePlayerStoreActions();
   const imageUrl = useLoadImage(data);
 
@@ -51,5 +51,3 @@ function MediaItemDuration({ duration }: { duration: number | null }) {
     </p>
   );
 }
-
-export default MediaItem;

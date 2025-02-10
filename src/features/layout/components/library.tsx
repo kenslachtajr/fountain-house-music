@@ -2,7 +2,7 @@
 
 import { AiOutlinePlus } from 'react-icons/ai';
 import { TbPlaylist } from 'react-icons/tb';
-import MediaItem from '~/components/MediaItem';
+import { MediaItem } from '~/components/media-item';
 import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
 
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';

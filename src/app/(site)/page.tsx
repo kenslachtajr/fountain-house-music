@@ -1,4 +1,4 @@
-import Header from '~/components/Header';
+import { Header } from '~/components/header';
 import { getAlbums } from '~/server/actions/album/get-albums';
 import PageContent from './_components/PageContent';
 import ListItem from './_components/list-item';

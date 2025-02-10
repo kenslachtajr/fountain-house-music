@@ -1,6 +1,6 @@
 'use client';
 
-import LikeButton from '~/components/LikeButton';
+import { LikeButton } from '~/components/like-button';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import { usePlayerStoreActions } from '~/features/player/store/player.store';
 import { Song } from '~/types/types';

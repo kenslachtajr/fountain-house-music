@@ -13,14 +13,14 @@ import { useAuthenticationDialogActions } from '~/features/authentication/stores
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { usePlayerStoreActions } from '~/features/player/store/player.store';
 import { createClient } from '~/utils/supabase/client';
-import Button from './Button';
+import { Button } from './button';
 
 interface HeaderProps {
   children: React.ReactNode;
   className?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ children, className }) => {
+export const Header: React.FC<HeaderProps> = ({ children, className }) => {
   const router = useRouter();
   const player = usePlayerStoreActions();
   const userDetails = useCurrentUserSelect();
@@ -97,5 +97,3 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
     </div>
   );
 };
-
-export default Header;

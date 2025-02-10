@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import Header from '~/components/Header';
+import { Header } from '~/components/header';
 import { getAlbumAction } from '~/server/actions/album/get-album';
 import { Album } from '~/types/types';
 import { formatDate } from '~/utils/format-date';

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-import MediaItem from '~/components/MediaItem';
+import { MediaItem } from '~/components/media-item';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import { usePlayerSongsSelect } from '~/features/player/store/player.store';

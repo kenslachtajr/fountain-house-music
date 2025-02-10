@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import Header from '~/components/Header';
+import { Header } from '~/components/header';
 import { getLikedSongs } from '~/server/actions/songs/get-liked-songs';
 import LikedContent from './_components/LikedContent';
 

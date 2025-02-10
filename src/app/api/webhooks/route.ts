@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 import { stripe } from '~/lib/stripe';
-import { manageSubscriptionStatusChange } from '~/lib/supabaseAdmin';
+import { manageSubscriptionStatusChange } from '~/server/actions/stripe/manage-subscription-status-change';
 import { upsertPriceRecord } from '~/server/actions/stripe/upsert-price-record';
 import { upsertProductRecord } from '~/server/actions/stripe/upsert-product-record';
 

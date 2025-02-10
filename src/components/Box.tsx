@@ -1,16 +1,17 @@
-import { twMerge } from 'tailwind-merge';
+import { ComponentPropsWithoutRef, forwardRef } from 'react';
+import { cn } from '~/lib/cn';
 
-interface BoxProps {
-  children: React.ReactNode;
-  className?: string;
-}
+export const Box = forwardRef<HTMLDivElement, ComponentPropsWithoutRef<'div'>>(
+  ({ children, className }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn('bg-neutral rounded-lg h-fit w-full', className)}
+      >
+        {children}
+      </div>
+    );
+  },
+);
 
-const Box: React.FC<BoxProps> = ({ children, className }) => {
-  return (
-    <div className={twMerge(`bg-neutral rounded-lg h-fit w-full`, className)}>
-      {children}
-    </div>
-  );
-};
-
-export default Box;
+Box.displayName = 'Box';

@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
-import Button from '~/components/Button';
-import Input from '~/components/Input';
+import { Button } from '~/components/button';
+import { Input } from '~/components/input';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { createClient } from '~/utils/supabase/client';
 import {

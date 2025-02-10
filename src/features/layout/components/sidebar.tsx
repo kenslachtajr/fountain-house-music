@@ -6,7 +6,7 @@ import { BiSearch } from 'react-icons/bi';
 import { HiHome } from 'react-icons/hi';
 import { twMerge } from 'tailwind-merge';
 
-import Box from '~/components/Box';
+import { Box } from '~/components/box';
 import { usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
 import { cn } from '~/lib/cn';
 import { Song, UserDetails } from '~/types/types';
