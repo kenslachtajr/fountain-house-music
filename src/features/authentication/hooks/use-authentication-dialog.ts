@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
-interface AuthenticationModalStore {
+interface AuthenticationDialogStore {
   isOpen: boolean;
   openDialog: () => void;
   closeDialog: () => void;
   toggleDialog: () => void;
 }
 
-export const useAuthenticationModal = create<AuthenticationModalStore>(
+export const useAuthenticationModal = create<AuthenticationDialogStore>(
   (set) => ({
     isOpen: false,
     openDialog: () => set({ isOpen: true }),

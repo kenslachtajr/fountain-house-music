@@ -4,8 +4,8 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { TbPlaylist } from 'react-icons/tb';
 
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
+import { useUploadDialog } from '~/features/upload/hooks/use-upload-modal';
 import { useCurrentUserFromStore } from '~/hooks/use-current-user';
-import useUploadModal from '~/hooks/useUploadModal';
 import { Song } from '~/types/types';
 import MediaItem from './MediaItem';
 
@@ -15,16 +15,16 @@ interface LibraryProps {
 
 const Library: React.FC<LibraryProps> = ({ songs }) => {
   const userDetails = useCurrentUserFromStore();
-  const { openDialog } = useAuthenticationModal();
-  const uploadModal = useUploadModal();
+  const { openDialog: openAuthenticationDialog } = useAuthenticationModal();
+  const { openDialog: openUploadDialog } = useUploadDialog();
 
   const onClick = () => {
     if (!userDetails) {
-      return openDialog();
+      return openAuthenticationDialog();
     }
 
     // TODO: Check for subscription
-    return uploadModal.onOpen();
+    return openUploadDialog();
   };
 
   if (!userDetails || userDetails.role === 'user') return null;

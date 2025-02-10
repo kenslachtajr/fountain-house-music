@@ -5,23 +5,21 @@ import uniqid from 'uniqid';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
+import Button from '~/components/Button';
+import Input from '~/components/Input';
 import { useCurrentUserFromStore } from '~/hooks/use-current-user';
-import useUploadModal from '~/hooks/useUploadModal';
 import { createClient } from '~/utils/supabase/client';
-import Button from './Button';
-import Input from './Input';
-import Modal from './Modal';
+import { useUploadDialog } from '../hooks/use-upload-modal';
 
-const uploadModal = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const uploadModal = useUploadModal();
-  const user = useCurrentUserFromStore();
-  const supabaseClient = createClient();
+export function UploadForm() {
   const router = useRouter();
-
+  const supabaseClient = createClient();
+  const user = useCurrentUserFromStore();
+  const { isOpen, closeDialog } = useUploadDialog();
+  const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, reset } = useForm<FieldValues>({
     defaultValues: {
       author: '',
@@ -30,13 +28,6 @@ const uploadModal = () => {
       image: null,
     },
   });
-
-  const onChange = (open: boolean) => {
-    if (!open) {
-      reset();
-      uploadModal.onClose();
-    }
-  };
 
   const onSubmit: SubmitHandler<FieldValues> = async (values) => {
     try {
@@ -98,7 +89,7 @@ const uploadModal = () => {
       setIsLoading(false);
       toast.success('Song created!');
       reset();
-      uploadModal.onClose();
+      closeDialog();
     } catch (error) {
       toast.error('Something went wrong!');
     } finally {
@@ -106,52 +97,48 @@ const uploadModal = () => {
     }
   };
 
-  return (
-    <Modal
-      title="Add a song"
-      description="Upload an mp3 file"
-      isOpen={uploadModal.isOpen}
-      onChange={onChange}
-    >
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
-        <Input
-          id="title"
-          disabled={isLoading}
-          {...register('title', { required: true })}
-          placeholder="Song title"
-        />
-        <Input
-          id="author"
-          disabled={isLoading}
-          {...register('author', { required: true })}
-          placeholder="Song author"
-        />
-        <div>
-          <div className="pb-1">Select a song file</div>
-          <Input
-            id="song"
-            type="file"
-            disabled={isLoading}
-            accept=".mp3"
-            {...register('song', { required: true })}
-          />
-        </div>
-        <div>
-          <div className="pb-1">Select an image</div>
-          <Input
-            id="image"
-            type="file"
-            disabled={isLoading}
-            accept="image/*"
-            {...register('image', { required: true })}
-          />
-        </div>
-        <Button disabled={isLoading} type="submit">
-          Create
-        </Button>
-      </form>
-    </Modal>
-  );
-};
+  useEffect(() => {
+    if (isOpen) return;
+    reset();
+  }, [isOpen, reset]);
 
-export default uploadModal;
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
+      <Input
+        id="title"
+        disabled={isLoading}
+        {...register('title', { required: true })}
+        placeholder="Song title"
+      />
+      <Input
+        id="author"
+        disabled={isLoading}
+        {...register('author', { required: true })}
+        placeholder="Song author"
+      />
+      <div>
+        <div className="pb-1">Select a song file</div>
+        <Input
+          id="song"
+          type="file"
+          disabled={isLoading}
+          accept=".mp3"
+          {...register('song', { required: true })}
+        />
+      </div>
+      <div>
+        <div className="pb-1">Select an image</div>
+        <Input
+          id="image"
+          type="file"
+          disabled={isLoading}
+          accept="image/*"
+          {...register('image', { required: true })}
+        />
+      </div>
+      <Button disabled={isLoading} type="submit">
+        Create
+      </Button>
+    </form>
+  );
+}
