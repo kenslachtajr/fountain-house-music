@@ -1,7 +1,10 @@
-import getActiveProductsWithPrices from '~/server/actions/getActiveProductsWithPrices';
+import { ProductWithPrice } from '~/types/types';
 import { Products } from './components/products';
 
-export async function SubscribeFeature() {
-  const products = await getActiveProductsWithPrices();
+interface SubscribeFeatureProps {
+  products: ProductWithPrice[];
+}
+
+export function SubscribeFeature({ products }: SubscribeFeatureProps) {
   return <Products products={products} />;
 }

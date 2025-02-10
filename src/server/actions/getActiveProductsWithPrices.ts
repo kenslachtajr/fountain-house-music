@@ -1,9 +1,9 @@
-'use server';
-
 import { ProductWithPrice } from '~/types/types';
 import { createClient } from '~/utils/supabase/server';
 
-const getActiveProductsWithPrices = async (): Promise<ProductWithPrice[]> => {
+export const getActiveProductsWithPrices = async (): Promise<
+  ProductWithPrice[]
+> => {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -18,7 +18,5 @@ const getActiveProductsWithPrices = async (): Promise<ProductWithPrice[]> => {
     console.log(error);
   }
 
-  return (data || []) as ProductWithPrice[];
+  return (data ?? []) as ProductWithPrice[];
 };
-
-export default getActiveProductsWithPrices;

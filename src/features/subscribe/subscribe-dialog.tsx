@@ -1,10 +1,15 @@
 'use client';
 
 import Modal from '~/components/Modal';
+import { ProductWithPrice } from '~/types/types';
 import { useSubscribeDialog } from './hooks/use-subscribe-dialog';
 import { SubscribeFeature } from './subscribe';
 
-export function SubscribeDialogFeature() {
+interface SubscribeDialogProps {
+  products: ProductWithPrice[];
+}
+
+export function SubscribeDialogFeature({ products }: SubscribeDialogProps) {
   const { isOpen, closeDialog } = useSubscribeDialog();
 
   const handleChange = (open: boolean) => {
@@ -20,7 +25,7 @@ export function SubscribeDialogFeature() {
       isOpen={isOpen}
       onChange={handleChange}
     >
-      <SubscribeFeature />
+      <SubscribeFeature products={products} />
     </Modal>
   );
 }
