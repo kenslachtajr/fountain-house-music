@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { Label } from '~/components/ui/label';
-import { useCurrentUserFromStore } from '~/hooks/use-current-user';
+import { useCurrentUserFromStore } from '~/store/current-user';
 import { UserDetails } from '~/types/types';
 import { createClient } from '~/utils/supabase/client';
 

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import Button from '~/components/Button';
-import { useCurrentUserFromStore } from '~/hooks/use-current-user';
 import { getStripe } from '~/lib/stripeClient';
+import { useCurrentUserFromStore } from '~/store/current-user';
 import { Price, ProductWithPrice } from '~/types/types';
 import { postData } from '~/utils/helpers';
 

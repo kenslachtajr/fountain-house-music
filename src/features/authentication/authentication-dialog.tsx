@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
-import { useCurrentUserFromStore } from '~/hooks/use-current-user';
+import { useCurrentUserFromStore } from '~/store/current-user';
 import { useCreateQueryString } from '~/utils/create-query-string';
 import { AuthenticationFeature } from './authentication';
 import { useAuthenticationModal } from './hooks/use-authentication-dialog';

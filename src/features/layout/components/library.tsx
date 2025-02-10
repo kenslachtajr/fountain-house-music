@@ -6,7 +6,7 @@ import MediaItem from '~/components/MediaItem';
 
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
 import { useUploadDialog } from '~/features/upload/hooks/use-upload-modal';
-import { useCurrentUserFromStore } from '~/hooks/use-current-user';
+import { useCurrentUserFromStore } from '~/store/current-user';
 import { Song } from '~/types/types';
 
 interface LibraryProps {

@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import MediaItem from '~/components/MediaItem';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import { usePlayerSongsSelect } from '~/features/player/store/player.store';
-import { useCurrentUserFromStore } from '~/hooks/use-current-user';
+import { useCurrentUserFromStore } from '~/store/current-user';
 import { Song } from '~/types/types';
 
 interface LikedContentProps {

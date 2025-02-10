@@ -1,7 +1,7 @@
 import { useGlobalAudioPlayer } from 'react-use-audio-player';
 import { create } from 'zustand';
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { useCurrentUserFromStore } from '~/hooks/use-current-user';
+import { useCurrentUserFromStore } from '~/store/current-user';
 import { Song } from '~/types/types';
 
 interface PlayerStore {

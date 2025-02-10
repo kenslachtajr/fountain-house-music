@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
-import { useCurrentUserFromStore } from '~/hooks/use-current-user';
+import { useCurrentUserFromStore } from '~/store/current-user';
 import { createClient } from '~/utils/supabase/client';
 
 interface LikeButtonProps {

@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 
 import Button from '~/components/Button';
 import Input from '~/components/Input';
-import { useCurrentUserFromStore } from '~/hooks/use-current-user';
+import { useCurrentUserFromStore } from '~/store/current-user';
 import { createClient } from '~/utils/supabase/client';
 import { useUploadDialog } from '../hooks/use-upload-modal';
 

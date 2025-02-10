@@ -11,7 +11,7 @@ import { twMerge } from 'tailwind-merge';
 
 import { useAuthenticationModal } from '~/features/authentication/hooks/use-authentication-dialog';
 import { usePlayerStoreActions } from '~/features/player/store/player.store';
-import { useCurrentUserFromStore } from '~/hooks/use-current-user';
+import { useCurrentUserFromStore } from '~/store/current-user';
 import { createClient } from '~/utils/supabase/client';
 import Button from './Button';
 
