@@ -12,6 +12,7 @@ import ToasterProvider from '~/providers/ToasterProvider';
 import UserProvider from '~/providers/UserProvider';
 import getActiveProductsWithPrices from '~/server/actions/getActiveProductsWithPrices';
 import getSongsByUserId from '~/server/actions/getSongsByUserId';
+import { NavigationFeature } from '~/features/navigation/navigation';
 
 const font = Figtree({ subsets: ['latin'] });
 
@@ -73,7 +74,10 @@ export default async function RootLayout({ children }: PropsWithChildren) {
           <UserProvider>
             <ModalProvider products={products} />
             <Sidebar songs={userSongs}>{children}</Sidebar>
-            <PlayerFeature />
+            <div className="fixed bottom-0 w-full">
+              <PlayerFeature />
+              <NavigationFeature/>
+            </div>
           </UserProvider>
         </SupabaseProvider>
       </body>

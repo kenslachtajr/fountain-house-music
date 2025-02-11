@@ -38,10 +38,11 @@ const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
     ],
     [pathname],
   );
+
   return (
     <div
       className={twMerge(
-        `*:
+        `
         flex
         h-screen
         overflow-hidden
@@ -62,8 +63,8 @@ const Sidebar: React.FC<SidebarProps> = ({ children, songs }) => {
       </div>
       <main
         className={cn(
-          'flex-1 h-full py-2 overflow-y-auto',
-          currentSong ? 'h-[calc(100%-64px)]' : 'h-full',
+          'flex-1 pt-2 overflow-auto',
+          currentSong ? "pb-[160px] md:pb-[80px]" : "pb-[80px] md:pb-0"
         )}
       >
         {children}

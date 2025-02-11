@@ -18,7 +18,7 @@ export function PlayerDetails() {
     <div className="flex justify-start w-full">
       <div className="flex items-center gap-x-4">
         {/* Media item */}
-        <div className="flex items-center w-full p-2 rounded-md cursor-pointer gap-x-3 hover:bg-neutral-800/50">
+        <div className="flex items-center w-full p-2 rounded-md cursor-pointer gap-x-3 hover:bg-neutral-800/50 max-md:max-w-72 max-w-96">
           <div className="relative overflow-hidden rounded-md min-h-12 min-w-12">
             <Image
               fill
