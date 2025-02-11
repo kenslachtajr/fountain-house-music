@@ -12,7 +12,7 @@ export function AlbumImage({ album }: AlbumImageProps) {
   const imageUrl = useLoadImage(album);
 
   return (
-    <div className="relative w-32 h-32 lg:h-44 lg:w-44">
+    <div className="relative aspect-square w-32 h-32 min-w-44 min-h-44 lg:w-44 lg:h-44">
       <Image
         fill
         alt="Album"
