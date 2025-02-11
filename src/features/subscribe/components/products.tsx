@@ -24,7 +24,7 @@ export function Products({ products }: ProductsProps) {
       return toast.error('Must be logged in');
     }
 
-    if (user?.subscriptions) {
+    if (user?.subscription) {
       setPriceIdLoading(undefined);
       return toast('Already subscribed!');
     }
@@ -44,7 +44,7 @@ export function Products({ products }: ProductsProps) {
     }
   };
 
-  if (user?.subscriptions) {
+  if (user?.subscription) {
     return <div className="text-center">Already subscribed!</div>;
   }
 

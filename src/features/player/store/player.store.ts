@@ -73,7 +73,7 @@ export const usePlayerStoreActions = () => {
       return;
     }
 
-    if (!user.subscriptions) {
+    if (!user.subscription) {
       openSubscribeDialog();
       return;
     }

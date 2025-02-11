@@ -61,7 +61,7 @@ export interface UserDetails {
   payment_method?: Stripe.PaymentMethod[Stripe.PaymentMethod.Type];
   role: 'admin' | 'user';
   email?: string;
-  subscriptions?: Subscription;
+  subscription?: Subscription;
 }
 
 type Prettify<T> = {
