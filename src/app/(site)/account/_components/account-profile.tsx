@@ -95,9 +95,7 @@ export function AccountProfile() {
 
     if (userFullNameSet.current || hasNoUserState) return;
 
-    setTimeout(() => {
-      form.reset({ full_name: userFullName, email: userEmail });
-    }, 100);
+    form.reset({ full_name: userFullName, email: userEmail });
 
     userFullNameSet.current = true;
   }, [form, user?.email, user?.full_name]);

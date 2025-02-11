@@ -1,7 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Modal } from '~/components/ui/legacy/modal';
 import { ProductWithPrice } from '~/types/types';
+import { useCurrentUserSelect } from '../layout/store/current-user';
 import {
   useIsSubscribeDialogOpenSelect,
   useSubscribeDialogActions,
@@ -13,6 +15,7 @@ interface SubscribeDialogProps {
 }
 
 export function SubscribeDialogFeature({ products }: SubscribeDialogProps) {
+  const user = useCurrentUserSelect();
   const isOpen = useIsSubscribeDialogOpenSelect();
   const { closeDialog } = useSubscribeDialogActions();
 
@@ -21,6 +24,11 @@ export function SubscribeDialogFeature({ products }: SubscribeDialogProps) {
       closeDialog();
     }
   };
+
+  useEffect(() => {
+    if (!user?.subscription) return;
+    closeDialog();
+  }, [user?.subscription]);
 
   return (
     <Modal

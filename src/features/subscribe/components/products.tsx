@@ -6,6 +6,7 @@ import { Button } from '~/components/ui/legacy/button';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { getStripe } from '~/lib/get-stripe';
 import { Price, ProductWithPrice } from '~/types/types';
+import { formatPrice } from '~/utils/format-price';
 import { postData } from '~/utils/post-data';
 
 interface ProductsProps {
@@ -71,14 +72,4 @@ export function Products({ products }: ProductsProps) {
   }
 
   return <div className="text-center">No products available!</div>;
-}
-
-function formatPrice(price: Price) {
-  const priceString = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: price.currency || undefined,
-    minimumFractionDigits: 0,
-  }).format((price?.unit_amount || 0) / 100);
-
-  return priceString;
 }
