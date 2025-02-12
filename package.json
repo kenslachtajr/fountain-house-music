@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "format": "prettier --check --ignore-path .gitignore .",
+    "format:fix": "prettier --write --ignore-path .gitignore .",
     "supabase:generate:types": "supabase gen types typescript --project-id \"mrtwlhupmsqkvymzxfzv\" --schema public > ./src/types/supabase.ts"
   },
   "dependencies": {
@@ -49,7 +51,8 @@
     "eslint": "^9",
     "eslint-config-next": "^15.1.6",
     "postcss": "^8.4.38",
-    "prettier": "^3.4.2",
+    "prettier": "^3.5.0",
+    "prettier-plugin-tailwindcss": "^0.6.11",
     "serwist": "^9.0.11",
     "supabase": "^2.9.6",
     "tailwindcss": "^3.4.3",
