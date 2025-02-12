@@ -1,4 +1,4 @@
-import { Header } from '~/components/header';
+import { Header } from '~/components/app-header';
 import { ListItem } from './list-item';
 
 export function HomeHeader() {
