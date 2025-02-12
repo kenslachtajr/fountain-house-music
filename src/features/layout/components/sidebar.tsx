@@ -44,18 +44,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ children, songs, user }) => {
   useSetUser(user);
 
   return (
-    <div
-      className={twMerge(
-        `*:
-        flex
-        h-screen
-        overflow-hidden
-      `,
-      )}
-    >
-      <div className="hidden md:flex flex-col gap-y-2 bg-black h-full w-[300px] p-2 overflow-y-auto">
+    <div className={twMerge(`*: flex h-screen overflow-hidden`)}>
+      <div className="hidden h-full w-[300px] flex-col gap-y-2 overflow-y-auto bg-black p-2 md:flex">
         <Box>
-          <div className="flex flex-col px-5 py-4 gap-y-4">
+          <div className="flex flex-col gap-y-4 px-5 py-4">
             {routes.map((item) => (
               <SidebarItem key={item.label} {...item} />
             ))}
@@ -67,7 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ children, songs, user }) => {
       </div>
       <main
         className={cn(
-          'flex-1 h-full py-2 overflow-y-auto',
+          'h-full flex-1 overflow-y-auto py-2',
           currentSong ? 'h-[calc(100%-64px)]' : 'h-full',
         )}
       >

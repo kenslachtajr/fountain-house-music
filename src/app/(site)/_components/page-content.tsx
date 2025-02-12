@@ -16,7 +16,7 @@ export const PageContent: React.FC<PageContentProps> = ({ albums }) => {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 mt-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
+    <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
       {albums.map((album) => (
         <AlbumCard
           key={album.id}

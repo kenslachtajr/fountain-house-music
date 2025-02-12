@@ -47,7 +47,7 @@ export function SubscriptionBilling() {
       <CardContent className="space-y-4">
         <>
           <h3 className="mb-1 font-medium">Current Plan</h3>
-          <div className="flex items-center justify-between p-4 border border-gray-500 rounded-lg">
+          <div className="flex items-center justify-between rounded-lg border border-gray-500 p-4">
             <div className="space-y-1">
               <p className="font-medium">{prices?.products?.name}</p>
               <p className="text-sm text-muted-foreground">$5.99 / month</p>
@@ -55,11 +55,11 @@ export function SubscriptionBilling() {
             </div>
             <form>
               <Button
-                className="inline-flex items-center text-white bg-transparent hover:bg-blue-500/10"
+                className="inline-flex items-center bg-transparent text-white hover:bg-blue-500/10"
                 onClick={redirectToCustomerPortal}
               >
                 Manage Subscription
-                <BiLinkExternal className="w-4 h-4 ml-2" />
+                <BiLinkExternal className="ml-2 h-4 w-4" />
               </Button>
             </form>
           </div>

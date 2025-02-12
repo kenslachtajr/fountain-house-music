@@ -15,11 +15,11 @@ export function PlayerDetails() {
   const Icon = isLiked ? AiFillHeart : AiOutlineHeart;
 
   return (
-    <div className="flex justify-start w-full">
+    <div className="flex w-full justify-start">
       <div className="flex items-center gap-x-4">
         {/* Media item */}
-        <div className="flex items-center w-full p-2 rounded-md cursor-pointer gap-x-3 hover:bg-neutral-800/50">
-          <div className="relative overflow-hidden rounded-md min-h-12 min-w-12">
+        <div className="flex w-full cursor-pointer items-center gap-x-3 rounded-md p-2 hover:bg-neutral-800/50">
+          <div className="relative min-h-12 min-w-12 overflow-hidden rounded-md">
             <Image
               fill
               src={imagePath ?? ''}
@@ -27,9 +27,9 @@ export function PlayerDetails() {
               className="object-cover"
             />
           </div>
-          <div className="flex flex-col overflow-hidden gap-y-1">
-            <p className="text-white truncate">{currentSong?.title}</p>
-            <p className="text-sm truncate text-neutral-400">
+          <div className="flex flex-col gap-y-1 overflow-hidden">
+            <p className="truncate text-white">{currentSong?.title}</p>
+            <p className="truncate text-sm text-neutral-400">
               {currentSong?.author}
             </p>
           </div>

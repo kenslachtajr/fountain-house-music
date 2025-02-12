@@ -6,7 +6,7 @@ export const Box = forwardRef<HTMLDivElement, ComponentPropsWithoutRef<'div'>>(
     return (
       <div
         ref={ref}
-        className={cn('bg-neutral rounded-lg h-fit w-full', className)}
+        className={cn('bg-neutral h-fit w-full rounded-lg', className)}
       >
         {children}
       </div>

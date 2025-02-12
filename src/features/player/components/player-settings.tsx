@@ -24,11 +24,11 @@ export function PlayerSettings() {
   };
 
   return (
-    <div className="justify-end hidden w-full pr-2 md:flex">
-      <div className="flex items-center w-3/5 gap-x-4">
+    <div className="hidden w-full justify-end pr-2 md:flex">
+      <div className="flex w-3/5 items-center gap-x-4">
         <TimeLabel />
         <VolumeIcon
-          className="cursor-pointer w-9 h-9"
+          className="h-9 w-9 cursor-pointer"
           size={34}
           onClick={toggleMute}
         />

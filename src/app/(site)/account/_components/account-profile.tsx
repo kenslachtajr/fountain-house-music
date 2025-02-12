@@ -133,7 +133,7 @@ export function AccountProfile() {
           <Button
             type="submit"
             disabled={!form.formState.isDirty}
-            className="px-2 py-1 w-fit bg-slate-200"
+            className="w-fit bg-slate-200 px-2 py-1"
           >
             Submit
           </Button>

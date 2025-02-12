@@ -23,8 +23,8 @@ export function AlbumCard({ album, onPlayAlbum }: AlbumCardProps) {
 
   return (
     <Link href={`/album/${album.id}`}>
-      <div className="relative flex flex-col items-center justify-center p-3 overflow-hidden transition rounded-md cursor-pointer group gap-x-4 bg-neutral-400/5 hover:bg-neutral-400/10">
-        <div className="relative w-full h-full overflow-hidden rounded-md aspect-square">
+      <div className="group relative flex cursor-pointer flex-col items-center justify-center gap-x-4 overflow-hidden rounded-md bg-neutral-400/5 p-3 transition hover:bg-neutral-400/10">
+        <div className="relative aspect-square h-full w-full overflow-hidden rounded-md">
           <Image
             className="object-cover"
             src={imageUrl || '/images/placeholder.jpeg'}
@@ -32,22 +32,22 @@ export function AlbumCard({ album, onPlayAlbum }: AlbumCardProps) {
             alt="Image"
           />
         </div>
-        <div className="flex flex-col items-start w-full pt-4 gap-y-1">
-          <p className="w-full font-semibold truncate">{album.name}</p>
-          <p className="w-full text-sm font-semibold text-gray-400 truncate">
+        <div className="flex w-full flex-col items-start gap-y-1 pt-4">
+          <p className="w-full truncate font-semibold">{album.name}</p>
+          <p className="w-full truncate text-sm font-semibold text-gray-400">
             {album.author}
           </p>
-          <span className="inline-flex justify-between w-full text-gray-500">
-            <span className="text-xs font-semibold truncate">
+          <span className="inline-flex w-full justify-between text-gray-500">
+            <span className="truncate text-xs font-semibold">
               {album.duration} &middot; {releaseDate}
             </span>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold truncate">
+            <span className="inline-flex items-center gap-1 truncate text-xs font-semibold">
               <BiDisc /> {album.songs_count} songs
             </span>
           </span>
         </div>
         <div
-          className="absolute hidden bottom-24 right-5 md:block"
+          className="absolute bottom-24 right-5 hidden md:block"
           onClick={handlePlayAlbum}
         >
           <PlayButton />
