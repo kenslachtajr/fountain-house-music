@@ -1,6 +1,8 @@
+import { useGlobalAudioPlayer } from 'react-use-audio-player';
 import { create } from 'zustand';
-import useAuthModal from '~/hooks/useAuthModal';
-import { useUser } from '~/hooks/useUser';
+import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
+import { useSubscribeDialogActions } from '~/features/subscribe/stores/use-subscribe-dialog';
 import { Song } from '~/types/types';
 
 interface PlayerStore {
@@ -11,6 +13,7 @@ interface PlayerStore {
     previousSong: () => void;
     setSongs: (songs: Song[]) => void;
     setCurrentSong: (song: Song) => void;
+    reset: () => void;
   };
 }
 
@@ -42,6 +45,9 @@ const usePlayerStore = create<PlayerStore>()((set, get) => ({
       );
       set({ currentSong: songs.at(currentIndex - 1) });
     },
+    reset: () => {
+      set({ currentSong: undefined, songs: [] });
+    },
   },
 }));
 
@@ -52,23 +58,37 @@ export const usePlayerSongsSelect = () =>
   usePlayerStore((state) => state.songs);
 
 export const usePlayerStoreActions = () => {
-  const { user } = useUser();
-  const authModal = useAuthModal();
-  const { setCurrentSong, ...actions } = usePlayerStore(
+  const user = useCurrentUserSelect();
+  const { stop } = useGlobalAudioPlayer();
+  const { openDialog: openAuthenticationDialog } =
+    useAuthenticationDialogActions();
+  const { openDialog: openSubscribeDialog } = useSubscribeDialogActions();
+  const { setCurrentSong, reset, ...actions } = usePlayerStore(
     (state) => state.actions,
   );
 
   const handleCurrentSong = (song: Song) => {
     if (!user) {
-      authModal.onOpen();
+      openAuthenticationDialog();
+      return;
+    }
+
+    if (!user.subscription) {
+      openSubscribeDialog();
       return;
     }
 
     setCurrentSong(song);
   };
 
+  const handleReset = () => {
+    stop();
+    reset();
+  };
+
   return {
     ...actions,
     setCurrentSong: handleCurrentSong,
+    reset: handleReset,
   };
 };

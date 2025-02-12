@@ -1,7 +1,7 @@
 'use client';
 
-import { BiCreditCard, BiLinkExternal } from 'react-icons/bi';
-import Button from '~/components/Button';
+import toast from 'react-hot-toast';
+import { BiLinkExternal } from 'react-icons/bi';
 import {
   Card,
   CardContent,
@@ -9,8 +9,35 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
+import { Button } from '~/components/ui/legacy/button';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
+import { useSubscribeDialogActions } from '~/features/subscribe/stores/use-subscribe-dialog';
+import { Subscription } from '~/types/types';
+import { postData } from '~/utils/post-data';
 
 export function SubscriptionBilling() {
+  const user = useCurrentUserSelect();
+  const { openDialog: openSubscribeDialog } = useSubscribeDialogActions();
+  const subscription = user?.subscription;
+  const prices = subscription?.prices;
+
+  const redirectToCustomerPortal = async () => {
+    try {
+      if (!subscription?.prices?.active) {
+        openSubscribeDialog();
+        return;
+      }
+
+      const { url } = await postData({
+        url: '/api/create-portal-link',
+      });
+
+      window.location.assign(url);
+    } catch (error) {
+      toast.error((error as Error)?.message);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -18,61 +45,67 @@ export function SubscriptionBilling() {
         <CardDescription>Manage your subscription</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
+        <>
           <h3 className="mb-1 font-medium">Current Plan</h3>
           <div className="flex items-center justify-between p-4 border border-gray-500 rounded-lg">
             <div className="space-y-1">
-              <p className="font-medium">Paid Plan</p>
-              <p className="text-sm text-muted-foreground">$5.99/month</p>
-              <p className="text-sm text-muted-foreground">
-                Renews on{' '}
-                <span className="font-medium">
-                  {new Date(1681078400000).toLocaleDateString()}
-                </span>
-              </p>
+              <p className="font-medium">{prices?.products?.name}</p>
+              <p className="text-sm text-muted-foreground">$5.99 / month</p>
+              <SubscriptionDates subscription={subscription!} />
             </div>
             <form>
               <Button
-                type="submit"
                 className="inline-flex items-center text-white bg-transparent hover:bg-blue-500/10"
+                onClick={redirectToCustomerPortal}
               >
                 Manage Subscription
                 <BiLinkExternal className="w-4 h-4 ml-2" />
               </Button>
             </form>
           </div>
-        </div>
-        <div>
-          <h3 className="mb-1 font-medium">Payment Method</h3>
-          <div className="p-4 border rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-2 border rounded-md">
-                  <BiCreditCard className="w-4 h-4" />
-                </div>
-                <div className="space-y-1">
-                  <p className="font-medium capitalize">Visa •••• 1234</p>
-                  <p className="text-sm text-muted-foreground">
-                    Expires on{' '}
-                    <span className="font-medium">
-                      {new Date(1681078400000).toLocaleDateString()}
-                    </span>
-                  </p>
-                </div>
-              </div>
-              <form>
-                <Button
-                  type="submit"
-                  className="inline-flex items-center text-white bg-transparent hover:bg-blue-500/10"
-                >
-                  Update
-                  <BiLinkExternal className="w-4 h-4 ml-2" />
-                </Button>
-              </form>
-            </div>
-          </div>
-        </div>
+        </>
       </CardContent>
     </Card>
+  );
+}
+
+interface SubscriptionDatesProps {
+  subscription: Subscription;
+}
+
+function SubscriptionDates({ subscription }: SubscriptionDatesProps) {
+  if (subscription?.ended_at) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Ended on{' '}
+        <span className="font-medium">
+          {new Date(subscription.ended_at).toLocaleDateString()}
+        </span>
+      </p>
+    );
+  }
+
+  if (!subscription?.ended_at && !subscription?.created) {
+    return <p className="text-sm text-muted-foreground">Start listening now</p>;
+  }
+
+  if (subscription?.cancel_at_period_end) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Cancels on{' '}
+        <span className="font-medium">
+          {new Date(subscription?.current_period_start).toLocaleDateString()}
+        </span>
+      </p>
+    );
+  }
+
+  return (
+    <p className="text-sm text-muted-foreground">
+      Renews on{' '}
+      <span className="font-medium">
+        {new Date(subscription?.current_period_end!).toLocaleDateString()}
+      </span>
+    </p>
   );
 }

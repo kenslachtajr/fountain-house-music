@@ -8,7 +8,14 @@ const withSerwist = withSerwistInit({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['mrtwlhupmsqkvymzxfzv.supabase.co'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'mrtwlhupmsqkvymzxfzv.supabase.co',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 };
 

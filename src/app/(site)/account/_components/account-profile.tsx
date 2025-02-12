@@ -1,11 +1,8 @@
 'use client';
 
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useEffect, useRef } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import Button from '~/components/Button';
-import Input from '~/components/Input';
 import {
   Card,
   CardContent,
@@ -15,18 +12,20 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { Label } from '~/components/ui/label';
-import { useUser } from '~/hooks/useUser';
-import { Database } from '~/types/supabase';
+import { Button } from '~/components/ui/legacy/button';
+import { Input } from '~/components/ui/legacy/input';
+import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { UserDetails } from '~/types/types';
+import { createClient } from '~/utils/supabase/client';
 
 type UserDetailsForm = Pick<UserDetails, 'full_name'> & {
   email: string;
 };
 
 export function AccountProfile() {
-  const user = useUser();
+  const user = useCurrentUserSelect();
+  const supabase = createClient();
   const userFullNameSet = useRef(false);
-  const supabase = useSupabaseClient<Database>();
   const form = useForm<UserDetailsForm>({
     defaultValues: {
       email: '',
@@ -38,7 +37,7 @@ export function AccountProfile() {
     email,
     full_name,
   }) => {
-    if (!user.userDetails) return toast.error('User not authenticated.');
+    if (!user) return toast.error('User not authenticated.');
 
     const updates = [];
 
@@ -61,7 +60,7 @@ export function AccountProfile() {
         supabase
           .from('users')
           .update({ full_name })
-          .eq('id', user.userDetails?.id)
+          .eq('id', user.id)
           .then(({ error }) => ({
             success: !error,
             message: error?.message,
@@ -90,17 +89,16 @@ export function AccountProfile() {
   };
 
   useEffect(() => {
-    // ! Super jank
-    const userFullName = user.userDetails?.full_name || '';
-    const userEmail = user.user?.email || '';
-    const hasNoUserState = !userFullName || !userEmail;
+    const userFullName = user?.full_name || '';
+    const userEmail = user?.email || '';
+    const hasNoUserState = !userFullName && !userEmail;
 
     if (userFullNameSet.current || hasNoUserState) return;
 
     form.reset({ full_name: userFullName, email: userEmail });
 
     userFullNameSet.current = true;
-  }, [form, user.user?.email, user.userDetails?.full_name]);
+  }, [form, user?.email, user?.full_name]);
 
   return (
     <Card>
