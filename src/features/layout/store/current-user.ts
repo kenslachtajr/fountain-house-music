@@ -12,7 +12,6 @@ const useCurrentUserStore = create<CurrentUserState>((set) => ({
   user: null,
   actions: {
     setUser: (user?: UserDetails | null) => {
-      console.log('SETTING USER::::', user);
       set({ user });
     },
   },
