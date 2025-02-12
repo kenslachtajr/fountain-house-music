@@ -20,7 +20,7 @@ export default async function AlbumPage(props: AlbumProps) {
   }
 
   return (
-    <div className="w-full h-full overflow-hidden overflow-y-auto rounded-lg bg-neutral-900">
+    <div className="h-full w-full overflow-hidden overflow-y-auto rounded-lg bg-neutral-900">
       <AlbumHeader album={album} />
       <AlbumContent songs={album.songs} />
     </div>

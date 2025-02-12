@@ -26,7 +26,7 @@ export function AuthSocials() {
           variant="outline"
           className="bg-[#404040] text-white hover:bg-[#404040]/70"
         >
-          <Icon className="w-4 h-4 mr-2" />
+          <Icon className="mr-2 h-4 w-4" />
           Sign in with {name}
         </Button>
       ))}

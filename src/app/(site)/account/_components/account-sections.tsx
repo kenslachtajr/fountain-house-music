@@ -10,7 +10,7 @@ export function AccountSections() {
   if (!isMounted) return null;
 
   return (
-    <div className="p-6 space-y-9">
+    <div className="space-y-9 p-6">
       <AccountProfile />
       <SubscriptionBilling />
     </div>

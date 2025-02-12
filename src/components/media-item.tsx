@@ -17,13 +17,13 @@ export const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
   const imageUrl = useLoadImage(data);
 
   return (
-    <div className="flex items-center w-full gap-x-4">
+    <div className="flex w-full items-center gap-x-4">
       <div
         onClick={() => setCurrentSong(data)}
-        className="flex items-center justify-between w-full p-2 rounded-md cursor-pointer hover:bg-neutral-800/50"
+        className="flex w-full cursor-pointer items-center justify-between rounded-md p-2 hover:bg-neutral-800/50"
       >
         <div className="flex gap-3 overflow-hidden">
-          <div className="relative rounded-md min-h-[48px] min-w-[48px] overflow-hidden">
+          <div className="relative min-h-[48px] min-w-[48px] overflow-hidden rounded-md">
             <Image
               fill
               src={imageUrl || '/images/placeholder.jpeg'}
@@ -31,9 +31,9 @@ export const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
               className="object-cover"
             />
           </div>
-          <div className="flex flex-col overflow-hidden gap-y-1">
-            <p className="text-white truncate">{data.title}</p>
-            <p className="text-sm truncate text-neutral-400">{data.author}</p>
+          <div className="flex flex-col gap-y-1 overflow-hidden">
+            <p className="truncate text-white">{data.title}</p>
+            <p className="truncate text-sm text-neutral-400">{data.author}</p>
           </div>
         </div>
         <MediaItemDuration duration={data.duration} />
@@ -46,7 +46,7 @@ export const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
 function MediaItemDuration({ duration }: { duration: number | null }) {
   if (!duration) return;
   return (
-    <p className="text-sm truncate text-neutral-400">
+    <p className="truncate text-sm text-neutral-400">
       {formatDuration(duration)}
     </p>
   );

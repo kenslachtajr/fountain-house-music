@@ -62,7 +62,7 @@ export function PlayerFeature() {
   if (!currentSong) return null;
 
   return (
-    <div className="fixed bottom-0 w-full h-20 bg-black">
+    <div className="fixed bottom-0 h-20 w-full bg-black">
       <SeekSlider />
       <div className="px-4 py-2">
         <div className="grid h-full grid-cols-2 md:grid-cols-3">

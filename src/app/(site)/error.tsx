@@ -4,7 +4,7 @@ import { Box } from '~/components/ui/legacy/box';
 
 const Error = () => {
   return (
-    <Box className="flex items-center justify-center h-full">
+    <Box className="flex h-full items-center justify-center">
       <div className="text-neutral-400">Something went wrong.</div>
     </Box>
   );

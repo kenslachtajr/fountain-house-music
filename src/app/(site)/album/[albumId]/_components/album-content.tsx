@@ -14,7 +14,7 @@ export function AlbumContent({ songs }: AlbumContentProps) {
   useSetSongsToState(songs);
 
   return (
-    <div className="flex flex-col w-full p-6 gap-y-2">
+    <div className="flex w-full flex-col gap-y-2 p-6">
       {songs.map((song) => (
         <AlbumItem key={song.id} song={song} />
       ))}
@@ -30,16 +30,16 @@ function AlbumItem({ song }: AlbumItemProps) {
   const { setCurrentSong } = usePlayerStoreActions();
 
   return (
-    <div className="flex items-center w-full gap-x-4">
+    <div className="flex w-full items-center gap-x-4">
       <div
         onClick={() => setCurrentSong(song)}
-        className="flex items-center justify-between w-full p-2 rounded-md cursor-pointer gap-x-3 hover:bg-neutral-800/50"
+        className="flex w-full cursor-pointer items-center justify-between gap-x-3 rounded-md p-2 hover:bg-neutral-800/50"
       >
-        <div className="flex flex-col overflow-hidden gap-y-1">
-          <p className="text-white truncate">{song.title}</p>
-          <p className="text-sm truncate text-neutral-400">{song.author}</p>
+        <div className="flex flex-col gap-y-1 overflow-hidden">
+          <p className="truncate text-white">{song.title}</p>
+          <p className="truncate text-sm text-neutral-400">{song.author}</p>
         </div>
-        <p className="text-sm truncate text-neutral-400">
+        <p className="truncate text-sm text-neutral-400">
           {formatDuration(song.duration ?? 0)}
         </p>
       </div>
