@@ -59,7 +59,7 @@ export function ForgotPassword() {
         Send reset password instructions
       </Button>
 
-      <div className="flex flex-col gap-2 text-sm text-center">
+      <div className="flex flex-col gap-2 text-center text-sm">
         <Link
           href={buildDialogHref('sign-in')}
           className="text-muted-foreground hover:text-primary"

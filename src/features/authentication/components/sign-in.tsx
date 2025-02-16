@@ -83,7 +83,7 @@ export function SignIn() {
         </Button>
       </form>
 
-      <div className="flex flex-col gap-2 text-sm text-center">
+      <div className="flex flex-col gap-2 text-center text-sm">
         <Link
           href={buildDialogHref('sign-up')}
           className="text-muted-foreground hover:text-primary"

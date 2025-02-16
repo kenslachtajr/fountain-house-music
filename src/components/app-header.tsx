@@ -44,29 +44,29 @@ export const Header: React.FC<HeaderProps> = ({ children, className }) => {
     <div
       className={twMerge(`h-fit bg-gradient-to-b from-blue-800 p-6`, className)}
     >
-      <div className="flex items-center justify-between w-full mb-4">
-        <div className="items-center hidden gap-x-2 md:flex">
+      <div className="mb-4 flex w-full items-center justify-between">
+        <div className="hidden items-center gap-x-2 md:flex">
           <button
             onClick={() => router.back()}
-            className="flex items-center justify-center transition bg-black rounded-full hover:opacity-75"
+            className="flex items-center justify-center rounded-full bg-black transition hover:opacity-75"
           >
             <RxCaretLeft className="text-white" size={35} />
           </button>
           <button
             onClick={() => router.forward()}
-            className="flex items-center justify-center transition bg-black rounded-full hover:opacity-75"
+            className="flex items-center justify-center rounded-full bg-black transition hover:opacity-75"
           >
             <RxCaretRight className="text-white" size={35} />
           </button>
         </div>
         <div className="flex items-center gap-x-2 md:hidden">
           <Link href="/">
-            <button className="flex items-center justify-center p-2 transition bg-white rounded-full hover:opacity-75">
+            <button className="flex items-center justify-center rounded-full bg-white p-2 transition hover:opacity-75">
               <HiHome className="text-black" size={20} />
             </button>
           </Link>
           <Link href="/search">
-            <button className="flex items-center justify-center p-2 transition bg-white rounded-full hover:opacity-75">
+            <button className="flex items-center justify-center rounded-full bg-white p-2 transition hover:opacity-75">
               <BiSearch className="text-black" size={20} />
             </button>
           </Link>
@@ -74,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({ children, className }) => {
         <div className="flex items-center justify-between gap-x-4">
           {userDetails ? (
             <div className="flex items-center gap-x-4">
-              <Button onClick={handleLogout} className="px-6 py-2 bg-white">
+              <Button onClick={handleLogout} className="bg-white px-6 py-2">
                 Logout
               </Button>
               <Button
@@ -88,13 +88,13 @@ export const Header: React.FC<HeaderProps> = ({ children, className }) => {
             <div className="flex items-center gap-x-4">
               <Button
                 onClick={() => openDialogTo('sign-up')}
-                className="px-6 py-2 text-white bg-transparent"
+                className="bg-transparent px-6 py-2 text-white"
               >
                 Sign Up
               </Button>
               <Button
                 onClick={() => openDialogTo('sign-in')}
-                className="px-6 py-2 bg-white"
+                className="bg-white px-6 py-2"
               >
                 Sign In
               </Button>
