@@ -36,14 +36,9 @@ export const resetPassword = actionClient
 
     if (!origin) return;
 
-    const { error, data } = await supabase.auth.updateUser(
-      {
-        password,
-      },
-      {
-        emailRedirectTo: origin,
-      },
-    );
+    const { error, data } = await supabase.auth.updateUser({
+      password,
+    });
 
     if (error) {
       throw new ActionError(error.message);

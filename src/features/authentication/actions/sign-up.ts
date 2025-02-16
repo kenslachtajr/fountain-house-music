@@ -25,11 +25,13 @@ export const signUp = actionClient
     const supabase = await createClient();
     const origin = (await headers()).get('origin');
 
+    if (!origin) return;
+
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${origin}/auth/confirm`,
+        emailRedirectTo: origin,
       },
     });
 
