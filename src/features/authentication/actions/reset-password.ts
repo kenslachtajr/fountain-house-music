@@ -29,7 +29,7 @@ export const resetPassword = actionClient
   .schema(resetPasswordSchema, {
     handleValidationErrorsShape: async (ve) => handleValidationErrorsShape(ve),
   })
-  .metadata({ shouldAuth: false })
+  .metadata({ shouldAuth: true })
   .action(async ({ parsedInput: { password } }) => {
     const supabase = await createClient();
     const origin = (await headers()).get('origin');
