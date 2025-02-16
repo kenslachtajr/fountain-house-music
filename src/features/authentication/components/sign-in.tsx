@@ -1,20 +1,44 @@
 'use client';
 
+import { useAction } from 'next-safe-action/hooks';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Separator } from '~/components/ui/separator';
-import { useCreateQueryString } from '~/hooks/use-create-query-string';
 import { signIn } from '../actions/sign-in';
+import { useAuthenticationDialogActions } from '../stores/use-authentication-dialog';
 import { AuthSocials } from './auth-socials';
-import { FormMessage } from './form-message';
 
 export function SignIn() {
-  const pathname = usePathname();
-  const createQueryString = useCreateQueryString();
+  const { buildDialogHref, closeDialog } = useAuthenticationDialogActions();
+
+  const { execute } = useAction(signIn, {
+    onSuccess: () => {
+      closeDialog();
+      toast.success('Welcome back!');
+    },
+    onError: ({ error }) => {
+      if (error?.serverError) {
+        toast.error(error.serverError);
+        return;
+      }
+
+      if (error?.validationErrors) {
+        toast.error(error.validationErrors.errorMessage);
+        return;
+      }
+    },
+  });
+
+  const handleSubmit = async (formData: FormData) => {
+    const password = String(formData.get('password'));
+    const email = String(formData.get('email'));
+
+    execute({ email, password });
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -26,7 +50,7 @@ export function SignIn() {
         <Separator className="flex-1 bg-[#2E3439]" />
       </div>
 
-      <form action={signIn} className="flex flex-col gap-4">
+      <form noValidate action={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="email" className="text-sm text-muted-foreground">
             Email address
@@ -57,22 +81,17 @@ export function SignIn() {
         >
           Sign in
         </Button>
-
-        <FormMessage />
       </form>
 
       <div className="flex flex-col gap-2 text-center text-sm">
         <Link
-          href={{ pathname, query: createQueryString('action', 'sign-up') }}
+          href={buildDialogHref('sign-up')}
           className="text-muted-foreground hover:text-primary"
         >
           Don&apos;t have an account? Sign up
         </Link>
         <Link
-          href={{
-            pathname,
-            query: createQueryString('action', 'forgot-password'),
-          }}
+          href={buildDialogHref('forgot-password')}
           className="text-muted-foreground hover:text-primary"
         >
           Forgot your password?

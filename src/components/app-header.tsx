@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { BiSearch } from 'react-icons/bi';
 import { FaUserAlt } from 'react-icons/fa';
@@ -12,7 +12,6 @@ import { twMerge } from 'tailwind-merge';
 import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { usePlayerStoreActions } from '~/features/player/store/player.store';
-import { useCreateQueryString } from '~/hooks/use-create-query-string';
 import { createClient } from '~/utils/supabase/client';
 import { Button } from './ui/legacy/button';
 
@@ -23,11 +22,9 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ children, className }) => {
   const router = useRouter();
-  const pathname = usePathname();
   const player = usePlayerStoreActions();
   const userDetails = useCurrentUserSelect();
-  const createQueryString = useCreateQueryString();
-  const { openDialog } = useAuthenticationDialogActions();
+  const { openDialogTo } = useAuthenticationDialogActions();
 
   const supabaseClient = createClient();
 
@@ -89,26 +86,18 @@ export const Header: React.FC<HeaderProps> = ({ children, className }) => {
             </div>
           ) : (
             <div className="flex items-center gap-x-4">
-              <Link
-                href={{
-                  pathname,
-                  query: createQueryString('action', 'sign-up'),
-                }}
+              <Button
+                onClick={() => openDialogTo('sign-up')}
+                className="bg-transparent px-6 py-2 text-white"
               >
-                <Button className="bg-transparent px-6 py-2 text-white">
-                  Sign Up
-                </Button>
-              </Link>
-              <Link
-                href={{
-                  pathname,
-                  query: createQueryString('action', 'sign-in'),
-                }}
+                Sign Up
+              </Button>
+              <Button
+                onClick={() => openDialogTo('sign-in')}
+                className="bg-white px-6 py-2"
               >
-                <Button onClick={openDialog} className="bg-white px-6 py-2">
-                  Sign In
-                </Button>
-              </Link>
+                Sign In
+              </Button>
             </div>
           )}
         </div>

@@ -15,13 +15,13 @@ interface LibraryProps {
 
 export function Library({ songs }: LibraryProps) {
   const userDetails = useCurrentUserSelect();
-  const { openDialog: openAuthenticationDialog } =
+  const { openDialogTo: openAuthenticationDialogTo } =
     useAuthenticationDialogActions();
   const { openDialog: openUploadDialog } = useUploadDialogActions();
 
   const onClick = () => {
     if (!userDetails) {
-      return openAuthenticationDialog();
+      return openAuthenticationDialogTo('sign-in');
     }
 
     // TODO: Check for subscription

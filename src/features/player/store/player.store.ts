@@ -60,7 +60,7 @@ export const usePlayerSongsSelect = () =>
 export const usePlayerStoreActions = () => {
   const user = useCurrentUserSelect();
   const { stop } = useGlobalAudioPlayer();
-  const { openDialog: openAuthenticationDialog } =
+  const { openDialogTo: openAuthenticationDialogTo } =
     useAuthenticationDialogActions();
   const { openDialog: openSubscribeDialog } = useSubscribeDialogActions();
   const { setCurrentSong, reset, ...actions } = usePlayerStore(
@@ -69,7 +69,7 @@ export const usePlayerStoreActions = () => {
 
   const handleCurrentSong = (song: Song) => {
     if (!user) {
-      openAuthenticationDialog();
+      openAuthenticationDialogTo('sign-in');
       return;
     }
 

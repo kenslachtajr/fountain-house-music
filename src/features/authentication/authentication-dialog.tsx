@@ -1,7 +1,5 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,46 +7,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
-import { useCurrentUserSelect } from '~/features/layout/store/current-user';
-import { useCreateQueryString } from '~/hooks/use-create-query-string';
 import { AuthenticationFeature } from './authentication';
-import { useUserActionSearchParam } from './hooks/user-action-search-param';
 import {
   useAuthenticationDialogActions,
+  useAuthenticationDialogOpenedToSelect,
   useIsAuthenticationDialogOpenSelect,
 } from './stores/use-authentication-dialog';
-import { AuthAction } from './utils/constants';
 
 export function AuthenticationDialogFeature() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const user = useCurrentUserSelect();
-  const action = useUserActionSearchParam();
-  const createQueryString = useCreateQueryString();
-  const isOpen = useIsAuthenticationDialogOpenSelect();
-  const { closeDialog, openDialog } = useAuthenticationDialogActions();
+  const { closeDialog } = useAuthenticationDialogActions();
+  const isDialogOpen = useIsAuthenticationDialogOpenSelect();
 
   const handleOpenChange = (open: boolean) => {
     if (open) return;
-    router.replace(`${pathname}/${createQueryString('action')}`);
     closeDialog();
   };
 
-  useEffect(() => {
-    if (!user) return;
-    closeDialog();
-  }, [user, closeDialog]);
-
-  useEffect(() => {
-    if (action) {
-      openDialog();
-    } else {
-      closeDialog();
-    }
-  }, [action, user, openDialog, closeDialog]);
-
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="border border-neutral-700 bg-neutral-800 sm:max-w-md">
         <AuthenticationHeader />
         <AuthenticationFeature />
@@ -58,9 +34,9 @@ export function AuthenticationDialogFeature() {
 }
 
 function AuthenticationHeader() {
-  const action = useSearchParams().get('action') as AuthAction;
+  const dialogOpenedTo = useAuthenticationDialogOpenedToSelect();
 
-  if (action === 'sign-up') {
+  if (dialogOpenedTo === 'sign-up') {
     return (
       <DialogHeader>
         <DialogTitle>Sign up</DialogTitle>
@@ -69,7 +45,7 @@ function AuthenticationHeader() {
     );
   }
 
-  if (action === 'forgot-password') {
+  if (dialogOpenedTo === 'forgot-password') {
     return (
       <DialogHeader>
         <DialogTitle>Forgot your password?</DialogTitle>
@@ -78,7 +54,7 @@ function AuthenticationHeader() {
     );
   }
 
-  if (action === 'reset-password') {
+  if (dialogOpenedTo === 'reset-password') {
     return (
       <DialogHeader>
         <DialogTitle>Reset your password</DialogTitle>
@@ -87,7 +63,7 @@ function AuthenticationHeader() {
     );
   }
 
-  if (action === 'sign-in') {
+  if (dialogOpenedTo === 'sign-in') {
     return (
       <DialogHeader>
         <DialogTitle>Welcome back!</DialogTitle>

@@ -1,24 +1,51 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
-import { encodedRedirect } from '~/utils/encoded-redirect';
+import { ValidationErrors } from 'next-safe-action';
+import { z } from 'zod';
+import { actionClient, ActionError } from '~/lib/safe-action';
 
 import { createClient } from '~/utils/supabase/server';
 
-export async function signIn(formData: FormData) {
-  const supabase = await createClient();
+const signInSchema = z.object({
+  password: z
+    .string({ required_error: 'Password is required' })
+    .min(6, { message: 'Password must be at least 6 characters' }),
+  email: z
+    .string({ required_error: 'Email is required' })
+    .email({ message: 'Email is invalid' }),
+});
 
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
+export const signIn = actionClient
+  .schema(signInSchema, {
+    handleValidationErrorsShape: async (ve) => handleValidationErrorsShape(ve),
+  })
+  .metadata({ shouldAuth: false })
+  .action(async ({ parsedInput: { email, password } }) => {
+    const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
+    const { error, data } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    return data;
   });
 
-  if (error) {
-    encodedRedirect('error', '/?action=sign-in', error.message);
-  }
-
-  revalidatePath('/', 'layout');
+// TODO: make this reusable
+function handleValidationErrorsShape(
+  ve: ValidationErrors<typeof signInSchema>,
+) {
+  return {
+    globalErrorMessage: ve._errors?.join(', '),
+    errorMessage: [
+      ve.email && `${ve.email._errors?.[0]}`,
+      ve.password && `${ve.password._errors?.[0]}`,
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  };
 }
