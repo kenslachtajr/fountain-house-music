@@ -1,23 +1,23 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
 import { ForgotPassword } from './components/forgot-password';
 import { ResetPassword } from './components/reset-password';
 import { SignIn } from './components/sign-in';
 import { SignUp } from './components/sign-up';
+import { useAuthenticationDialogOpenedToSelect } from './stores/use-authentication-dialog';
 
 export function AuthenticationFeature() {
-  const actionParam = useSearchParams().get('action');
+  const dialogOpenedTo = useAuthenticationDialogOpenedToSelect();
 
-  if (actionParam === 'forgot-password') {
+  if (dialogOpenedTo === 'forgot-password') {
     return <ForgotPassword />;
   }
 
-  if (actionParam === 'reset-password') {
+  if (dialogOpenedTo === 'reset-password') {
     return <ResetPassword />;
   }
 
-  if (actionParam === 'sign-up') {
+  if (dialogOpenedTo === 'sign-up') {
     return <SignUp />;
   }
 

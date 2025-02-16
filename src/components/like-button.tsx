@@ -16,7 +16,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({ songId }) => {
   const router = useRouter();
   const supabaseClient = createClient();
 
-  const { openDialog } = useAuthenticationDialogActions();
+  const { openDialogTo } = useAuthenticationDialogActions();
   const user = useCurrentUserSelect();
 
   const [isLiked, setIsLiked] = useState(false);
@@ -46,7 +46,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({ songId }) => {
 
   const handleLike = async () => {
     if (!user) {
-      return openDialog();
+      return openDialogTo('sign-in');
     }
 
     if (isLiked) {

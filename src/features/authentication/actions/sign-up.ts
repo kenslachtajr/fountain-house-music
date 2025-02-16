@@ -1,43 +1,56 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { ValidationErrors } from 'next-safe-action';
 import { headers } from 'next/headers';
-import { encodedRedirect } from '~/utils/encoded-redirect';
+import { z } from 'zod';
+import { actionClient, ActionError } from '~/lib/safe-action';
 
 import { createClient } from '~/utils/supabase/server';
 
-export async function signUp(formData: FormData) {
-  const supabase = await createClient();
-  const origin = (await headers()).get('origin');
-  const referer = (await headers()).get('referer');
+const signUpSchema = z.object({
+  password: z
+    .string({ required_error: 'Password is required' })
+    .min(6, { message: 'Password must be at least 6 characters' }),
+  email: z
+    .string({ required_error: 'Email is required' })
+    .email({ message: 'Email is invalid' }),
+});
 
-  const email = formData.get('email')?.toString();
-  const password = formData.get('password')?.toString();
+export const signUp = actionClient
+  .schema(signUpSchema, {
+    handleValidationErrorsShape: async (ve) => handleValidationErrorsShape(ve),
+  })
+  .metadata({ shouldAuth: false })
+  .action(async ({ parsedInput: { email, password } }) => {
+    const supabase = await createClient();
+    const origin = (await headers()).get('origin');
 
-  if (!referer) return;
+    const { error, data } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${origin}/auth/confirm`,
+      },
+    });
 
-  if (!email || !password) {
-    return encodedRedirect('error', referer, 'Email and password are required');
-  }
+    if (error) {
+      throw new ActionError(error.message);
+    }
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${origin}/auth/confirm`,
-    },
+    return data;
   });
 
-  if (error) {
-    console.error(error.code + ' ' + error.message);
-    encodedRedirect('error', referer, error.message);
-  } else {
-    encodedRedirect(
-      'success',
-      referer,
-      'Thanks for signing up! Please check your email for a verification link.',
-    );
-  }
-
-  revalidatePath('/', 'layout');
+// TODO: make this reusable
+function handleValidationErrorsShape(
+  ve: ValidationErrors<typeof signUpSchema>,
+) {
+  return {
+    globalErrorMessage: ve._errors?.join(', '),
+    errorMessage: [
+      ve.email && `${ve.email._errors?.[0]}`,
+      ve.password && `${ve.password._errors?.[0]}`,
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  };
 }

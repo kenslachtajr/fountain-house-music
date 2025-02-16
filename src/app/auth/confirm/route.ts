@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as EmailOtpType | null;
   const next = searchParams.get('next') ?? '/';
+  const action = searchParams.get('action') ?? 'sign-in';
   const redirectTo = request.nextUrl.clone();
   redirectTo.pathname = next;
 
@@ -20,6 +21,7 @@ export async function GET(request: NextRequest) {
     });
     if (!error) {
       // redirect user to specified redirect URL or root of app
+      redirectTo.searchParams.set('action', action);
       return NextResponse.redirect(redirectTo);
     }
   }

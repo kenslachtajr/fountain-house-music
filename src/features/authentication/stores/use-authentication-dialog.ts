@@ -1,26 +1,30 @@
-import { create } from 'zustand';
+import { usePathname } from 'next/navigation';
+import { useQueryState } from 'nuqs';
+import { AuthAction, isAuthenticationActionParam } from '../utils/constants';
 
-interface AuthenticationDialogState {
-  isOpen: boolean;
-  actions: {
-    openDialog: () => void;
-    closeDialog: () => void;
-    toggleDialog: () => void;
-  };
+function useUserActionParam() {
+  return useQueryState('action', {
+    parse: (action) => (isAuthenticationActionParam(action) ? action : null),
+  });
 }
 
-const useAuthenticationDialogStore = create<AuthenticationDialogState>(
-  (set) => ({
-    isOpen: false,
-    actions: {
-      openDialog: () => set({ isOpen: true }),
-      closeDialog: () => set({ isOpen: false }),
-      toggleDialog: () => set((state) => ({ isOpen: !state.isOpen })),
-    },
-  }),
-);
+export function useAuthenticationDialogOpenedToSelect() {
+  return useUserActionParam()[0];
+}
 
-export const useIsAuthenticationDialogOpenSelect = () =>
-  useAuthenticationDialogStore((state) => state.isOpen);
-export const useAuthenticationDialogActions = () =>
-  useAuthenticationDialogStore((state) => state.actions);
+export function useIsAuthenticationDialogOpenSelect() {
+  return useUserActionParam()[0] !== null;
+}
+
+export function useAuthenticationDialogActions() {
+  const pathname = usePathname();
+  const [_, setAction] = useUserActionParam();
+
+  return {
+    closeDialog: () => setAction(null),
+    openDialogTo: (action: AuthAction) => setAction(action),
+    buildDialogHref: (action: AuthAction) => {
+      return { pathname, query: { action } };
+    },
+  };
+}

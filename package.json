@@ -26,6 +26,8 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
     "next": "latest",
+    "next-safe-action": "^7.10.3",
+    "nuqs": "^2.3.2",
     "query-string": "^9.1.1",
     "react": "^19.0.0",
     "react-async": "^10.0.1",
@@ -39,7 +41,7 @@
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "uniqid": "^5.4.0",
-    "zod": "^3.24.1",
+    "zod": "^3.24.2",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

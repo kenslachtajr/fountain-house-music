@@ -1,33 +1,45 @@
 'use server';
 
+import { ValidationErrors } from 'next-safe-action';
 import { headers } from 'next/headers';
-import { encodedRedirect } from '~/utils/encoded-redirect';
+import { z } from 'zod';
+import { actionClient, ActionError } from '~/lib/safe-action';
 import { createClient } from '~/utils/supabase/server';
 
-export async function forgotPassword(formData: FormData) {
-  const email = formData.get('email')?.toString();
-  const supabase = await createClient();
-  const origin = (await headers()).get('origin');
-  const referer = (await headers()).get('referer');
+const forgotPasswordSchema = z.object({
+  email: z
+    .string({ required_error: 'Email is required' })
+    .email({ message: 'Email is invalid' }),
+});
 
-  if (!referer) return;
+export const forgotPassword = actionClient
+  .schema(forgotPasswordSchema, {
+    handleValidationErrorsShape: async (ve) => handleValidationErrorsShape(ve),
+  })
+  .metadata({ shouldAuth: false })
+  .action(async ({ parsedInput: { email } }) => {
+    const supabase = await createClient();
+    const origin = (await headers()).get('origin');
 
-  if (!email) {
-    return encodedRedirect('error', referer, 'Email is required');
-  }
+    if (!origin) return;
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/?action=reset-password`,
+    const { error, data } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: origin,
+    });
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    return data;
   });
 
-  if (error) {
-    console.error(error.message);
-    return encodedRedirect('error', referer, 'Could not reset password');
-  }
-
-  return encodedRedirect(
-    'success',
-    referer,
-    'Check your email for a link to reset your password.',
-  );
+// TODO: make this reusable
+function handleValidationErrorsShape(
+  ve: ValidationErrors<typeof forgotPasswordSchema>,
+) {
+  return {
+    globalErrorMessage: ve._errors?.join(', '),
+    errorMessage: ve.email && `${ve.email._errors?.[0]}`,
+  };
 }

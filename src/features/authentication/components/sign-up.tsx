@@ -1,20 +1,43 @@
 'use client';
 
+import { useAction } from 'next-safe-action/hooks';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Separator } from '~/components/ui/separator';
-import { useCreateQueryString } from '~/hooks/use-create-query-string';
 import { signUp } from '../actions/sign-up';
+import { useAuthenticationDialogActions } from '../stores/use-authentication-dialog';
 import { AuthSocials } from './auth-socials';
-import { FormMessage } from './form-message';
 
 export function SignUp() {
-  const pathname = usePathname();
-  const createQueryString = useCreateQueryString();
+  const { buildDialogHref } = useAuthenticationDialogActions();
+
+  const { execute } = useAction(signUp, {
+    onSuccess: () => {
+      toast.success('Welcome to Fountain House Music!');
+    },
+    onError: ({ error }) => {
+      if (error?.serverError) {
+        toast.error(error.serverError);
+        return;
+      }
+
+      if (error?.validationErrors) {
+        toast.error(error.validationErrors.errorMessage);
+        return;
+      }
+    },
+  });
+
+  const handleSubmit = async (formData: FormData) => {
+    const password = String(formData.get('password'));
+    const email = String(formData.get('email'));
+
+    execute({ email, password });
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -26,7 +49,7 @@ export function SignUp() {
         <Separator className="flex-1 bg-[#2E3439]" />
       </div>
 
-      <form action={signUp} className="flex flex-col gap-4">
+      <form action={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="email" className="text-sm text-muted-foreground">
             Email address
@@ -51,15 +74,16 @@ export function SignUp() {
           />
         </div>
 
-        <Button className="w-full bg-[#404040] text-white hover:bg-[#404040]/70">
+        <Button
+          type="submit"
+          className="w-full bg-[#404040] text-white hover:bg-[#404040]/70"
+        >
           Sign Up
         </Button>
 
-        <FormMessage />
-
-        <div className="flex flex-col gap-2 text-center text-sm">
+        <div className="flex flex-col gap-2 text-sm text-center">
           <Link
-            href={{ pathname, query: createQueryString('action', 'sign-in') }}
+            href={buildDialogHref('sign-in')}
             className="text-muted-foreground hover:text-primary"
           >
             Already have an account? Sign in

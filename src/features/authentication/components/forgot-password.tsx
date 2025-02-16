@@ -1,22 +1,44 @@
 'use client';
 
+import { useAction } from 'next-safe-action/hooks';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
-import { useCreateQueryString } from '~/hooks/use-create-query-string';
 import { forgotPassword } from '../actions/forgot-password';
-import { FormMessage } from './form-message';
+import { useAuthenticationDialogActions } from '../stores/use-authentication-dialog';
 
 export function ForgotPassword() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const createQueryString = useCreateQueryString();
+  const { buildDialogHref, openDialogTo } = useAuthenticationDialogActions();
+
+  const { execute } = useAction(forgotPassword, {
+    onSuccess: () => {
+      openDialogTo('reset-password');
+      toast.success('Check your email for instructions.');
+    },
+    onError: ({ error }) => {
+      if (error?.serverError) {
+        toast.error(error.serverError);
+        return;
+      }
+
+      if (error?.validationErrors) {
+        toast.error(error.validationErrors.errorMessage);
+        return;
+      }
+    },
+  });
+
+  const handleForgotPassword = async (formData: FormData) => {
+    const email = String(formData.get('email'));
+
+    execute({ email });
+  };
 
   return (
-    <form action={forgotPassword} className="flex flex-col gap-6">
+    <form action={handleForgotPassword} className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <Label htmlFor="email" className="text-sm text-muted-foreground">
           Email address
@@ -30,15 +52,16 @@ export function ForgotPassword() {
         />
       </div>
 
-      <Button className="w-full bg-[#404040] text-white hover:bg-[#404040]/70">
+      <Button
+        type="submit"
+        className="w-full bg-[#404040] text-white hover:bg-[#404040]/70"
+      >
         Send reset password instructions
       </Button>
 
-      <FormMessage />
-
-      <div className="flex flex-col gap-2 text-center text-sm">
+      <div className="flex flex-col gap-2 text-sm text-center">
         <Link
-          href={{ pathname, query: createQueryString('action', 'sign-in') }}
+          href={buildDialogHref('sign-in')}
           className="text-muted-foreground hover:text-primary"
         >
           Already have an account? Sign in
