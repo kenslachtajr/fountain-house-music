@@ -1,6 +1,6 @@
 import { createSafeActionClient } from 'next-safe-action';
 import { z } from 'zod';
-import { getCurrentUser } from '~/server/actions/user/get-current-user';
+import { getCurrentUser } from '~/server/queries/user/get-current-user';
 
 export class ActionError extends Error {}
 

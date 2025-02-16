@@ -1,5 +1,5 @@
 import { Header } from '~/components/app-header';
-import { getSongsByTitleOrAuthor } from '~/server/actions/songs/get-songs-by-title-or-author';
+import { getSongsByTitleOrAuthor } from '~/server/queries/songs/get-songs-by-title-or-author';
 import { SearchContent } from './_components/search-content';
 import { SearchInput } from './_components/search-input';
 
