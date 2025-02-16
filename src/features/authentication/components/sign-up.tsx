@@ -70,6 +70,7 @@ export function SignUp() {
             id="password"
             type="password"
             name="password"
+            placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
             className="bg-[#2E3439]"
           />
         </div>

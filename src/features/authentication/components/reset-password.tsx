@@ -48,6 +48,7 @@ export function ResetPassword() {
             id="password"
             type="password"
             name="password"
+            placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
             className="bg-[#2E3439]"
           />
         </div>
@@ -62,6 +63,7 @@ export function ResetPassword() {
             id="confirmPassword"
             type="password"
             name="confirmPassword"
+            placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
             className="bg-[#2E3439]"
           />
         </div>
