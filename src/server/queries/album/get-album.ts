@@ -1,6 +1,5 @@
-'use server';
-
-import { Album, SupaAlbumWithSongs } from '~/types/types';
+import { AlbumSongs } from '~/types/schemas';
+import { Album } from '~/types/types';
 import { createClient } from '~/utils/supabase/server';
 import { convertToAlbum } from './converter';
 
@@ -11,7 +10,7 @@ export const getAlbumAction = async (id: string): Promise<Album | null> => {
     .from('albums')
     .select('*, songs(*)')
     .eq('id', id)
-    .returns<SupaAlbumWithSongs[]>()
+    .returns<AlbumSongs[]>()
     .single();
 
   if (error) {

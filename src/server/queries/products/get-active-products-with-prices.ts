@@ -1,5 +1,3 @@
-'use server';
-
 import { ProductWithPrice } from '~/types/types';
 import { createClient } from '~/utils/supabase/server';
 

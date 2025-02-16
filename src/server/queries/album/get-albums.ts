@@ -1,6 +1,4 @@
-'use server';
-
-import { SupaAlbumWithSongs } from '~/types/types';
+import { AlbumSongs } from '~/types/schemas';
 import { createClient } from '~/utils/supabase/server';
 import { convertToAlbum } from './converter';
 
@@ -11,7 +9,7 @@ export const getAlbums = async () => {
     .from('albums')
     .select('*, songs(*)')
     .order('release_date', { ascending: true })
-    .returns<SupaAlbumWithSongs[]>();
+    .returns<AlbumSongs[]>();
 
   if (error) {
     console.log(error);

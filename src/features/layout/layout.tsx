@@ -1,8 +1,8 @@
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { PropsWithChildren } from 'react';
 
-import { getSongsByUserId } from '~/server/actions/songs/get-songs-by-user-id';
-import { getCurrentUser } from '~/server/actions/user/get-current-user';
+import { getSongsByUserId } from '~/server/queries/songs/get-songs-by-user-id';
+import { getCurrentUser } from '~/server/queries/user/get-current-user';
 import { UserDetails } from '~/types/types';
 import { PlayerFeature } from '../player/player';
 import { GlobalToaster } from './components/global-toaster';

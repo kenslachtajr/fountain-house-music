@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getAlbumAction } from '~/server/actions/album/get-album';
+import { getAlbumAction } from '~/server/queries/album/get-album';
 import { AlbumContent } from './_components/album-content';
 import { AlbumHeader } from './_components/album-header';
 

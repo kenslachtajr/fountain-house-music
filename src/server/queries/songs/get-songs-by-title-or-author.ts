@@ -1,5 +1,3 @@
-'use server';
-
 import { Song } from '~/types/types';
 import { createClient } from '~/utils/supabase/server';
 

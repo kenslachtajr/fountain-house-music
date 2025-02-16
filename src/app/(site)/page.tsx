@@ -1,4 +1,4 @@
-import { getAlbums } from '~/server/actions/album/get-albums';
+import { getAlbums } from '~/server/queries/album/get-albums';
 import { HomeHeader } from './_components/home-header';
 import { PageContent } from './_components/page-content';
 
