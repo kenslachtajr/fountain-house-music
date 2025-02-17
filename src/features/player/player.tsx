@@ -34,27 +34,27 @@ export function PlayerFeature() {
 
   useEffect(() => {
     if (currentSong && navigator && navigator.mediaSession) {
-      // navigator.mediaSession.metadata = new MediaMetadata({
-      //   title: currentSong.title ?? '',
-      //   artist: currentSong.author ?? '',
-      //   album: currentSong.album ?? '',
-      //   artwork: [
-      //     {
-      //       src: songImage ?? '/images/logo.jpg',
-      //       sizes: '256x256',
-      //       type: 'image/jpeg',
-      //     },
-      //   ],
-      // });
-      // navigator.mediaSession.setActionHandler('play', () => play());
-      // navigator.mediaSession.setActionHandler('seekto', (s) =>
-      //   seek(s.seekTime!),
-      // );
-      // navigator.mediaSession.setActionHandler('pause', () => pause());
-      // navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
-      // navigator.mediaSession.setActionHandler('previoustrack', () =>
-      //   previousSong(),
-      // );
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentSong.title ?? '',
+        artist: currentSong.author ?? '',
+        album: currentSong.album ?? '',
+        artwork: [
+          {
+            src: songImage ?? '/images/logo.jpg',
+            sizes: '256x256',
+            type: 'image/jpeg',
+          },
+        ],
+      });
+      navigator.mediaSession.setActionHandler('play', () => play());
+      navigator.mediaSession.setActionHandler('seekto', (s) =>
+        seek(s.seekTime!),
+      );
+      navigator.mediaSession.setActionHandler('pause', () => pause());
+      navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
+      navigator.mediaSession.setActionHandler('previoustrack', () =>
+        previousSong(),
+      );
     }
   }, [currentSong, songImage]);
 
