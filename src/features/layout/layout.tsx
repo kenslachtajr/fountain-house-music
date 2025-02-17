@@ -15,7 +15,7 @@ export async function LayoutFeature({ children }: PropsWithChildren<unknown>) {
 
   return (
     <NuqsAdapter>
-      <Sidebar songs={userSongs} user={user as UserDetails}>
+      <Sidebar songs={userSongs ?? []} user={user as UserDetails}>
         {children}
       </Sidebar>
 

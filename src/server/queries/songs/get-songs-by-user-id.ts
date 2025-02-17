@@ -3,6 +3,7 @@ import { Song } from '~/types/types';
 
 export const getSongsByUserId = () => {
   return withAuth(async (supabase, user) => {
+    if (!user) return;
     const { data, error } = await supabase
       .from('songs')
       .select('*')
