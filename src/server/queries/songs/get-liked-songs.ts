@@ -3,7 +3,7 @@ import { Song } from '~/types/types';
 
 export const getLikedSongs = () => {
   return withAuth(async (supabase, user): Promise<Song[]> => {
-    if (!user.id) {
+    if (!user?.id) {
       return [];
     }
 
