@@ -18,7 +18,7 @@ export const LikedContent: React.FC<LikedContentProps> = ({
 
   if (songs.length === 0) {
     return (
-      <div className="flex w-full flex-col gap-y-2 px-6 text-neutral-400">
+      <div className="flex w-full flex-col gap-y-2 px-6 text-center text-neutral-400">
         No liked songs.
       </div>
     );

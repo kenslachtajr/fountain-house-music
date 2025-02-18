@@ -8,6 +8,7 @@ import { PlayerFeature } from '../player/player';
 import { GlobalToaster } from './components/global-toaster';
 import { IncludeModals } from './components/include-modals';
 import { Sidebar } from './components/sidebar';
+import { MobileNavigationFeature } from '~/features/mobile-navigation/mobile-navigation';
 
 export async function LayoutFeature({ children }: PropsWithChildren<unknown>) {
   const user = await getCurrentUser();
@@ -20,7 +21,10 @@ export async function LayoutFeature({ children }: PropsWithChildren<unknown>) {
       </Sidebar>
 
       <GlobalToaster />
-      <PlayerFeature />
+      <div className="fixed bottom-0 w-full">
+        <PlayerFeature />
+        <MobileNavigationFeature/>
+      </div>
       <IncludeModals />
     </NuqsAdapter>
   );

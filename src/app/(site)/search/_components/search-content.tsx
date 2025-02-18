@@ -10,7 +10,7 @@ interface SearchContentProps {
 export const SearchContent: React.FC<SearchContentProps> = ({ songs }) => {
   if (songs.length === 0) {
     return (
-      <div className="flex w-full flex-col gap-y-2 px-6 text-neutral-400">
+      <div className="flex w-full flex-col gap-y-2 px-6 text-center text-neutral-400">
         No songs found!
       </div>
     );
