@@ -44,7 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ children, songs, user }) => {
   useSetUser(user);
 
   return (
-    <div className={twMerge(`*: flex h-screen overflow-hidden`)}>
+    <div className={twMerge(`flex h-screen overflow-hidden`)}>
       <div className="hidden h-full w-[300px] flex-col gap-y-2 overflow-y-auto bg-black p-2 md:flex">
         <Box>
           <div className="flex flex-col gap-y-4 px-5 py-4">
@@ -59,8 +59,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ children, songs, user }) => {
       </div>
       <main
         className={cn(
-          'h-full flex-1 overflow-y-auto py-2',
-          currentSong ? 'h-[calc(100%-64px)]' : 'h-full',
+          'flex-1 pt-2 overflow-auto',
+          currentSong ? "pb-[160px] md:pb-[80px]" : "pb-[80px] md:pb-0"
         )}
       >
         {children}

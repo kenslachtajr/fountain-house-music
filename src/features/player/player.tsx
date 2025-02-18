@@ -61,7 +61,7 @@ export function PlayerFeature() {
   if (!currentSong) return null;
 
   return (
-    <div className="fixed bottom-0 w-full h-20 bg-black">
+    <div className="w-full h-20 max-md:from-blue-950 max-md:bg-gradient-to-b ">
       <SeekSlider />
       <div className="px-4 py-2">
         <div className="grid h-full grid-cols-2 md:grid-cols-3">
