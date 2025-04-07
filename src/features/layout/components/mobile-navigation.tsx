@@ -13,7 +13,7 @@ export function MobileNavigationFeature() {
   const userDetails = useCurrentUserSelect();
 
   return (
-    <div className="md:hidden flex justify-around align-middle h-[80px] pb-[env(safe-area-inset-bottom)]">
+    <div className="md:hidden flex justify-around align-middle h-[80px] bg-black pb-[env(safe-area-inset-bottom)]">
       <Link className="pt-3" href="/">
         <GoHomeFill size={40}/>
       </Link>

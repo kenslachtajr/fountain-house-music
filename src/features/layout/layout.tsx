@@ -8,7 +8,7 @@ import { PlayerFeature } from '../player/player';
 import { GlobalToaster } from './components/global-toaster';
 import { IncludeModals } from './components/include-modals';
 import { Sidebar } from './components/sidebar';
-import { MobileNavigationFeature } from '~/features/mobile-navigation/mobile-navigation';
+import { MobileNavigationFeature } from '~/features/layout/components/mobile-navigation';
 
 export async function LayoutFeature({ children }: PropsWithChildren<unknown>) {
   const user = await getCurrentUser();

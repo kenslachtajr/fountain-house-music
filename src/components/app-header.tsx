@@ -24,7 +24,7 @@ export const Header: React.FC<HeaderProps> = ({ children, className }) => {
     <div
       className={twMerge(`h-fit bg-gradient-to-b from-blue-800 p-6`, className)}
     >
-      <div className="mb-4 flex w-full items-center justify-between max-md:justify-center">
+      <div className="mb-4 flex w-full items-center justify-between max-md:w-full">
         <div className="hidden items-center gap-x-2 md:flex">
           <button
             onClick={() => router.back()}
@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({ children, className }) => {
             <RxCaretRight className="text-white" size={35} />
           </button>
         </div>
-        <div className="flex red items-center justify-between gap-x-2">
+        <div className="flex items-center justify-between gap-x-2 max-md:w-full">
           {userDetails ? (
             <button
               onClick={() => router.push('/account')}
