@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useGlobalAudioPlayer } from 'react-use-audio-player';
+import { useAudioPlayerContext } from 'react-use-audio-player';
 import { SimpleSlider } from '~/components/ui/slider';
 import { useLoadImage } from '~/hooks/use-load-image';
 import { PlayerControls } from './components/player-controls';
@@ -15,7 +15,7 @@ import {
 } from './store/player.store';
 
 export function PlayerFeature() {
-  const { load, seek, play, pause } = useGlobalAudioPlayer();
+  const { load, seek, play, pause } = useAudioPlayerContext();
   const { nextSong, previousSong } = usePlayerStoreActions();
 
   const currentSong = usePlayerCurrentSongSelect();
@@ -61,7 +61,7 @@ export function PlayerFeature() {
   if (!currentSong) return null;
 
   return (
-    <div className="w-full h-20 max-md:from-blue-950 max-md:bg-gradient-to-b ">
+    <div className="w-full h-20 max-md:bg-gradient-to-b max-md:from-blue-950">
       <SeekSlider />
       <div className="px-4 py-2">
         <div className="grid h-full grid-cols-2 md:grid-cols-3">
@@ -76,7 +76,7 @@ export function PlayerFeature() {
 
 function SeekSlider() {
   const time = useAudioTime();
-  const { duration, pause, seek, togglePlayPause } = useGlobalAudioPlayer();
+  const { duration, pause, seek, togglePlayPause } = useAudioPlayerContext();
 
   return (
     <SimpleSlider

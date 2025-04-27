@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
-import { useGlobalAudioPlayer } from 'react-use-audio-player';
+import { useAudioPlayerContext } from 'react-use-audio-player';
 import { SimpleSlider } from '~/components/ui/slider';
 import { TimeLabel } from './player-time-label';
 
@@ -8,7 +8,7 @@ import { TimeLabel } from './player-time-label';
 // !: https://github.com/E-Kuerschner/useAudioPlayer/issues/141
 
 export function PlayerSettings() {
-  const { setVolume, volume } = useGlobalAudioPlayer();
+  const { setVolume, volume } = useAudioPlayerContext();
   const [prevVolume, setPrevVolume] = useState(volume || 1);
 
   const muted = volume === 0;
@@ -24,11 +24,11 @@ export function PlayerSettings() {
   };
 
   return (
-    <div className="hidden w-full justify-end pr-2 md:flex">
-      <div className="flex w-3/5 items-center gap-x-4">
+    <div className="justify-end hidden w-full pr-2 md:flex">
+      <div className="flex items-center w-3/5 gap-x-4">
         <TimeLabel />
         <VolumeIcon
-          className="h-9 w-9 cursor-pointer"
+          className="cursor-pointer h-9 w-9"
           size={34}
           onClick={toggleMute}
         />
