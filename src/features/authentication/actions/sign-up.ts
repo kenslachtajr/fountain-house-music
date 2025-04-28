@@ -27,8 +27,6 @@ export const signUp = actionClient
 
     if (!origin) return;
 
-    console.log(origin);
-
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
@@ -41,7 +39,7 @@ export const signUp = actionClient
       throw new ActionError(error.message);
     }
 
-    return { ...data, origin };
+    return data;
   });
 
 // TODO: make this reusable

@@ -32,8 +32,6 @@ export function SignUp() {
     },
   });
 
-  console.log({ result: result.data });
-
   const handleSubmit = async (formData: FormData) => {
     const password = String(formData.get('password'));
     const email = String(formData.get('email'));
