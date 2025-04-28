@@ -1,4 +1,4 @@
-import { useGlobalAudioPlayer } from 'react-use-audio-player';
+import { useAudioPlayerContext } from 'react-use-audio-player';
 import { create } from 'zustand';
 import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
@@ -59,7 +59,7 @@ export const usePlayerSongsSelect = () =>
 
 export const usePlayerStoreActions = () => {
   const user = useCurrentUserSelect();
-  const { stop } = useGlobalAudioPlayer();
+  const { stop } = useAudioPlayerContext();
   const { openDialogTo: openAuthenticationDialogTo } =
     useAuthenticationDialogActions();
   const { openDialog: openSubscribeDialog } = useSubscribeDialogActions();
