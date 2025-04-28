@@ -25,7 +25,7 @@ export function ForgotPassword() {
       }
 
       if (error?.validationErrors) {
-        toast.error(error.validationErrors.errorMessage);
+        toast.error(error.validationErrors.errorMessage ?? '');
         return;
       }
     },
