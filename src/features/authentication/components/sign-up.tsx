@@ -15,7 +15,7 @@ import { AuthSocials } from './auth-socials';
 export function SignUp() {
   const { buildDialogHref } = useAuthenticationDialogActions();
 
-  const { execute } = useAction(signUp, {
+  const { execute, result } = useAction(signUp, {
     onSuccess: () => {
       toast.success('Welcome to Fountain House Music!');
     },
@@ -31,6 +31,8 @@ export function SignUp() {
       }
     },
   });
+
+  console.log({ result: result.data });
 
   const handleSubmit = async (formData: FormData) => {
     const password = String(formData.get('password'));
