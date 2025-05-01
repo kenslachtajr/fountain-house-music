@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { BiLinkExternal } from 'react-icons/bi';
 import {
@@ -20,21 +21,39 @@ export function SubscriptionBilling() {
   const { openDialog: openSubscribeDialog } = useSubscribeDialogActions();
   const subscription = user?.subscription;
   const prices = subscription?.prices;
+  const [isLoading, setIsLoading] = useState(false);
 
   const redirectToCustomerPortal = async () => {
     try {
+      setIsLoading(true);
+
+      if (!user) {
+        throw new Error('You must be logged in');
+      }
+
       if (!subscription?.prices?.active) {
         openSubscribeDialog();
         return;
       }
 
-      const { url } = await postData({
+      const { url, error } = await postData({
         url: '/api/create-portal-link',
       });
 
+      if (error) {
+        throw new Error(error.message);
+      }
+
       window.location.assign(url);
     } catch (error) {
-      toast.error((error as Error)?.message);
+      console.error('Portal redirect error:', error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Failed to redirect to billing portal',
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,17 +68,28 @@ export function SubscriptionBilling() {
           <h3 className="mb-1 font-medium">Current Plan</h3>
           <div className="flex items-center justify-between rounded-lg border border-gray-500 p-4">
             <div className="space-y-1">
-              <p className="font-medium">{prices?.products?.name}</p>
-              <p className="text-sm text-muted-foreground">$5.99 / month</p>
+              <p className="font-medium">
+                {prices?.products?.name || 'No active subscription'}
+              </p>
+              {prices?.unit_amount && (
+                <p className="text-sm text-muted-foreground">
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: prices.currency || 'USD',
+                  }).format(prices.unit_amount / 100)}
+                  {prices.interval && ` / ${prices.interval}`}
+                </p>
+              )}
               <SubscriptionDates subscription={subscription!} />
             </div>
             <form>
               <Button
                 className="inline-flex items-center bg-transparent text-white hover:bg-blue-500/10"
                 onClick={redirectToCustomerPortal}
+                disabled={isLoading}
               >
-                Manage Subscription
-                <BiLinkExternal className="ml-2 h-4 w-4" />
+                {isLoading ? 'Loading...' : 'Manage Subscription'}
+                {!isLoading && <BiLinkExternal className="ml-2 h-4 w-4" />}
               </Button>
             </form>
           </div>
