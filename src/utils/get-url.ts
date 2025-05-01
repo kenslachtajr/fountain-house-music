@@ -1,11 +1,17 @@
+import { shouldNeverHappen } from '~/utils/should-never-happen';
+
 export const getURL = () => {
-  let url =
-    process?.env?.NEXT_PUBLIC_SITE_URL ??
-    process?.env?.NEXT_PUBLIC_VERCEL_URL ??
-    'http://localhost:3000/';
+  const url =
+    process?.env?.NEXT_PUBLIC_SITE_URL ?? process?.env?.NEXT_PUBLIC_VERCEL_URL;
 
-  url = url.includes('http') ? url : `https://${url}`;
-  url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
+  if (!url) {
+    return shouldNeverHappen(
+      'Neither NEXT_PUBLIC_SITE_URL nor NEXT_PUBLIC_VERCEL_URL is defined',
+    );
+  }
 
-  return url;
+  const finalUrl = url.includes('http') ? url : `https://${url}`;
+  return finalUrl.charAt(finalUrl.length - 1) === '/'
+    ? finalUrl
+    : `${finalUrl}/`;
 };

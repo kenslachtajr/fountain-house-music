@@ -1,4 +1,5 @@
 import { stripe } from '~/lib/stripe';
+import { shouldNeverHappen } from '~/utils/should-never-happen';
 import { createClient } from '~/utils/supabase/server';
 
 export const createOrRetrieveCustomer = async ({
@@ -9,7 +10,9 @@ export const createOrRetrieveCustomer = async ({
   uuid: string;
 }) => {
   if (!uuid) {
-    throw new Error('User ID is required');
+    return shouldNeverHappen(
+      'User ID is required for customer creation/retrieval',
+    );
   }
 
   const supabaseAdmin = await createClient();
@@ -23,7 +26,9 @@ export const createOrRetrieveCustomer = async ({
       .single();
 
     if (queryError && queryError.code !== 'PGRST116') {
-      throw new Error(`Database error: ${queryError.message}`);
+      return shouldNeverHappen(
+        `Unexpected database error: ${queryError.message}`,
+      );
     }
 
     if (existingCustomer?.stripe_customer_id) {
@@ -72,7 +77,9 @@ export const createOrRetrieveCustomer = async ({
     if (insertError) {
       // If we fail to insert into our database, clean up the Stripe customer
       await stripe.customers.del(customer.id);
-      throw new Error(`Failed to insert customer: ${insertError.message}`);
+      return shouldNeverHappen(
+        `Failed to insert customer: ${insertError.message}`,
+      );
     }
 
     console.log(
@@ -81,6 +88,6 @@ export const createOrRetrieveCustomer = async ({
     return customer.id;
   } catch (error: any) {
     console.error('Error in createOrRetrieveCustomer:', error);
-    throw new Error(`Failed to handle customer: ${error.message}`);
+    return shouldNeverHappen(`Failed to handle customer: ${error.message}`);
   }
 };

@@ -1,5 +1,6 @@
 'use client';
 
+import { shouldNeverHappen } from '~/utils/should-never-happen';
 import { ForgotPassword } from './components/forgot-password';
 import { ResetPassword } from './components/reset-password';
 import { SignIn } from './components/sign-in';
@@ -21,5 +22,11 @@ export function AuthenticationFeature() {
     return <SignUp />;
   }
 
-  return <SignIn />;
+  if (dialogOpenedTo === 'sign-in') {
+    return <SignIn />;
+  }
+
+  return shouldNeverHappen(
+    `Unknown authentication dialog state: ${dialogOpenedTo}`,
+  );
 }

@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
+import { shouldNeverHappen } from '~/utils/should-never-happen';
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not defined');
+  shouldNeverHappen('STRIPE_SECRET_KEY environment variable is not defined');
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {

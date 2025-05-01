@@ -6,6 +6,7 @@ import { stripe } from '~/lib/stripe';
 import { manageSubscriptionStatusChange } from '~/server/actions/stripe/manage-subscription-status-change';
 import { upsertPriceRecord } from '~/server/actions/stripe/upsert-price-record';
 import { upsertProductRecord } from '~/server/actions/stripe/upsert-product-record';
+import { shouldNeverHappen } from '~/utils/should-never-happen';
 
 const relevantEvents = new Set([
   'product.created',
@@ -73,8 +74,9 @@ export async function POST(request: Request) {
           }
           break;
         default:
-          console.warn(`Unhandled relevant event: ${event.type}`);
-          throw new Error('Unhandled relevant event');
+          shouldNeverHappen(
+            `Unhandled Stripe webhook event type: ${event.type}`,
+          );
       }
       console.log(`✅ Webhook handled: ${event.type}`);
       return NextResponse.json(
