@@ -1,4 +1,5 @@
 import { Price } from '~/types/types';
+import { shouldNeverHappen } from '~/utils/should-never-happen';
 
 export const postData = async ({
   url,
@@ -15,7 +16,10 @@ export const postData = async ({
   });
 
   if (!res.ok) {
-    throw new Error(res.statusText);
+    return shouldNeverHappen(
+      `API request failed: ${res.status} ${res.statusText}`,
+      { url, data, status: res.status },
+    );
   }
 
   return res.json();
