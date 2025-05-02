@@ -14,6 +14,7 @@ import {
 
 import { Label } from '~/components/ui/label';
 import { cn } from '~/lib/cn';
+import { shouldNeverHappen } from '~/utils/should-never-happen';
 
 const Form = FormProvider;
 
@@ -49,7 +50,7 @@ const useFormField = () => {
   const fieldState = getFieldState(fieldContext.name, formState);
 
   if (!fieldContext) {
-    throw new Error('useFormField should be used within <FormField>');
+    shouldNeverHappen('useFormField should be used within <FormField>');
   }
 
   const { id } = itemContext;

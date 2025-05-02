@@ -6,6 +6,7 @@ import { stripe } from '~/lib/stripe';
 import { manageSubscriptionStatusChange } from '~/server/actions/stripe/manage-subscription-status-change';
 import { upsertPriceRecord } from '~/server/actions/stripe/upsert-price-record';
 import { upsertProductRecord } from '~/server/actions/stripe/upsert-product-record';
+import { shouldNeverHappen } from '~/utils/should-never-happen';
 
 const relevantEvents = new Set([
   'product.created',
@@ -21,14 +22,22 @@ const relevantEvents = new Set([
 export async function POST(request: Request) {
   const body = await request.text();
   const sig = (await headers()).get('Stripe-Signature');
-
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!sig || !webhookSecret) {
+    console.error('Missing Stripe webhook secret or signature');
+    return new NextResponse('Missing webhook secret or signature', {
+      status: 400,
+    });
+  }
+
   let event: Stripe.Event;
 
   try {
-    if (!sig || !webhookSecret) return;
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+    console.log(`🔔 Webhook received: ${event.type}`);
   } catch (error: any) {
+    console.error(`Webhook signature verification failed: ${error.message}`);
     return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
   }
 
@@ -65,13 +74,25 @@ export async function POST(request: Request) {
           }
           break;
         default:
-          throw new Error('Unhandled relevant event');
+          shouldNeverHappen(
+            `Unhandled Stripe webhook event type: ${event.type}`,
+          );
       }
-    } catch (error) {
-      console.log(error);
-      return new NextResponse('Webhook error', { status: 400 });
+      console.log(`✅ Webhook handled: ${event.type}`);
+      return NextResponse.json(
+        { received: true, type: event.type },
+        { status: 200 },
+      );
+    } catch (error: any) {
+      console.error(`Webhook handler failed: ${error.message}`);
+      return new NextResponse(`Webhook handler failed: ${error.message}`, {
+        status: 400,
+      });
     }
   }
 
-  return NextResponse.json({ received: true }, { status: 200 });
+  return NextResponse.json(
+    { received: true, type: event.type },
+    { status: 200 },
+  );
 }

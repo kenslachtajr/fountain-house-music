@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { stripe } from '~/lib/stripe';
 import { createOrRetrieveCustomer } from '~/server/actions/stripe/create-or-retrieve-customer';
 import { getURL } from '~/utils/get-url';
+import { shouldNeverHappen } from '~/utils/should-never-happen';
 import { createClient } from '~/utils/supabase/server';
 
 export async function POST() {
@@ -13,14 +14,22 @@ export async function POST() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) throw new Error('Could not get user');
+    if (!user) {
+      return shouldNeverHappen(
+        'No authenticated user found when creating portal link',
+      );
+    }
 
     const customer = await createOrRetrieveCustomer({
       uuid: user.id || '',
       email: user.email || '',
     });
 
-    if (!customer) throw new Error('Could not get customer');
+    if (!customer) {
+      return shouldNeverHappen(
+        'Failed to create or retrieve customer for portal link',
+      );
+    }
 
     const { url } = await stripe.billingPortal.sessions.create({
       customer,
