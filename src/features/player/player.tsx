@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Howler } from 'howler';
+import howler from 'howler';
 import { useAudioPlayerContext } from 'react-use-audio-player';
 import { SimpleSlider } from '~/components/ui/slider';
 import { useLoadImage } from '~/hooks/use-load-image';
@@ -28,7 +28,7 @@ export function PlayerFeature() {
 
     // Get preferred volume or default
     const userVolume = parseFloat(localStorage.getItem('player-volume') || '0.7');
-    Howler.volume(userVolume); // Set volume before playback
+    howler.Howler.volume(userVolume); // Set volume before playback
 
     load(songUrl, {
       autoplay: true,
