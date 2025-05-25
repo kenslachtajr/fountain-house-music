@@ -1,25 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
 import { useAudioPlayerContext } from 'react-use-audio-player';
 import { SimpleSlider } from '~/components/ui/slider';
 import { TimeLabel } from './player-time-label';
 
-// !: muted from globalAudioPlayer is not a boolean, it's howler instance at times.
-// !: https://github.com/E-Kuerschner/useAudioPlayer/issues/141
-
 export function PlayerSettings() {
-  const { setVolume, volume } = useAudioPlayerContext();
-  const [prevVolume, setPrevVolume] = useState(volume || 1);
+  const { setVolume, volume: currentVolume } = useAudioPlayerContext();
+  const [muted, setMuted] = useState(false);
+  const lastVolumeRef = useRef(currentVolume || 1);
 
-  const muted = volume === 0;
+  // Restore volume when song changes (if current is full volume)
+  useEffect(() => {
+    if (currentVolume === 1 && lastVolumeRef.current !== 1) {
+      setVolume(lastVolumeRef.current);
+    }
+  }, [currentVolume, setVolume]);
+
   const VolumeIcon = muted ? HiSpeakerXMark : HiSpeakerWave;
 
   const toggleMute = () => {
     if (muted) {
-      setVolume(prevVolume);
+      setMuted(false);
+      setVolume(lastVolumeRef.current);
     } else {
-      setPrevVolume(volume);
+      setMuted(true);
+      lastVolumeRef.current = currentVolume || 1;
       setVolume(0);
+    }
+  };
+
+  const handleVolumeChange = (value: number) => {
+    if (!muted) {
+      lastVolumeRef.current = value;
+      setVolume(value);
     }
   };
 
@@ -35,12 +48,8 @@ export function PlayerSettings() {
         <SimpleSlider
           max={1}
           step={0.1}
-          defaultValue={1}
-          value={muted ? prevVolume : volume}
-          onValueChange={(value) => {
-            setPrevVolume(value || 0);
-            setVolume(value);
-          }}
+          value={muted ? lastVolumeRef.current : currentVolume}
+          onValueChange={handleVolumeChange}
         />
       </div>
     </div>
