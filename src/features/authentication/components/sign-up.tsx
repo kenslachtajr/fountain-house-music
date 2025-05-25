@@ -10,14 +10,13 @@ import { Label } from '~/components/ui/label';
 import { Separator } from '~/components/ui/separator';
 import { signUp } from '../actions/sign-up';
 import { useAuthenticationDialogActions } from '../stores/use-authentication-dialog';
-import { AuthSocials } from './auth-socials';
 
 export function SignUp() {
   const { buildDialogHref } = useAuthenticationDialogActions();
 
   const { execute, result } = useAction(signUp, {
     onSuccess: () => {
-      toast.success('Welcome to Fountain House Music!');
+      toast.success('Welcome to Fountain House Music! Check your email and follow the "Confirm your email" link.');
     },
     onError: ({ error }) => {
       if (error?.serverError) {
@@ -41,7 +40,6 @@ export function SignUp() {
 
   return (
     <div className="flex flex-col gap-6">
-      <AuthSocials />
 
       <div className="flex items-center gap-4">
         <Separator className="flex-1 bg-[#2E3439]" />

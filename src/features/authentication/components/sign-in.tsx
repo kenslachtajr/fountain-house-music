@@ -10,7 +10,6 @@ import { Label } from '~/components/ui/label';
 import { Separator } from '~/components/ui/separator';
 import { signIn } from '../actions/sign-in';
 import { useAuthenticationDialogActions } from '../stores/use-authentication-dialog';
-import { AuthSocials } from './auth-socials';
 
 export function SignIn() {
   const { buildDialogHref, closeDialog } = useAuthenticationDialogActions();
@@ -42,7 +41,6 @@ export function SignIn() {
 
   return (
     <div className="flex flex-col gap-6">
-      <AuthSocials />
 
       <div className="flex items-center gap-4">
         <Separator className="flex-1 bg-[#2E3439]" />
