@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import type { AppProps } from 'next/app';
+"use client";
 
-function InstallPrompt() {
+import { useEffect, useState } from 'react';
+
+export default function InstallPrompt() {
   const [isIOS, setIsIOS] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
-    console.log(window.navigator.userAgent);
     setIsIOS(/iphone|ipad|ipod/i.test(window.navigator.userAgent));
 
     const handler = (e: any) => {
@@ -41,18 +41,3 @@ function InstallPrompt() {
 
   return null;
 }
-
-function MyApp({ Component, pageProps }: AppProps) {
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js');
-    }
-  }, []);
-  return (
-    <>
-      <Component {...pageProps} />
-    </>
-  );
-}
-
-export default MyApp;

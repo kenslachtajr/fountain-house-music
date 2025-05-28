@@ -6,6 +6,7 @@ import { PropsWithChildren } from 'react';
 
 import { LayoutFeature } from '~/features/layout/layout';
 import { cn } from '~/lib/cn';
+import InstallPrompt from '../components/InstallPrompt.tsx';
 
 const font = Figtree({ subsets: ['latin'] });
 
@@ -19,8 +20,14 @@ export const revalidate = 0;
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (
     <html suppressHydrationWarning lang="en">
-      <head />
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/images/web-app-manifest-192x192.png" />
+        <meta name="theme-color" content="#000000" />
+        <link rel="apple-touch-icon" href="/images/web-app-manifest-192x192.png" />
+      </head>
       <body suppressHydrationWarning className={cn('dark', font.className)}>
+        <InstallPrompt />
         <LayoutFeature>{children}</LayoutFeature>
       </body>
     </html>
