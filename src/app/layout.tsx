@@ -6,7 +6,7 @@ import { PropsWithChildren } from 'react';
 
 import { LayoutFeature } from '~/features/layout/layout';
 import { cn } from '~/lib/cn';
-import InstallPrompt from '../components/InstallPrompt.tsx';
+import InstallPrompt from '../components/InstallPrompt';
 
 const font = Figtree({ subsets: ['latin'] });
 
