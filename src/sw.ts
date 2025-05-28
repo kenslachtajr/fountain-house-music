@@ -63,18 +63,6 @@ const serwist = new Serwist({
   runtimeCaching: [...defaultCache, audioCache],
 });
 
-// Handle visibility changes
-self.addEventListener('visibilitychange', () => {
-  self.clients.matchAll().then((clients) => {
-    clients.forEach((client) => {
-      client.postMessage({
-        type: 'VISIBILITY_CHANGE',
-        hidden: document.hidden,
-      });
-    });
-  });
-});
-
 // Keep the service worker alive when playing audio
 self.addEventListener('fetch', (event: FetchEvent) => {
   if (event.request.url.match(/\.(mp3|wav|ogg|m4a)$/)) {
