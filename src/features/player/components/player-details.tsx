@@ -36,12 +36,12 @@ export function PlayerDetails() {
         </div>
 
         {/* Like button */}
-        <button
+        {/* <button
           onClick={() => setIsLiked(!isLiked)}
           className="transition hover:opacity-75"
         >
           <Icon color={isLiked ? '#0096FF' : 'white'} size={25} />
-        </button>
+        </button> */}
       </div>
     </div>
   );

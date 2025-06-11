@@ -1,11 +1,36 @@
+import { useEffect } from 'react';
 import { AiFillStepBackward, AiFillStepForward } from 'react-icons/ai';
 import { HiPause, HiPlay } from 'react-icons/hi';
 import { useAudioPlayerContext } from 'react-use-audio-player';
 import { usePlayerStoreActions } from '../store/player.store';
+import { useIdleTimer } from '../hooks/use-idle-timer';
 
 export function PlayerControls() {
-  const { getPosition, seek } = useAudioPlayerContext();
-  const { nextSong, previousSong } = usePlayerStoreActions();
+  const { getPosition, seek, pause, isPlaying } = useAudioPlayerContext();
+  const { nextSong, previousSong, currentTrack } = usePlayerStoreActions();
+
+  useIdleTimer(() => {
+    if (isPlaying) pause();
+  }, 15 * 60 * 1000);
+
+  // --- Media Session API integration ---
+  useEffect(() => {
+    if ('mediaSession' in navigator && currentTrack) {
+      navigator.mediaSession.setActionHandler('previoustrack', previousSong);
+      navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: currentTrack.title,
+        artist: currentTrack.artist,
+        album: currentTrack.album,
+        artwork: [
+          { src: currentTrack.imageUrl || '/images/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: currentTrack.imageUrl || '/images/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+        ]
+      });
+    }
+  }, [nextSong, previousSong, currentTrack]);
+  // Add current track info to dependencies if you want metadata to update per track
 
   const handlePreviousSong = () => {
     const position = getPosition();
@@ -21,8 +46,26 @@ export function PlayerControls() {
   return (
     <>
       {/* Mobile controls */}
-      <div className="flex items-center justify-end w-full col-auto md:hidden">
+      <div className="flex items-center justify-center w-full col-auto gap-x-6 md:hidden">
+        <button
+          aria-label="navigate to previous song"
+          onClick={handlePreviousSong}
+        >
+          <AiFillStepBackward
+            size={30}
+            className="transition cursor-pointer text-neutral-400 hover:text-white"
+          />
+        </button>
         <PlayIcon />
+        <button
+          aria-label="navigate to next song"
+          onClick={nextSong}
+        >
+          <AiFillStepForward
+            size={30}
+            className="transition cursor-pointer text-neutral-400 hover:text-white"
+          />
+        </button>
       </div>
 
       {/* Desktop controls */}
