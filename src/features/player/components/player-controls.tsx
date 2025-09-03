@@ -7,7 +7,7 @@ import { useIdleTimer } from '../hooks/use-idle-timer';
 
 export function PlayerControls() {
   const { getPosition, seek, pause, isPlaying } = useAudioPlayerContext();
-  const { nextSong, previousSong, currentTrack } = usePlayerStoreActions();
+  const { nextSong, previousSong } = usePlayerStoreActions();
 
   useIdleTimer(() => {
     if (isPlaying) pause();
@@ -15,22 +15,11 @@ export function PlayerControls() {
 
   // --- Media Session API integration ---
   useEffect(() => {
-    if ('mediaSession' in navigator && currentTrack) {
+    if ('mediaSession' in navigator) {
       navigator.mediaSession.setActionHandler('previoustrack', previousSong);
       navigator.mediaSession.setActionHandler('nexttrack', nextSong);
-
-      navigator.mediaSession.metadata = new window.MediaMetadata({
-        title: currentTrack.title,
-        artist: currentTrack.artist,
-        album: currentTrack.album,
-        artwork: [
-          { src: currentTrack.imageUrl || '/images/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: currentTrack.imageUrl || '/images/icon-512x512.png', sizes: '512x512', type: 'image/png' }
-        ]
-      });
     }
-  }, [nextSong, previousSong, currentTrack]);
-  // Add current track info to dependencies if you want metadata to update per track
+  }, [nextSong, previousSong]);
 
   const handlePreviousSong = () => {
     const position = getPosition();

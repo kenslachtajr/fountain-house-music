@@ -27,6 +27,7 @@ interface SongToUpdate {
   id: string;
   url: string;
   duration: number;
+  song_order: number;
 }
 
 export default function FixDurationsPage() {

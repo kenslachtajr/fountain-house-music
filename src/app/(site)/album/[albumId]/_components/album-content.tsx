@@ -15,7 +15,9 @@ export function AlbumContent({ songs }: AlbumContentProps) {
 
   return (
     <div className="flex w-full flex-col gap-y-2 p-6">
-      {songs.map((song) => (
+      {[...songs]
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map((song) => (
         <AlbumItem key={song.id} song={song} />
       ))}
     </div>
