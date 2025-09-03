@@ -12,19 +12,19 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/images/icons/icon-192.png",
+      "src": "public/images/icons/ios/192.png",
       "sizes": "192x192",
       "type": "images/png",
       "purpose": "any"
     },
     {
-      "src": "/images/icons/icon-512.png",
+      "src": "public/images/ios/512.png",
       "sizes": "512x512",
       "type": "images/png",
       "purpose": "any"
     },
     {
-      "src": "/images/icons/icon-512-maskable.png",
+      "src": "public/images/icons/512.png",
       "sizes": "512x512",
       "type": "images/png",
       "purpose": "maskable"
