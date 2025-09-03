@@ -24,6 +24,7 @@ export const songsSchema = z.object({
   song_path: z.string().nullable(),
   title: z.string().nullable(),
   user_id: z.string().nullable(),
+  order: z.number().nullable(),
 });
 
 export const albumSongsSchema = z.object({
