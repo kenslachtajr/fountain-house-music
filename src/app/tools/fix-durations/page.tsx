@@ -73,7 +73,7 @@ export default function FixDurationsPage() {
 
       try {
         const duration = await getDurationFromUrl(url);
-        updates.push({ id: song.id, url, duration });
+        updates.push({ id: song.id, url, duration, song_order: 0 });
         setLog((prev) => [...prev, `Ready: ${song.id} — ${duration}s`]);
       } catch (err) {
         setLog((prev) => [...prev, `❌ Failed ${song.id}: ${err}`]);
