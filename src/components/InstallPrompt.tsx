@@ -52,7 +52,7 @@ export default function InstallPrompt() {
         }}
         className="w-full bg-blue-600 text-white rounded mb-2"
       >
-        Install Fountain App
+        Install Fountain House Music App
       </button>
     );
   }
