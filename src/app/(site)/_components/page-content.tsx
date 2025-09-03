@@ -30,7 +30,7 @@ export const PageContent: React.FC<PageContentProps> = ({ albums }) => {
             // const overriddenOrder = album.songs.map(song => song.song_order);
 
             const sortedSongs = album.songs.sort((a, b) => 
-              a.song_order - b.song_order
+              (a.order || 0) - (b.order || 0)
             );
             setSongs(sortedSongs);
             setCurrentSong(sortedSongs[0]);
