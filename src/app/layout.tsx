@@ -22,9 +22,9 @@ export default async function RootLayout({ children }: PropsWithChildren) {
     <html suppressHydrationWarning lang="en">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="icon" href="/images/web-app-manifest-192x192.png" />
+        <link rel="icon" href="/images/apple-icon.png" />
         <meta name="theme-color" content="#000000" />
-        <link rel="apple-touch-icon" href="/images/web-app-manifest-192x192.png" />
+        <link rel="apple-touch-icon" href="/images/apple-icon.png" />
       </head>
       <body suppressHydrationWarning className={cn('dark', font.className)}>
         <InstallPrompt />

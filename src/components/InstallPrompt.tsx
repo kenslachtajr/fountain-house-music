@@ -50,9 +50,9 @@ export default function InstallPrompt() {
           deferredPrompt.prompt();
           setDeferredPrompt(null);
         }}
-        className="p-2 bg-blue-600 text-white rounded mb-2"
+        className="w-full bg-blue-600 text-white rounded mb-2"
       >
-        Install Fountain App
+        Install Fountain House Music App
       </button>
     );
   }
