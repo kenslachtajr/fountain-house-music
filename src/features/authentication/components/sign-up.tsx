@@ -31,9 +31,16 @@ export function SignUp() {
     },
   });
 
+
   const handleSubmit = async (formData: FormData) => {
     const password = String(formData.get('password'));
     const email = String(formData.get('email'));
+    const confirmEmail = String(formData.get('confirmEmail'));
+
+    if (email !== confirmEmail) {
+      toast.error('Email addresses do not match.');
+      return;
+    }
 
     execute({ email, password });
   };
@@ -58,6 +65,20 @@ export function SignUp() {
             name="email"
             placeholder="name@example.com"
             className="bg-[#2E3439]"
+            required
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="confirmEmail" className="text-sm text-muted-foreground">
+            Confirm Email address
+          </Label>
+          <Input
+            id="confirmEmail"
+            type="email"
+            name="confirmEmail"
+            placeholder="Re-enter your email"
+            className="bg-[#2E3439]"
+            required
           />
         </div>
         <div className="flex flex-col gap-2">
@@ -70,6 +91,7 @@ export function SignUp() {
             name="password"
             placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
             className="bg-[#2E3439]"
+            required
           />
         </div>
 
