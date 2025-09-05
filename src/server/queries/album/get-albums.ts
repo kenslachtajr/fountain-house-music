@@ -8,7 +8,7 @@ export const getAlbums = async () => {
   const { data: albums, error } = await supabase
     .from('albums')
     .select('*, songs(*)')
-    .order('release_date', { ascending: true })
+    .order('release_date', { ascending: false })
     .returns<AlbumSongs[]>();
 
   if (error) {
