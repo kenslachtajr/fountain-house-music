@@ -10,8 +10,15 @@ interface AlbumContentProps {
   songs: Song[];
 }
 
+
 export function AlbumContent({ songs }: AlbumContentProps) {
-  useSetSongsToState(songs);
+  // Sort by track number at the beginning of the title
+  const sortedSongs = [...songs].sort((a, b) => {
+    const getTrackNum = (title: string) =>
+      parseInt(title.trim().split(' ')[0], 10) || 0;
+    return getTrackNum(a.title ?? '') - getTrackNum(b.title ?? '');
+  });
+  useSetSongsToState(sortedSongs);
 
   return (
     <div className="flex w-full flex-col gap-y-2 p-6">
