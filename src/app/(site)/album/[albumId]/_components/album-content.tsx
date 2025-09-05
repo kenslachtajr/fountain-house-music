@@ -14,7 +14,7 @@ export function AlbumContent({ songs }: AlbumContentProps) {
   // Sort songs by track number (assumes track number is at start of title)
   const sortedSongs = [...songs].sort((a, b) => {
     const getTrackNum = (title: string) => parseInt((title ?? '').trim().split(' ')[0], 10) || 0;
-    return getTrackNum(a.title ?? '') - getTrackNum(b.title ?? '');
+    return getTrackNum(a.title ?? '') - getTrackNum(b.title ?? ''); 
   });
   useSetSongsToState(sortedSongs);
 
