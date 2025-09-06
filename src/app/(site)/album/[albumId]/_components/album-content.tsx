@@ -2,7 +2,7 @@
 
 import { LikeButton } from '~/components/like-button';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
-import { usePlayerStoreActions } from '~/features/player/store/player.store';
+import { usePlayerStoreActions, usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
 import { Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
 
@@ -33,6 +33,8 @@ interface AlbumItemProps {
 
 function AlbumItem({ song }: AlbumItemProps) {
   const { setCurrentSong } = usePlayerStoreActions();
+  const currentSong = usePlayerCurrentSongSelect();
+  const isPlaying = currentSong?.id === song.id;
 
   return (
     <div className="flex w-full items-center gap-x-4">
@@ -41,7 +43,19 @@ function AlbumItem({ song }: AlbumItemProps) {
         className="flex w-full cursor-pointer items-center justify-between gap-x-3 rounded-md p-2 hover:bg-neutral-800/50"
       >
         <div className="flex flex-col gap-y-1 overflow-hidden">
-          <p className="truncate text-white">{song.title}</p>
+          <div className="flex items-center gap-2">
+            <p className="truncate text-white">{song.title}</p>
+            {isPlaying && (
+              <span className="inline-block h-4 w-4">
+                {/* Animated bars icon */}
+                <span className="flex h-full items-end gap-[1.5px]">
+                  <span className="w-[2px] h-2 animate-bar1 rounded-sm" />
+                  <span className="w-[2px] h-3 animate-bar2 rounded-sm" />
+                  <span className="w-[2px] h-4 animate-bar3 rounded-sm" />
+                </span>
+              </span>
+            )}
+          </div>
           <p className="truncate text-sm text-neutral-400">{song.author}</p>
         </div>
         <p className="truncate text-sm text-neutral-400">
@@ -52,3 +66,14 @@ function AlbumItem({ song }: AlbumItemProps) {
     </div>
   );
 }
+// Add keyframes for animated bars
+// You can move this to a global CSS file if preferred
+import '~/app/globals.css';
+
+// Add the following to your CSS (e.g., globals.css or a module):
+// @keyframes bar1 { 0%, 100% { height: 0.5rem; } 50% { height: 1.25rem; } }
+// @keyframes bar2 { 0%, 100% { height: 1rem; } 50% { height: 0.75rem; } }
+// @keyframes bar3 { 0%, 100% { height: 1.25rem; } 50% { height: 0.5rem; } }
+// .animate-bar1 { animation: bar1 1s infinite ease-in-out; }
+// .animate-bar2 { animation: bar2 1s infinite ease-in-out 0.2s; }
+// .animate-bar3 { animation: bar3 1s infinite ease-in-out 0.4s; }
