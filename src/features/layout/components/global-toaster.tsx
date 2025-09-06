@@ -6,7 +6,7 @@ export function GlobalToaster() {
       toastOptions={{
         position: 'bottom-right',
         style: {
-          background: '#333',
+          background: 'hsl(220, 70%, 50%)', // app blue
           color: '#fff',
         },
       }}

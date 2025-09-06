@@ -1,3 +1,27 @@
+@keyframes bar1 {
+  0%, 100% { height: 0.5rem; }
+  50% { height: 1.25rem; }
+}
+@keyframes bar2 {
+  0%, 100% { height: 1rem; }
+  50% { height: 0.75rem; }
+}
+@keyframes bar3 {
+  0%, 100% { height: 1.25rem; }
+  50% { height: 0.5rem; }
+}
+.animate-bar1 {
+  animation: bar1 1s infinite ease-in-out;
+  background-color: hsl(var(--primary));
+}
+.animate-bar2 {
+  animation: bar2 1s infinite ease-in-out 0.2s;
+  background-color: hsl(var(--primary));
+}
+.animate-bar3 {
+  animation: bar3 1s infinite ease-in-out 0.4s;
+  background-color: hsl(var(--primary));
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -45,8 +69,8 @@ body,
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
+    --primary: 220 70% 50%; /* blue */
+    --primary-foreground: 0 0% 98%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;

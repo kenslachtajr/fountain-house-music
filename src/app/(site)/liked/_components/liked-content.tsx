@@ -12,11 +12,16 @@ interface LikedContentProps {
 export const LikedContent: React.FC<LikedContentProps> = ({
   songs: likedSongs,
 }) => {
-  const songs = usePlayerSongsSelect();
-
   useSetSongsToState(likedSongs);
+  const playerSongs = usePlayerSongsSelect();
+  // Compare arrays by id
+  const arraysMatch =
+    playerSongs.length === likedSongs.length &&
+    playerSongs.every((s, i) => s.id === likedSongs[i].id);
 
-  if (songs.length === 0) {
+  const renderSongs = arraysMatch ? playerSongs : likedSongs;
+
+  if (renderSongs.length === 0) {
     return (
       <div className="flex w-full flex-col gap-y-2 px-6 text-center text-neutral-400">
         No liked songs.
@@ -26,7 +31,7 @@ export const LikedContent: React.FC<LikedContentProps> = ({
 
   return (
     <div className="flex w-full flex-col gap-y-2 p-6">
-      {songs.map((song) => (
+      {renderSongs.map((song) => (
         <MediaItem key={song.id} data={song} />
       ))}
     </div>

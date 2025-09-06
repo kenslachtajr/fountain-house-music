@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import { usePlayerStoreActions } from '~/features/player/store/player.store';
+import { usePlayerStoreActions, usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
 import { useLoadImage } from '~/hooks/use-load-image';
 import { Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
@@ -14,7 +14,9 @@ interface MediaItemProps {
 
 export const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
   const { setCurrentSong } = usePlayerStoreActions();
+  const currentSong = usePlayerCurrentSongSelect();
   const imageUrl = useLoadImage(data);
+  const isPlaying = currentSong?.id === data.id;
 
   return (
     <div className="flex w-full items-center gap-x-4">
@@ -32,7 +34,18 @@ export const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
             />
           </div>
           <div className="flex flex-col gap-y-1 overflow-hidden">
-            <p className="truncate text-white">{data.title}</p>
+            <div className="flex items-center gap-2">
+              <p className="truncate text-white">{data.title}</p>
+              {isPlaying && (
+                <span className="inline-block h-4 w-4">
+                  <span className="flex h-full items-end gap-[1.5px]">
+                    <span className="w-[2px] h-2 animate-bar1 rounded-sm" />
+                    <span className="w-[2px] h-3 animate-bar2 rounded-sm" />
+                    <span className="w-[2px] h-4 animate-bar3 rounded-sm" />
+                  </span>
+                </span>
+              )}
+            </div>
             <p className="truncate text-sm text-neutral-400">{data.author}</p>
           </div>
         </div>
