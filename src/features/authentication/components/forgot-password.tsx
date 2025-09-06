@@ -11,11 +11,10 @@ import { forgotPassword } from '../actions/forgot-password';
 import { useAuthenticationDialogActions } from '../stores/use-authentication-dialog';
 
 export function ForgotPassword() {
-  const { buildDialogHref, openDialogTo } = useAuthenticationDialogActions();
+  const { buildDialogHref } = useAuthenticationDialogActions();
 
   const { execute } = useAction(forgotPassword, {
     onSuccess: () => {
-      openDialogTo('reset-password');
       toast.success('Check your email for instructions.');
     },
     onError: ({ error }) => {
