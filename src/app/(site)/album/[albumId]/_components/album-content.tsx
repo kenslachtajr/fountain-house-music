@@ -3,6 +3,7 @@
 import { LikeButton } from '~/components/like-button';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import { usePlayerStoreActions, usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
+import { useAudioPlayerContext } from 'react-use-audio-player';
 import { Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
 
@@ -34,7 +35,8 @@ interface AlbumItemProps {
 function AlbumItem({ song }: AlbumItemProps) {
   const { setCurrentSong } = usePlayerStoreActions();
   const currentSong = usePlayerCurrentSongSelect();
-  const isPlaying = currentSong?.id === song.id;
+  const { isPlaying: audioIsPlaying } = useAudioPlayerContext();
+  const isCurrent = currentSong?.id === song.id;
 
   return (
     <div className="flex w-full items-center gap-x-4">
@@ -45,13 +47,12 @@ function AlbumItem({ song }: AlbumItemProps) {
         <div className="flex flex-col gap-y-1 overflow-hidden">
           <div className="flex items-center gap-2">
             <p className="truncate text-white">{song.title}</p>
-            {isPlaying && (
+            {isCurrent && (
               <span className="inline-block h-4 w-4">
-                {/* Animated bars icon */}
                 <span className="flex h-full items-end gap-[1.5px]">
-                  <span className="w-[2px] h-2 animate-bar1 rounded-sm" />
-                  <span className="w-[2px] h-3 animate-bar2 rounded-sm" />
-                  <span className="w-[2px] h-4 animate-bar3 rounded-sm" />
+                  <span className={`w-[2px] h-2 rounded-sm ${audioIsPlaying ? 'animate-bar1' : 'bg-[hsl(var(--primary))]'}`} />
+                  <span className={`w-[2px] h-3 rounded-sm ${audioIsPlaying ? 'animate-bar2' : 'bg-[hsl(var(--primary))]'}`} />
+                  <span className={`w-[2px] h-4 rounded-sm ${audioIsPlaying ? 'animate-bar3' : 'bg-[hsl(var(--primary))]'}`} />
                 </span>
               </span>
             )}
