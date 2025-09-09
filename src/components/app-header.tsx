@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FaUserAlt } from 'react-icons/fa';
+import { FaUserAlt, FaInstagram, FaFacebook } from 'react-icons/fa';
 import { RxCaretLeft, RxCaretRight } from 'react-icons/rx';
 import { twMerge } from 'tailwind-merge';
 
@@ -40,6 +40,32 @@ export const Header: React.FC<HeaderProps> = ({ children, className }) => {
           </button>
         </div>
         <div className="flex items-center justify-between gap-x-2 max-md:w-full">
+          {/* Social Share Icons */}
+          <div className="flex items-center gap-x-2 mr-4">
+            <span className="text-white text-xs font-medium mr-1">Share</span>
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=https://fountain-house-music.vercel.app&quote=${encodeURIComponent(
+                'Listen to great Christian music with a message! Your subscriptions empowers us to continue to create more anointed music from other great singers and musicians. Sign up today!'
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Share on Facebook"
+              className="text-white hover:text-blue-500 transition-colors duration-200"
+            >
+              <FaFacebook size={24} />
+            </a>
+            <a
+              href={`https://www.instagram.com/?url=https://fountain-house-music.vercel.app&text=${encodeURIComponent(
+                'Listen to great Christian music with a message! Your subscriptions empowers us to continue to create more anointed music from other great singers and musicians. Sign up today!'
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Share on Instagram"
+              className="text-white hover:text-pink-500 transition-colors duration-200"
+            >
+              <FaInstagram size={24} />
+            </a>
+          </div>
           {userDetails ? (
             <button
               onClick={() => router.push('/account')}

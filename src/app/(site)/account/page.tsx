@@ -10,6 +10,11 @@ export default function Account() {
         <h1 className="mb-2 text-3xl font-semibold text-white">Account</h1>
       </Header>
       <AccountSections />
+      <div className="mt-4 px-6">
+        <p className="text-sm text-neutral-300">
+          Need technical support? Please email inquiries to: <a href="mailto:fountainhousestudio@gmail.com" className="underline text-blue-400">fountainhousestudio@gmail.com</a>
+        </p>
+      </div>
       <div className="mt-8 rounded-lg bg-neutral-800 p-6 text-neutral-300">
         <h2 className="mb-2 text-xl font-semibold text-white">Terms and Conditions</h2>
         <p className="mb-4 text-sm">
