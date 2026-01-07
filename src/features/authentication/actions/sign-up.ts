@@ -1,7 +1,6 @@
 'use server';
 
 import { ValidationErrors } from 'next-safe-action';
-import { headers } from 'next/headers';
 import { z } from 'zod';
 import { actionClient, ActionError } from '~/lib/safe-action';
 
@@ -23,19 +22,22 @@ export const signUp = actionClient
   .metadata({ shouldAuth: false })
   .action(async ({ parsedInput: { email, password } }) => {
     const supabase = await createClient();
-    const origin = (await headers()).get('origin');
 
-    console.log('origin header:', JSON.stringify(origin));
-    console.log('emailRedirectTo:', JSON.stringify(`${origin}/`));
+    // Canonical base URL (set this in Vercel to https://fountainhousemusic.com)
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fountainhousemusic.com';
 
-    if (!origin) return;
+    // Build a correct, slash-safe redirect URL for Supabase confirmation emails
+    const emailRedirectTo = new URL('/auth/confirm', baseUrl).toString();
+
+    console.log('NEXT_PUBLIC_SITE_URL:', JSON.stringify(baseUrl));
+    console.log('emailRedirectTo:', JSON.stringify(emailRedirectTo));
 
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        // emailRedirectTo: origin,
-        emailRedirectTo: `${origin}/`,
+        emailRedirectTo,
       },
     });
 
