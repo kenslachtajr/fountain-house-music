@@ -33,6 +33,7 @@ export const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
               src={imageUrl || '/images/placeholder.jpeg'}
               alt="Media item"
               className="object-cover"
+              sizes="48px"
             />
           </div>
           <div className="flex flex-col gap-y-1 overflow-hidden">

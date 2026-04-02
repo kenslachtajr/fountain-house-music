@@ -30,6 +30,7 @@ export function AlbumCard({ album, onPlayAlbum }: AlbumCardProps) {
             src={imageUrl || '/images/placeholder.jpeg'}
             fill
             alt="Image"
+            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 25vw, 20vw"
           />
         </div>
         <div className="flex w-full flex-col items-start gap-y-1 pt-4">

@@ -20,7 +20,7 @@ export async function LayoutFeature({ children }: PropsWithChildren<unknown>) {
         {children}
       </Sidebar>
 
-      <div className="fixed bottom-0 w-full">
+      <div className="fixed bottom-0 w-full bg-black">
         <PlayerFeature />
         <MobileNavigationFeature />
       </div>

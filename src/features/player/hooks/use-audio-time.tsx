@@ -1,14 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { useAudioPlayerContext } from 'react-use-audio-player';
+import { useUnifiedAudio } from './use-unified-audio';
 
 export function useAudioTime() {
   const frameRef = useRef<number | undefined>(undefined);
   const [pos, setPos] = useState<number>(0);
-  const { getPosition } = useAudioPlayerContext();
+  const lastUpdateRef = useRef<number>(0);
+  const { getPosition } = useUnifiedAudio();
 
   useEffect(() => {
-    const animate = () => {
-      setPos(getPosition());
+    const animate = (timestamp: number) => {
+      if (timestamp - lastUpdateRef.current >= 250) {
+        setPos(getPosition());
+        lastUpdateRef.current = timestamp;
+      }
       frameRef.current = requestAnimationFrame(animate);
     };
 

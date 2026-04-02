@@ -2,6 +2,7 @@ import { getLikedSongs } from '~/server/queries/songs/get-liked-songs';
 import { LikedContent } from './_components/liked-content';
 import { LikedHeader } from './_components/liked-header';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function Liked() {

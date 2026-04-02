@@ -1,13 +1,12 @@
-import { useEffect } from 'react';
 import { AiFillStepBackward, AiFillStepForward } from 'react-icons/ai';
 import { HiPause, HiPlay } from 'react-icons/hi';
-import { useAudioPlayerContext } from 'react-use-audio-player';
+import { useUnifiedAudio } from '../hooks/use-unified-audio';
 import { usePlayerStoreActions } from '../store/player.store';
 import { useIdleTimer } from '../hooks/use-idle-timer';
 
 // Accept onPlay prop to trigger audio load/play on user gesture
 export function PlayerControls({ onPlay }: { onPlay?: () => void }) {
-  const { getPosition, seek, pause, isPlaying } = useAudioPlayerContext();
+  const { getPosition, seek, pause, isPlaying } = useUnifiedAudio();
   const { nextSong, previousSong } = usePlayerStoreActions();
 
   useIdleTimer(() => {
@@ -72,7 +71,7 @@ export function PlayerControls({ onPlay }: { onPlay?: () => void }) {
 }
 
 function PlayIcon({ onPlay }: { onPlay?: () => void }) {
-  const { pause, play, isPlaying } = useAudioPlayerContext();
+  const { pause, play, isPlaying } = useUnifiedAudio();
   const Icon = isPlaying ? HiPause : HiPlay;
 
   const handleClick = () => {

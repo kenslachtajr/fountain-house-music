@@ -1,20 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
-import { useAudioPlayerContext } from 'react-use-audio-player';
+import { useUnifiedAudio } from '../hooks/use-unified-audio';
 import { SimpleSlider } from '~/components/ui/slider';
 import { TimeLabel } from './player-time-label';
 
 export function PlayerSettings() {
-  const { setVolume, volume: currentVolume } = useAudioPlayerContext();
+  const { setVolume, volume: currentVolume } = useUnifiedAudio();
   const [muted, setMuted] = useState(false);
-  const lastVolumeRef = useRef(currentVolume || 1);
+  const [localVolume, setLocalVolume] = useState(currentVolume || 0.7);
+  const lastVolumeRef = useRef(localVolume);
 
-  // Restore volume when song changes (if current is full volume)
   useEffect(() => {
-    if (currentVolume === 1 && lastVolumeRef.current !== 1) {
-      setVolume(lastVolumeRef.current);
-    }
-  }, [currentVolume, setVolume]);
+    setLocalVolume(currentVolume);
+    lastVolumeRef.current = currentVolume || 0.7;
+  }, [currentVolume]);
 
   const VolumeIcon = muted ? HiSpeakerXMark : HiSpeakerWave;
 
@@ -24,7 +23,7 @@ export function PlayerSettings() {
       setVolume(lastVolumeRef.current);
     } else {
       setMuted(true);
-      lastVolumeRef.current = currentVolume || 1;
+      lastVolumeRef.current = localVolume;
       setVolume(0);
     }
   };
@@ -32,7 +31,9 @@ export function PlayerSettings() {
   const handleVolumeChange = (value: number) => {
     if (!muted) {
       lastVolumeRef.current = value;
+      setLocalVolume(value);
       setVolume(value);
+      localStorage.setItem('player-volume', String(value));
     }
   };
 
@@ -48,7 +49,7 @@ export function PlayerSettings() {
         <SimpleSlider
           max={1}
           step={0.1}
-          value={muted ? lastVolumeRef.current : currentVolume}
+          value={muted ? lastVolumeRef.current : localVolume}
           onValueChange={handleVolumeChange}
         />
       </div>

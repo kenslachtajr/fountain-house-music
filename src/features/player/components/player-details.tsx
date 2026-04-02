@@ -20,12 +20,15 @@ export function PlayerDetails() {
         {/* Media item */}
         <div className="flex items-center w-full p-2 rounded-md cursor-pointer gap-x-3 hover:bg-neutral-800/50 max-md:max-w-72 max-w-96">
           <div className="relative min-h-12 min-w-12 overflow-hidden rounded-md">
-            <Image
-              fill
-              src={imagePath ?? ''}
-              alt="Media item"
-              className="object-cover"
-            />
+            {imagePath && (
+              <Image
+                fill
+                src={imagePath}
+                alt="Media item"
+                className="object-cover"
+                sizes="48px"
+              />
+            )}
           </div>
           <div className="flex flex-col gap-y-1 overflow-hidden">
             <p className="truncate text-white">{currentSong?.title}</p>

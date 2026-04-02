@@ -1,16 +1,31 @@
+'use client';
+
+import { useMemo } from 'react';
 import { Album, Song } from '~/types/types';
 import { createClient } from '~/utils/supabase/client';
 
-export const useLoadImage = (song?: Album | Song) => {
-  const supabaseClient = createClient();
+let cachedClient: ReturnType<typeof createClient> | null = null;
 
-  if (!song?.image_path) {
-    return null;
+function getSupabaseClient() {
+  if (!cachedClient) {
+    cachedClient = createClient();
   }
+  return cachedClient;
+}
 
-  const { data: imageData } = supabaseClient.storage
-    .from('images')
-    .getPublicUrl(song.image_path);
+export const useLoadImage = (song?: Album | Song) => {
+  const imagePath = song?.image_path;
 
-  return imageData.publicUrl;
+  return useMemo(() => {
+    if (!imagePath) {
+      return null;
+    }
+
+    const supabaseClient = getSupabaseClient();
+    const { data: imageData } = supabaseClient.storage
+      .from('images')
+      .getPublicUrl(imagePath);
+
+    return imageData.publicUrl;
+  }, [imagePath]);
 };

@@ -1,123 +1,149 @@
 'use client';
 
-import { useEffect } from 'react';
-import { Howler } from 'howler';
-import { useAudioPlayerContext } from 'react-use-audio-player';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { SimpleSlider } from '~/components/ui/slider';
 import { useLoadImage } from '~/hooks/use-load-image';
+import { isNativeApp } from '~/utils/platform';
 import { PlayerControls } from './components/player-controls';
 import { PlayerDetails } from './components/player-details';
 import { PlayerSettings } from './components/player-settings';
 import { useAudioTime } from './hooks/use-audio-time';
+import { useUnifiedAudio } from './hooks/use-unified-audio';
 import { useLoadSongUrl } from './hooks/use-load-song-url';
+import {
+  setNativeMediaMetadata,
+  setNativePlaybackState,
+  setNativeActionHandlers,
+} from './providers/native-media-session';
 import {
   usePlayerCurrentSongSelect,
   usePlayerStoreActions,
 } from './store/player.store';
 
 export function PlayerFeature() {
-  // Helper to set Media Session metadata and handlers
-  // Helper to set Media Session metadata and handlers
-  const setMediaSession = () => {
-    if (currentSong && navigator && navigator.mediaSession) {
-      if (!songImage || songImage.length === 0) return;
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: currentSong.title ?? '',
-        artist: currentSong.author ?? '',
-        album: currentSong.album ?? '',
-        artwork: [
-          {
-            src: songImage,
-            sizes: '512x512',
-            type: 'image/jpeg',
-          },
-        ],
-      });
-      navigator.mediaSession.setActionHandler('play', play);
-      navigator.mediaSession.setActionHandler('seekto', (s) => seek(s.seekTime!));
-      navigator.mediaSession.setActionHandler('pause', () => pause());
-      navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
-      navigator.mediaSession.setActionHandler('previoustrack', () => previousSong());
-    }
-  };
-  // Reset player state and audio element
-  const resetPlayer = () => {
-    // Pause and unload audio
-    pause();
-    // Try to reset volume and mute state
-    const audio = document.querySelector('audio');
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-      audio.src = '';
-      audio.load();
-      audio.volume = 1;
-      audio.muted = false;
-    }
-    // Optionally, reload the page or reset app state
-    // window.location.reload();
-  };
-  const { load, seek, play, pause, isPlaying } = useAudioPlayerContext();
+  const { load, seek, play, pause, isPlaying, setVolume } = useUnifiedAudio();
   const { nextSong, previousSong } = usePlayerStoreActions();
 
   const currentSong = usePlayerCurrentSongSelect();
   const songUrl = useLoadSongUrl(currentSong);
   const songImage = useLoadImage(currentSong);
 
-  // Always set Media Session metadata before playback, then load and play
+  const playRef = useRef(play);
+  const pauseRef = useRef(pause);
+  const seekRef = useRef(seek);
+  const nextSongRef = useRef(nextSong);
+  const previousSongRef = useRef(previousSong);
+
+  useEffect(() => { playRef.current = play; }, [play]);
+  useEffect(() => { pauseRef.current = pause; }, [pause]);
+  useEffect(() => { seekRef.current = seek; }, [seek]);
+  useEffect(() => { nextSongRef.current = nextSong; }, [nextSong]);
+  useEffect(() => { previousSongRef.current = previousSong; }, [previousSong]);
+
+  const handleNextSong = useCallback(() => nextSongRef.current(), []);
+  const handlePreviousSong = useCallback(() => previousSongRef.current(), []);
+
+  useEffect(() => {
+    if (!navigator?.mediaSession) return;
+
+    navigator.mediaSession.setActionHandler('play', () => playRef.current());
+    navigator.mediaSession.setActionHandler('pause', () => pauseRef.current());
+    navigator.mediaSession.setActionHandler('nexttrack', () => nextSongRef.current());
+    navigator.mediaSession.setActionHandler('previoustrack', () => previousSongRef.current());
+    navigator.mediaSession.setActionHandler('seekto', (s) => {
+      if (s.seekTime != null) seekRef.current(s.seekTime);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!currentSong || !songImage || songImage.length === 0) return;
+    if (!navigator?.mediaSession) return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentSong.title ?? '',
+      artist: currentSong.author ?? '',
+      album: currentSong.album ?? '',
+      artwork: [{ src: songImage, sizes: '512x512', type: 'image/jpeg' }],
+    });
+  }, [currentSong, songImage]);
+
+  useEffect(() => {
+    if (!currentSong || !songImage) return;
+    if (!isNativeApp()) return;
+
+    setNativeMediaMetadata(
+      currentSong.title ?? '',
+      currentSong.author ?? '',
+      currentSong.album ?? '',
+      songImage,
+    );
+    setNativeActionHandlers({
+      play: () => playRef.current(),
+      pause: () => pauseRef.current(),
+      next: () => nextSongRef.current(),
+      previous: () => previousSongRef.current(),
+      seekto: (time: number) => seekRef.current(time),
+    });
+  }, [currentSong, songImage]);
+
+  useEffect(() => {
+    if (isNativeApp()) {
+      setNativePlaybackState(isPlaying ? 'playing' : 'paused');
+    }
+  }, [isPlaying]);
+
   useEffect(() => {
     if (!songUrl) return;
-    setMediaSession();
-    const userVolume = parseFloat(localStorage.getItem('player-volume') || '0.7');
-    Howler.volume(userVolume);
+
+    const userVolume = parseFloat(
+      localStorage.getItem('player-volume') || '0.7',
+    );
+    setVolume(userVolume);
+
     load(songUrl, {
       autoplay: true,
       html5: true,
       format: 'mp3',
-      onend: () => nextSong(),
+      onend: () => nextSongRef.current(),
     });
     play();
-    // Only depend on songUrl and nextSong to avoid infinite loop
-    // load and play are stable from context
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [songUrl, nextSong]);
+  }, [songUrl]);
 
-  // Set Media Session API metadata and handlers on song change
-  useEffect(() => {
-    setMediaSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSong, songImage]);
-
-  // Add robust listeners for all key audio events
   useEffect(() => {
     const audio = document.querySelector('audio');
     if (!audio) return;
 
-    const updateSession = () => setMediaSession();
-    const handleError = (e: Event) => {
-      // Optionally, show a user-friendly error or try to reload
-      // For now, just log
-      // eslint-disable-next-line no-console
-      console.error('Audio error', e);
+    const updatePositionState = () => {
+      if (!navigator?.mediaSession || !audio.duration || !isFinite(audio.duration)) return;
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: audio.duration,
+          position: audio.currentTime,
+          playbackRate: audio.playbackRate,
+        });
+      } catch {}
     };
 
-    audio.addEventListener('play', updateSession);
-    audio.addEventListener('playing', updateSession);
-    audio.addEventListener('pause', updateSession);
-    audio.addEventListener('ended', updateSession);
-    audio.addEventListener('timeupdate', updateSession);
-    audio.addEventListener('error', handleError);
+    const handlePlay = () => updatePositionState();
+    const handlePause = () => updatePositionState();
+    const handleEnded = () => nextSongRef.current();
+    const handleTimeUpdate = () => updatePositionState();
+
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('playing', handlePlay);
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
 
     return () => {
-      audio.removeEventListener('play', updateSession);
-      audio.removeEventListener('playing', updateSession);
-      audio.removeEventListener('pause', updateSession);
-      audio.removeEventListener('ended', updateSession);
-      audio.removeEventListener('timeupdate', updateSession);
-      audio.removeEventListener('error', handleError);
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('playing', handlePlay);
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSong, songImage]);
+  }, [currentSong]);
 
   if (!currentSong) return null;
 
@@ -137,7 +163,12 @@ export function PlayerFeature() {
 
 function SeekSlider() {
   const time = useAudioTime();
-  const { duration, pause, seek, togglePlayPause } = useAudioPlayerContext();
+  const { duration, play, pause, seek, isPlaying } = useUnifiedAudio();
+  const [dragging, setDragging] = useState(false);
+  const [dragValue, setDragValue] = useState(0);
+  const wasPlayingRef = useRef(false);
+
+  const displayValue = dragging ? dragValue : (time / duration) * 100;
 
   return (
     <SimpleSlider
@@ -145,11 +176,21 @@ function SeekSlider() {
       step={0.1}
       minStepsBetweenThumbs={1}
       defaultValue={1}
-      value={(time / duration) * 100}
-      onValueCommit={togglePlayPause}
+      value={isNaN(displayValue) ? 0 : displayValue}
       onValueChange={(value) => {
-        pause();
+        if (!dragging) {
+          wasPlayingRef.current = isPlaying;
+          pause();
+          setDragging(true);
+        }
+        setDragValue(value);
+      }}
+      onValueCommit={(value) => {
         seek(value * (duration / 100));
+        setDragging(false);
+        if (wasPlayingRef.current) {
+          play();
+        }
       }}
     />
   );

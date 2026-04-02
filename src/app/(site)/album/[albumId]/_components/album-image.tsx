@@ -18,6 +18,7 @@ export function AlbumImage({ album }: AlbumImageProps) {
         alt="Album"
         src={imageUrl ?? '/images/liked.jpeg'}
         className="object-cover"
+        sizes="176px"
       />
     </div>
   );

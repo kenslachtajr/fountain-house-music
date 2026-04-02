@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useAudioPlayerContext } from 'react-use-audio-player';
+import { useUnifiedAudio } from '../hooks/use-unified-audio';
 
 export const TimeLabel = () => {
   const [pos, setPos] = useState(0);
-  const { duration, getPosition } = useAudioPlayerContext();
+  const { duration, getPosition } = useUnifiedAudio();
 
   useEffect(() => {
     const i = setInterval(() => {

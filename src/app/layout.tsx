@@ -15,7 +15,7 @@ const APP_DEFAULT_TITLE = 'Fountain House Music';
 const APP_TITLE_TEMPLATE = '%s - Fountain House Music';
 const APP_DESCRIPTION = 'Listen to great music!';
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (
@@ -36,6 +36,11 @@ export default async function RootLayout({ children }: PropsWithChildren) {
 
 export const viewport: Viewport = {
   themeColor: '#FFFFFF',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
 };
 
 export const metadata: Metadata = {

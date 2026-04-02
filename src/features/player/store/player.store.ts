@@ -1,8 +1,8 @@
-import { useAudioPlayerContext } from 'react-use-audio-player';
 import { create } from 'zustand';
 import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
 import { useSubscribeDialogActions } from '~/features/subscribe/stores/use-subscribe-dialog';
+import { useUnifiedAudio } from '~/features/player/hooks/use-unified-audio';
 import { Song } from '~/types/types';
 
 interface PlayerStore {
@@ -59,7 +59,7 @@ export const usePlayerSongsSelect = () =>
 
 export const usePlayerStoreActions = () => {
   const user = useCurrentUserSelect();
-  const { stop } = useAudioPlayerContext();
+  const { stop } = useUnifiedAudio();
   const { openDialogTo: openAuthenticationDialogTo } =
     useAuthenticationDialogActions();
   const { openDialog: openSubscribeDialog } = useSubscribeDialogActions();

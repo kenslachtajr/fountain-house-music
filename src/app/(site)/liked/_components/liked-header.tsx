@@ -12,6 +12,7 @@ export function LikedHeader() {
               alt="Playlist"
               src="/images/liked.jpeg"
               className="object-cover"
+              sizes="176px"
             />
           </div>
           <div className="mt-4 flex flex-col gap-y-2 md:mt-0">

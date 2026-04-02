@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { isNativeApp } from '~/utils/platform';
 
 export default function InstallPrompt() {
   const [isIOS, setIsIOS] = useState(false);
@@ -32,8 +33,7 @@ export default function InstallPrompt() {
     };
   }, []);
 
-  // Hide prompt if running as installed app
-  if (isStandalone) return null;
+  if (isNativeApp() || isStandalone) return null;
 
   if (isIOS) {
     return (

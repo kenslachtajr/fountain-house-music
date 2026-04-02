@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { BiSearch } from 'react-icons/bi';
+import { BsPeopleFill } from 'react-icons/bs';
 import { FaUser } from 'react-icons/fa';
 import { GoHomeFill } from 'react-icons/go';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
@@ -16,6 +17,9 @@ export function MobileNavigationFeature() {
     <div className="md:hidden flex justify-around align-middle h-[80px] bg-black pb-[env(safe-area-inset-bottom)]">
       <Link className="pt-3" href="/">
         <GoHomeFill size={40}/>
+      </Link>
+      <Link className="pt-3" href="/artists">
+        <BsPeopleFill size={40} />
       </Link>
       <Link className="pt-3" href="/search">
         <BiSearch size={40} />

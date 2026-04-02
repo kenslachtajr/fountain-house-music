@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 import { BiSearch } from 'react-icons/bi';
+import { BsPeopleFill } from 'react-icons/bs';
 import { HiHome } from 'react-icons/hi';
 import { twMerge } from 'tailwind-merge';
 
@@ -28,8 +29,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ children, songs, user }) => {
       {
         icon: HiHome,
         label: 'Home',
-        active: pathname !== '/search',
+        active: pathname === '/',
         href: '/',
+      },
+      {
+        icon: BsPeopleFill,
+        label: 'Artists',
+        active: pathname === '/artists' || !!pathname?.startsWith('/artist/'),
+        href: '/artists',
       },
       {
         icon: BiSearch,
