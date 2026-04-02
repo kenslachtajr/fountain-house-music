@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FaPlay } from 'react-icons/fa';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
+import { useTheme } from '~/features/layout/components/theme-context';
 
 interface ListItemProps {
   image: string;
@@ -13,6 +14,7 @@ interface ListItemProps {
 
 export const ListItem: React.FC<ListItemProps> = ({ image, name, href }) => {
   const user = useCurrentUserSelect();
+  const { primaryColor } = useTheme();
 
   if (!user) return;
 
@@ -26,7 +28,10 @@ export const ListItem: React.FC<ListItemProps> = ({ image, name, href }) => {
           <Image className="object-cover" fill src={image} alt="Image" sizes="64px" />
         </div>
         <p className="truncate py-5 font-medium">{name}</p>
-        <div className="absolute right-5 flex items-center justify-center rounded-full bg-blue-500 p-4 opacity-0 drop-shadow-md transition hover:scale-110 group-hover:opacity-100">
+        <div 
+          className="absolute right-5 flex items-center justify-center rounded-full p-4 opacity-0 drop-shadow-md transition hover:scale-110 group-hover:opacity-100"
+          style={{ backgroundColor: primaryColor }}
+        >
           <FaPlay className="text-black" />
         </div>
       </Link>

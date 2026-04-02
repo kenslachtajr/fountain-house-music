@@ -5,7 +5,9 @@
   "scripts": {
     "build:css": "postcss ./src/styles/globals.css -o ./dist/styles.css",
     "dev": "next dev",
+    "dev:clean": "rm -rf .next && next dev",
     "build": "next build",
+    "build:clean": "rm -rf .next && next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --check --ignore-path .gitignore .",

@@ -24,7 +24,7 @@ const Slider = React.forwardRef<
       <SliderPrimitive.Track className="relative h-2 md:h-0.5 w-full grow overflow-hidden rounded-full bg-neutral-600">
         <SliderPrimitive.Range className="absolute h-full" style={{ backgroundColor: primaryColor }} />
       </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb className="block h-7 w-7 md:h-4 md:w-4 rounded-full border-2 border-gray-200 bg-white ring-offset-[#0096FF] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" />
+      <SliderPrimitive.Thumb className="block h-7 w-7 md:h-4 md:w-4 rounded-full border-2 border-gray-200 bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" style={{ '--tw-ring-color': primaryColor, '--tw-ring-offset-color': 'transparent' } as React.CSSProperties} />
     </SliderPrimitive.Root>
   );
 });

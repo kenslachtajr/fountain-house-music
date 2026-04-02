@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
 import { useUnifiedAudio } from '../hooks/use-unified-audio';
 import { SimpleSlider } from '~/components/ui/slider';
@@ -7,17 +7,29 @@ import { TimeLabel } from './player-time-label';
 export function PlayerSettings() {
   const { setVolume, volume: currentVolume } = useUnifiedAudio();
   const [muted, setMuted] = useState(false);
-  const [localVolume, setLocalVolume] = useState(0.7);
-  const lastVolumeRef = useRef(0.7);
+  
+  const [localVolume, setLocalVolume] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return parseFloat(localStorage.getItem('player-volume') || '0.7');
+    }
+    return 0.7;
+  });
+  const lastVolumeRef = useRef(localVolume);
   const isInitializedRef = useRef(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isInitializedRef.current && currentVolume > 0) {
       setLocalVolume(currentVolume);
       lastVolumeRef.current = currentVolume;
       isInitializedRef.current = true;
     }
   }, [currentVolume]);
+
+  useEffect(() => {
+    if (isInitializedRef.current && currentVolume > 0 && !muted) {
+      setLocalVolume(currentVolume);
+    }
+  }, [currentVolume, muted]);
 
   const VolumeIcon = muted ? HiSpeakerXMark : HiSpeakerWave;
 

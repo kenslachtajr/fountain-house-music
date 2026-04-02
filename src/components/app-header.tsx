@@ -8,6 +8,7 @@ import { twMerge } from 'tailwind-merge';
 
 import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
+import { useTheme } from '~/features/layout/components/theme-context';
 import { Button } from './ui/legacy/button';
 
 interface HeaderProps {
@@ -19,10 +20,12 @@ export const Header: React.FC<HeaderProps> = ({ children, className }) => {
   const router = useRouter();
   const userDetails = useCurrentUserSelect();
   const { openDialogTo } = useAuthenticationDialogActions();
+  const { primaryColor } = useTheme();
 
   return (
     <div
-      className={twMerge(`h-fit bg-gradient-to-b from-blue-800 p-6`, className)}
+      className={twMerge(`h-fit p-6`, className)}
+      style={{ background: `linear-gradient(to bottom, ${primaryColor}dd, transparent)` }}
     >
       <div className="mb-4 flex w-full items-center justify-between max-md:w-full">
         <div className="hidden items-center gap-x-2 md:flex">

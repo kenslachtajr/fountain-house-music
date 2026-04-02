@@ -148,7 +148,7 @@ export function PlayerFeature() {
   if (!currentSong) return null;
 
   return (
-    <div className="w-full h-20 max-md:bg-gradient-to-b max-md:from-blue-950">
+    <div className="w-full h-20 bg-black">
       <SeekSlider />
       <div className="px-4 py-2">
         <div className="grid h-full grid-cols-2 md:grid-cols-3">
@@ -175,8 +175,7 @@ function SeekSlider() {
       max={100}
       step={0.1}
       minStepsBetweenThumbs={1}
-      defaultValue={1}
-      value={isNaN(displayValue) ? 0 : displayValue}
+      value={isNaN(displayValue) || !duration ? 0 : displayValue}
       onValueChange={(value) => {
         if (!dragging) {
           wasPlayingRef.current = isPlaying;
