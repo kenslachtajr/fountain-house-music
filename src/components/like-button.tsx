@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { useAuthenticationDialogActions } from '~/features/authentication/stores/use-authentication-dialog';
 import { useCurrentUserSelect } from '~/features/layout/store/current-user';
+import { useTheme } from '~/features/layout/components/theme-context';
 import { createClient } from '~/utils/supabase/client';
 
 interface LikeButtonProps {
@@ -15,6 +16,7 @@ interface LikeButtonProps {
 export const LikeButton: React.FC<LikeButtonProps> = ({ songId }) => {
   const router = useRouter();
   const supabaseClient = createClient();
+  const { primaryColor } = useTheme();
 
   const { openDialogTo } = useAuthenticationDialogActions();
   const user = useCurrentUserSelect();
@@ -79,7 +81,9 @@ export const LikeButton: React.FC<LikeButtonProps> = ({ songId }) => {
 
   return (
     <button onClick={handleLike} className="transition hover:opacity-75">
-      <Icon color={isLiked ? '#0096FF' : 'white'} size={25} />
+      <span style={{ color: isLiked ? primaryColor : 'white' }}>
+        <Icon size={25} />
+      </span>
     </button>
   );
 };

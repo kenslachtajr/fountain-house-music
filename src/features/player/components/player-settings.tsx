@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
 import { useUnifiedAudio } from '../hooks/use-unified-audio';
 import { SimpleSlider } from '~/components/ui/slider';
@@ -7,12 +7,16 @@ import { TimeLabel } from './player-time-label';
 export function PlayerSettings() {
   const { setVolume, volume: currentVolume } = useUnifiedAudio();
   const [muted, setMuted] = useState(false);
-  const [localVolume, setLocalVolume] = useState(currentVolume || 0.7);
-  const lastVolumeRef = useRef(localVolume);
+  const [localVolume, setLocalVolume] = useState(0.7);
+  const lastVolumeRef = useRef(0.7);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
-    setLocalVolume(currentVolume);
-    lastVolumeRef.current = currentVolume || 0.7;
+    if (!isInitializedRef.current && currentVolume > 0) {
+      setLocalVolume(currentVolume);
+      lastVolumeRef.current = currentVolume;
+      isInitializedRef.current = true;
+    }
   }, [currentVolume]);
 
   const VolumeIcon = muted ? HiSpeakerXMark : HiSpeakerWave;
@@ -21,6 +25,7 @@ export function PlayerSettings() {
     if (muted) {
       setMuted(false);
       setVolume(lastVolumeRef.current);
+      setLocalVolume(lastVolumeRef.current);
     } else {
       setMuted(true);
       lastVolumeRef.current = localVolume;
@@ -28,14 +33,14 @@ export function PlayerSettings() {
     }
   };
 
-  const handleVolumeChange = (value: number) => {
-    if (!muted) {
-      lastVolumeRef.current = value;
-      setLocalVolume(value);
-      setVolume(value);
-      localStorage.setItem('player-volume', String(value));
-    }
-  };
+  const handleVolumeChange = useCallback((value: number) => {
+    lastVolumeRef.current = value;
+    setLocalVolume(value);
+    setVolume(value);
+    localStorage.setItem('player-volume', String(value));
+  }, [setVolume]);
+
+  const displayValue = muted ? lastVolumeRef.current : localVolume;
 
   return (
     <div className="justify-end hidden w-full pr-2 md:flex">
@@ -48,8 +53,8 @@ export function PlayerSettings() {
         />
         <SimpleSlider
           max={1}
-          step={0.1}
-          value={muted ? lastVolumeRef.current : localVolume}
+          step={0.01}
+          value={displayValue}
           onValueChange={handleVolumeChange}
         />
       </div>

@@ -4,6 +4,7 @@ import { LikeButton } from '~/components/like-button';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import { usePlayerStoreActions, usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
 import { useAudioPlayerContext } from 'react-use-audio-player';
+import { useTheme } from '~/features/layout/components/theme-context';
 import { Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
 
@@ -37,6 +38,7 @@ function AlbumItem({ song }: AlbumItemProps) {
   const currentSong = usePlayerCurrentSongSelect();
   const { isPlaying: audioIsPlaying } = useAudioPlayerContext();
   const isCurrent = currentSong?.id === song.id;
+  const { primaryColor } = useTheme();
 
   return (
     <div className="flex w-full items-center gap-x-4">
@@ -50,9 +52,9 @@ function AlbumItem({ song }: AlbumItemProps) {
             {isCurrent && (
               <span className="inline-block h-4 w-4">
                 <span className="flex h-full items-end gap-[1.5px]">
-                  <span className={`w-[2px] h-2 rounded-sm ${audioIsPlaying ? 'animate-bar1' : 'bg-[hsl(var(--primary))]'}`} />
-                  <span className={`w-[2px] h-3 rounded-sm ${audioIsPlaying ? 'animate-bar2' : 'bg-[hsl(var(--primary))]'}`} />
-                  <span className={`w-[2px] h-4 rounded-sm ${audioIsPlaying ? 'animate-bar3' : 'bg-[hsl(var(--primary))]'}`} />
+                  <span className="w-[2px] h-2 rounded-sm" style={{ backgroundColor: primaryColor }} />
+                  <span className="w-[2px] h-3 rounded-sm" style={{ backgroundColor: primaryColor }} />
+                  <span className="w-[2px] h-4 rounded-sm" style={{ backgroundColor: primaryColor }} />
                 </span>
               </span>
             )}
@@ -67,14 +69,3 @@ function AlbumItem({ song }: AlbumItemProps) {
     </div>
   );
 }
-// Add keyframes for animated bars
-// You can move this to a global CSS file if preferred
-import '~/app/globals.css';
-
-// Add the following to your CSS (e.g., globals.css or a module):
-// @keyframes bar1 { 0%, 100% { height: 0.5rem; } 50% { height: 1.25rem; } }
-// @keyframes bar2 { 0%, 100% { height: 1rem; } 50% { height: 0.75rem; } }
-// @keyframes bar3 { 0%, 100% { height: 1.25rem; } 50% { height: 0.5rem; } }
-// .animate-bar1 { animation: bar1 1s infinite ease-in-out; }
-// .animate-bar2 { animation: bar2 1s infinite ease-in-out 0.2s; }
-// .animate-bar3 { animation: bar3 1s infinite ease-in-out 0.4s; }

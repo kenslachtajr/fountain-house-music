@@ -8,6 +8,7 @@ import { useLoadImage } from '~/hooks/use-load-image';
 import { Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
 import { LikeButton } from './like-button';
+import { useTheme } from '~/features/layout/components/theme-context';
 
 interface MediaItemProps {
   data: Song;
@@ -19,6 +20,7 @@ export const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
   const { isPlaying: audioIsPlaying } = useAudioPlayerContext();
   const imageUrl = useLoadImage(data);
   const isCurrent = currentSong?.id === data.id;
+  const { primaryColor } = useTheme();
 
   return (
     <div className="flex w-full items-center gap-x-4">
@@ -42,9 +44,9 @@ export const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
               {isCurrent && (
                 <span className="inline-block h-4 w-4">
                   <span className="flex h-full items-end gap-[1.5px]">
-                    <span className={`w-[2px] h-2 rounded-sm ${audioIsPlaying ? 'animate-bar1' : 'bg-[hsl(var(--primary))]'}`} />
-                    <span className={`w-[2px] h-3 rounded-sm ${audioIsPlaying ? 'animate-bar2' : 'bg-[hsl(var(--primary))]'}`} />
-                    <span className={`w-[2px] h-4 rounded-sm ${audioIsPlaying ? 'animate-bar3' : 'bg-[hsl(var(--primary))]'}`} />
+                    <span className="w-[2px] h-2 rounded-sm" style={{ backgroundColor: primaryColor }} />
+                    <span className="w-[2px] h-3 rounded-sm" style={{ backgroundColor: primaryColor }} />
+                    <span className="w-[2px] h-4 rounded-sm" style={{ backgroundColor: primaryColor }} />
                   </span>
                 </span>
               )}

@@ -30,9 +30,6 @@ export const signUp = actionClient
     // Build a correct, slash-safe redirect URL for Supabase confirmation emails
     const emailRedirectTo = new URL('/auth/confirm', baseUrl).toString();
 
-    console.log('NEXT_PUBLIC_SITE_URL:', JSON.stringify(baseUrl));
-    console.log('emailRedirectTo:', JSON.stringify(emailRedirectTo));
-
     const { error, data } = await supabase.auth.signUp({
       email,
       password,

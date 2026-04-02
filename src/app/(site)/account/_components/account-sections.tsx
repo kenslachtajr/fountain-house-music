@@ -3,6 +3,7 @@
 import { useIsMounted } from '~/hooks/use-is-mounted';
 import { AccountProfile } from './account-profile';
 import { SubscriptionBilling } from './subscription-billing';
+import { ThemeSelector } from './theme-selector';
 import toast from 'react-hot-toast';
 import { createClient } from '~/utils/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -32,6 +33,7 @@ export function AccountSections() {
   return (
     <div className="space-y-9 p-6">
       <AccountProfile />
+      <ThemeSelector />
       <SubscriptionBilling />
       <Link href="/"
             onClick={handleLogout} className="inline-block px-6 py-2 bg-white text-black rounded-full">

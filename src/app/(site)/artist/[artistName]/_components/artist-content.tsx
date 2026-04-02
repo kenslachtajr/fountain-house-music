@@ -3,6 +3,7 @@
 import { LikeButton } from '~/components/like-button';
 import { usePlayerStoreActions, usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
 import { useAudioPlayerContext } from 'react-use-audio-player';
+import { useTheme } from '~/features/layout/components/theme-context';
 import { Album, Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
 import { AlbumCard } from '../../../_components/album-card';
@@ -57,6 +58,7 @@ function ArtistSongItem({ song, allSongs }: { song: Song; allSongs: Song[] }) {
   const currentSong = usePlayerCurrentSongSelect();
   const { isPlaying: audioIsPlaying } = useAudioPlayerContext();
   const isCurrent = currentSong?.id === song.id;
+  const { primaryColor } = useTheme();
 
   const handleClick = () => {
     setSongs(allSongs);
@@ -75,9 +77,9 @@ function ArtistSongItem({ song, allSongs }: { song: Song; allSongs: Song[] }) {
             {isCurrent && (
               <span className="inline-block h-4 w-4">
                 <span className="flex h-full items-end gap-[1.5px]">
-                  <span className={`w-[2px] h-2 rounded-sm ${audioIsPlaying ? 'animate-bar1' : 'bg-[hsl(var(--primary))]'}`} />
-                  <span className={`w-[2px] h-3 rounded-sm ${audioIsPlaying ? 'animate-bar2' : 'bg-[hsl(var(--primary))]'}`} />
-                  <span className={`w-[2px] h-4 rounded-sm ${audioIsPlaying ? 'animate-bar3' : 'bg-[hsl(var(--primary))]'}`} />
+                  <span className="w-[2px] h-2 rounded-sm" style={{ backgroundColor: primaryColor }} />
+                  <span className="w-[2px] h-3 rounded-sm" style={{ backgroundColor: primaryColor }} />
+                  <span className="w-[2px] h-4 rounded-sm" style={{ backgroundColor: primaryColor }} />
                 </span>
               </span>
             )}

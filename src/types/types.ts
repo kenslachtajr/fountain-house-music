@@ -62,6 +62,7 @@ export interface UserDetails {
   role: 'admin' | 'user';
   email?: string;
   subscription?: Subscription;
+  theme?: string;
 }
 
 type Prettify<T> = {

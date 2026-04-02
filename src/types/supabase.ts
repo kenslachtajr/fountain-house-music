@@ -289,6 +289,7 @@ export type Database = {
           id: string;
           payment_method: Json | null;
           role: string;
+          theme: string | null;
         };
         Insert: {
           avatar_url?: string | null;
@@ -297,6 +298,7 @@ export type Database = {
           id: string;
           payment_method?: Json | null;
           role?: string;
+          theme?: string | null;
         };
         Update: {
           avatar_url?: string | null;
@@ -305,6 +307,7 @@ export type Database = {
           id?: string;
           payment_method?: Json | null;
           role?: string;
+          theme?: string | null;
         };
         Relationships: [];
       };

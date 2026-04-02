@@ -9,6 +9,7 @@ import { GlobalToaster } from './components/global-toaster';
 import { IncludeModals } from './components/include-modals';
 import { Providers } from './components/providers';
 import { Sidebar } from './components/sidebar';
+import { ThemeProvider } from './components/theme-provider';
 
 export async function LayoutFeature({ children }: PropsWithChildren<unknown>) {
   const user = await getCurrentUser();
@@ -16,16 +17,18 @@ export async function LayoutFeature({ children }: PropsWithChildren<unknown>) {
 
   return (
     <Providers>
-      <Sidebar songs={userSongs ?? []} user={user as UserDetails}>
-        {children}
-      </Sidebar>
+      <ThemeProvider>
+        <Sidebar songs={userSongs ?? []} user={user as UserDetails}>
+          {children}
+        </Sidebar>
 
-      <div className="fixed bottom-0 w-full bg-black">
-        <PlayerFeature />
-        <MobileNavigationFeature />
-      </div>
-      <GlobalToaster />
-      <IncludeModals />
+        <div className="fixed bottom-0 w-full bg-black">
+          <PlayerFeature />
+          <MobileNavigationFeature />
+        </div>
+        <GlobalToaster />
+        <IncludeModals />
+      </ThemeProvider>
     </Providers>
   );
 }

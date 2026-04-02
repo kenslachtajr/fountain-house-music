@@ -1,27 +1,3 @@
-@keyframes bar1 {
-  0%, 100% { height: 0.5rem; }
-  50% { height: 1.25rem; }
-}
-@keyframes bar2 {
-  0%, 100% { height: 1rem; }
-  50% { height: 0.75rem; }
-}
-@keyframes bar3 {
-  0%, 100% { height: 1.25rem; }
-  50% { height: 0.5rem; }
-}
-.animate-bar1 {
-  animation: bar1 1s infinite ease-in-out;
-  background-color: hsl(var(--primary));
-}
-.animate-bar2 {
-  animation: bar2 1s infinite ease-in-out 0.2s;
-  background-color: hsl(var(--primary));
-}
-.animate-bar3 {
-  animation: bar3 1s infinite ease-in-out 0.4s;
-  background-color: hsl(var(--primary));
-}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
