@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { SimpleSlider } from '~/components/ui/slider';
 import { useLoadImage } from '~/hooks/use-load-image';
 import { isNativeApp } from '~/utils/platform';
+import { createClient } from '~/utils/supabase/client';
 import { PlayerControls } from './components/player-controls';
 import { PlayerDetails } from './components/player-details';
 import { PlayerSettings } from './components/player-settings';
@@ -18,7 +19,14 @@ import {
 import {
   usePlayerCurrentSongSelect,
   usePlayerStoreActions,
+  getPlayerState,
 } from './store/player.store';
+
+let supabaseClient: ReturnType<typeof createClient> | null = null;
+function getSupabase() {
+  if (!supabaseClient) supabaseClient = createClient();
+  return supabaseClient;
+}
 
 export function PlayerFeature() {
   const { load, seek, play, pause, isPlaying, setVolume } = useUnifiedAudio();
@@ -28,12 +36,15 @@ export function PlayerFeature() {
   const songUrl = useLoadSongUrl(currentSong);
   const songImage = useLoadImage(currentSong);
 
+  const loadRef = useRef(load);
   const playRef = useRef(play);
   const pauseRef = useRef(pause);
   const seekRef = useRef(seek);
   const nextSongRef = useRef(nextSong);
   const previousSongRef = useRef(previousSong);
+  const autoAdvancingRef = useRef(false);
 
+  useEffect(() => { loadRef.current = load; }, [load]);
   useEffect(() => { playRef.current = play; }, [play]);
   useEffect(() => { pauseRef.current = pause; }, [pause]);
   useEffect(() => { seekRef.current = seek; }, [seek]);
@@ -42,6 +53,25 @@ export function PlayerFeature() {
 
   const handleNextSong = useCallback(() => nextSongRef.current(), []);
   const handlePreviousSong = useCallback(() => previousSongRef.current(), []);
+
+  const handleSongEnd = useCallback(() => {
+    const { songs, currentSong } = getPlayerState();
+    const currentIndex = songs.findIndex((s) => s.id === currentSong?.id);
+    const next = songs[currentIndex + 1];
+
+    if (next?.song_path) {
+      const { data } = getSupabase().storage.from('songs').getPublicUrl(next.song_path);
+      autoAdvancingRef.current = true;
+      loadRef.current(data.publicUrl, {
+        html5: true,
+        format: 'mp3',
+        onend: handleSongEnd,
+      });
+      playRef.current();
+    }
+
+    nextSongRef.current();
+  }, []);
 
   useEffect(() => {
     if (!navigator?.mediaSession) return;
@@ -95,20 +125,24 @@ export function PlayerFeature() {
   useEffect(() => {
     if (!songUrl) return;
 
+    if (autoAdvancingRef.current) {
+      autoAdvancingRef.current = false;
+      return;
+    }
+
     const userVolume = parseFloat(
       localStorage.getItem('player-volume') || '0.7',
     );
     setVolume(userVolume);
 
     load(songUrl, {
-      autoplay: true,
       html5: true,
       format: 'mp3',
-      onend: () => nextSongRef.current(),
+      onend: handleSongEnd,
     });
     play();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [songUrl]);
+  }, [songUrl, handleSongEnd]);
 
   useEffect(() => {
     const audio = document.querySelector('audio');
@@ -127,20 +161,17 @@ export function PlayerFeature() {
 
     const handlePlay = () => updatePositionState();
     const handlePause = () => updatePositionState();
-    const handleEnded = () => nextSongRef.current();
     const handleTimeUpdate = () => updatePositionState();
 
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('playing', handlePlay);
     audio.addEventListener('pause', handlePause);
-    audio.addEventListener('ended', handleEnded);
     audio.addEventListener('timeupdate', handleTimeUpdate);
 
     return () => {
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('playing', handlePlay);
       audio.removeEventListener('pause', handlePause);
-      audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
     };
   }, [currentSong]);

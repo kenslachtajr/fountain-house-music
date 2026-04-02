@@ -57,6 +57,8 @@ export const usePlayerCurrentSongSelect = () =>
 export const usePlayerSongsSelect = () =>
   usePlayerStore((state) => state.songs);
 
+export const getPlayerState = () => usePlayerStore.getState();
+
 export const usePlayerStoreActions = () => {
   const user = useCurrentUserSelect();
   const { stop } = useUnifiedAudio();
