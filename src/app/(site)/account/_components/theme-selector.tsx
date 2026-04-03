@@ -35,7 +35,7 @@ export function ThemeSelector() {
       .eq('id', user.id);
 
     if (error) {
-      toast.error('Failed to save theme');
+      toast.error(error.message || 'Failed to save theme');
       setIsSaving(false);
     } else {
       setSelectedTheme(themeId);
