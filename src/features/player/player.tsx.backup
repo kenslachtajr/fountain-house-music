@@ -39,48 +39,42 @@ export function PlayerFeature() {
   const nextSongRef = useRef(nextSong);
   const previousSongRef = useRef(previousSong);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
-  let supabaseClient: ReturnType<typeof createClient> | null = null;
-  function getSupabase() {
-    if (!supabaseClient) supabaseClient = createClient();
-    return supabaseClient;
-  }
 
-  const handleEnded = useCallback(() => {
-    const { songs, currentSong } = getPlayerState();
-    const currentIndex = songs.findIndex((s) => s.id === currentSong?.id);
-    const next = songs[currentIndex + 1];
-
-    if (next?.song_path) {
-      const { data } = getSupabase().storage.from('songs').getPublicUrl(next.song_path);
-      loadRef.current(data.publicUrl, {
-        html5: true,
-        format: 'mp3',
-        onend: handleEnded,
-      });
-      playRef.current();
-    }
-
-    nextSongRef.current();
-  }, []);
+  useEffect(() => { loadRef.current = load; }, [load]);
+  useEffect(() => { playRef.current = play; }, [play]);
 
   useEffect(() => {
-    // @ts-ignore - react-use-audio-player's internal structure
-    if (audioPlayer && (audioPlayer as any)._howl?._sounds?.[0]?._node) {
-      audioElementRef.current = (audioPlayer as any)._howl._sounds[0]._node;
+    if (audioPlayer?.howl?._sounds?.[0]?._node) {
+      audioElementRef.current = audioPlayer.howl._sounds[0]._node;
     }
   }, [audioPlayer]);
 
   useEffect(() => {
     if (!audioElementRef.current) return;
 
-    audioElementRef.current!.addEventListener('ended', handleEnded);
+    const handleEnded = () => {
+      const { songs, currentSong } = getPlayerState();
+      const currentIndex = songs.findIndex((s) => s.id === currentSong?.id);
+      const next = songs[currentIndex + 1];
+
+      if (next?.song_path) {
+        const { data } = getSupabase().storage.from('songs').getPublicUrl(next.song_path);
+        loadRef.current(data.publicUrl, {
+          html5: true,
+          format: 'mp3',
+          onend: handleEnded,
+        });
+        playRef.current();
+      }
+
+      nextSongRef.current();
+    };
+
+    audioElementRef.current.addEventListener('ended', handleEnded);
     return () => {
-      audioElementRef.current!.removeEventListener('ended', handleEnded);
+      audioElementRef.current.removeEventListener('ended', handleEnded);
     };
   }, []);
-
-  useEffect(() => { loadRef.current = load; }, [load]);
-  useEffect(() => { playRef.current = play; }, [play]);
   useEffect(() => { pauseRef.current = pause; }, [pause]);
   useEffect(() => { seekRef.current = seek; }, [seek]);
   useEffect(() => { nextSongRef.current = nextSong; }, [nextSong]);
@@ -150,11 +144,11 @@ export function PlayerFeature() {
       autoplay: true,
       html5: true,
       format: 'mp3',
-      onend: handleEnded,
+      onend: handleSongEnd,
     });
     play();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [songUrl]);
+  }, [songUrl, handleSongEnd]);
 
   useEffect(() => {
     const audio = document.querySelector('audio');
