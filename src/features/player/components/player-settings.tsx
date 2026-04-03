@@ -18,9 +18,11 @@ export function PlayerSettings() {
   const isInitializedRef = useRef(false);
 
   useLayoutEffect(() => {
-    if (!isInitializedRef.current && currentVolume > 0) {
-      setLocalVolume(currentVolume);
-      lastVolumeRef.current = currentVolume;
+    if (!isInitializedRef.current) {
+      // Initialize from either current audio volume or localStorage
+      const initVolume = currentVolume > 0 ? currentVolume : parseFloat(localStorage.getItem('player-volume') || '0.7');
+      setLocalVolume(initVolume);
+      lastVolumeRef.current = initVolume;
       isInitializedRef.current = true;
     }
   }, [currentVolume]);

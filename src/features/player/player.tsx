@@ -67,6 +67,9 @@ export function PlayerFeature() {
     // @ts-ignore - react-use-audio-player's internal structure
     if (audioPlayer && (audioPlayer as any)._howl?._sounds?.[0]?._node) {
       audioElementRef.current = (audioPlayer as any)._howl._sounds[0]._node;
+    } else if (audioPlayer && audioPlayer.howl?._sounds?.[0]?._node) {
+      // Fallback for different internal structure
+      audioElementRef.current = audioPlayer.howl._sounds[0]._node;
     }
   }, [audioPlayer]);
 
