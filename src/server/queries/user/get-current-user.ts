@@ -17,6 +17,7 @@ export const getCurrentUser = () => {
     }
 
     return {
+      id: user.id,
       ...data,
       email: user.email,
       subscription: authenticatedUserSubscription,
