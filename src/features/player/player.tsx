@@ -61,15 +61,12 @@ export function PlayerFeature() {
     }
 
     nextSongRef.current();
-  }, []);
+  }, [getSupabase]);
 
   useEffect(() => {
     // @ts-ignore - react-use-audio-player's internal structure
     if (audioPlayer && (audioPlayer as any)._howl?._sounds?.[0]?._node) {
       audioElementRef.current = (audioPlayer as any)._howl._sounds[0]._node;
-    } else if (audioPlayer && audioPlayer.howl?._sounds?.[0]?._node) {
-      // Fallback for different internal structure
-      audioElementRef.current = audioPlayer.howl._sounds[0]._node;
     }
   }, [audioPlayer]);
 
@@ -80,7 +77,7 @@ export function PlayerFeature() {
     return () => {
       audioElementRef.current!.removeEventListener('ended', handleEnded);
     };
-  }, []);
+  }, [handleEnded]);
 
   useEffect(() => { loadRef.current = load; }, [load]);
   useEffect(() => { playRef.current = play; }, [play]);
