@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { SimpleSlider } from '~/components/ui/slider';
 import { useLoadImage } from '~/hooks/use-load-image';
 import { isNativeApp } from '~/utils/platform';
-import { createClient } from '~/utils/supabase/client';
+
 import { PlayerControls } from './components/player-controls';
 import { PlayerDetails } from './components/player-details';
 import { PlayerSettings } from './components/player-settings';
@@ -19,14 +19,7 @@ import {
 import {
   usePlayerCurrentSongSelect,
   usePlayerStoreActions,
-  getPlayerState,
 } from './store/player.store';
-
-let supabaseClient: ReturnType<typeof createClient> | null = null;
-function getSupabase() {
-  if (!supabaseClient) supabaseClient = createClient();
-  return supabaseClient;
-}
 
 export function PlayerFeature() {
   const { load, seek, play, pause, isPlaying, setVolume } = useUnifiedAudio();
@@ -42,7 +35,6 @@ export function PlayerFeature() {
   const seekRef = useRef(seek);
   const nextSongRef = useRef(nextSong);
   const previousSongRef = useRef(previousSong);
-  const autoAdvancingRef = useRef(false);
 
   useEffect(() => { loadRef.current = load; }, [load]);
   useEffect(() => { playRef.current = play; }, [play]);
@@ -55,21 +47,6 @@ export function PlayerFeature() {
   const handlePreviousSong = useCallback(() => previousSongRef.current(), []);
 
   const handleSongEnd = useCallback(() => {
-    const { songs, currentSong } = getPlayerState();
-    const currentIndex = songs.findIndex((s) => s.id === currentSong?.id);
-    const next = songs[currentIndex + 1];
-
-    if (next?.song_path) {
-      const { data } = getSupabase().storage.from('songs').getPublicUrl(next.song_path);
-      autoAdvancingRef.current = true;
-      loadRef.current(data.publicUrl, {
-        html5: true,
-        format: 'mp3',
-        onend: handleSongEnd,
-      });
-      playRef.current();
-    }
-
     nextSongRef.current();
   }, []);
 
@@ -124,11 +101,6 @@ export function PlayerFeature() {
 
   useEffect(() => {
     if (!songUrl) return;
-
-    if (autoAdvancingRef.current) {
-      autoAdvancingRef.current = false;
-      return;
-    }
 
     const userVolume = parseFloat(
       localStorage.getItem('player-volume') || '0.7',
