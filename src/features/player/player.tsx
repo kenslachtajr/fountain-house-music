@@ -136,6 +136,7 @@ export function PlayerFeature() {
     setVolume(userVolume);
 
     load(songUrl, {
+      autoplay: true,
       html5: true,
       format: 'mp3',
       onend: handleSongEnd,
