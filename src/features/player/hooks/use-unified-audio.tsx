@@ -1,12 +1,21 @@
 import { createContext, useEffect, useRef, useState, useCallback } from 'react';
-import { AudioPlayer } from '@mediagrid/capacitor-native-audio';
 import { isNativeApp } from '~/utils/platform';
 
 const AUDIO_ID = 'main-player';
 
+let AudioPlayer: typeof import('@mediagrid/capacitor-native-audio').AudioPlayer | null = null;
+
 const isNativePlatform = (): boolean => {
   try {
-    return isNativeApp() && typeof AudioPlayer !== 'undefined';
+    if (!isNativeApp()) return false;
+    if (typeof window === 'undefined') return false;
+    
+    if (!AudioPlayer) {
+      const audioModule = require('@mediagrid/capacitor-native-audio');
+      AudioPlayer = audioModule.AudioPlayer;
+    }
+    
+    return AudioPlayer !== null && AudioPlayer !== undefined;
   } catch {
     return false;
   }
@@ -70,11 +79,12 @@ function broadcastNativeState(updates: { isPlaying?: boolean; duration?: number 
 
 function startNativePolling(): void {
   if (nativePollingTimer) return;
+  if (!AudioPlayer) return;
   nativePollingTimer = setInterval(async () => {
     if (!nativeInitialized) return;
     if (skipPositionUpdate) return;
     try {
-      const { currentTime } = await AudioPlayer.getCurrentTime({ audioId: AUDIO_ID });
+      const { currentTime } = await AudioPlayer!.getCurrentTime({ audioId: AUDIO_ID });
       nativeCurrentTime = currentTime;
       broadcastNativeState({ isPlaying: nativeIsPlayingGlobal, duration: nativeDurationGlobal });
     } catch (_) {}
@@ -89,6 +99,8 @@ function stopNativePolling(): void {
 }
 
 async function loadNativeAudio(url: string, options: LoadOptions): Promise<void> {
+  if (!AudioPlayer) return;
+  
   if (nativeInitialized) {
     stopNativePolling();
     try {
@@ -114,13 +126,13 @@ async function loadNativeAudio(url: string, options: LoadOptions): Promise<void>
 
     AudioPlayer.onAudioReady({ audioId: AUDIO_ID }, async () => {
       try {
-        const { duration } = await AudioPlayer.getDuration({ audioId: AUDIO_ID });
+        const { duration } = await AudioPlayer!.getDuration({ audioId: AUDIO_ID });
         broadcastNativeState({ duration });
       } catch (_) {}
 
       if (options.autoplay) {
         try {
-          await AudioPlayer.play({ audioId: AUDIO_ID });
+          await AudioPlayer!.play({ audioId: AUDIO_ID });
           broadcastNativeState({ isPlaying: true });
           startNativePolling();
         } catch (_) {}
@@ -144,13 +156,15 @@ async function loadNativeAudio(url: string, options: LoadOptions): Promise<void>
       }
     });
 
-    if (options.volume !== undefined) {
+    if (options.volume !== undefined && AudioPlayer) {
       nativeVolumeGlobal = options.volume;
       await AudioPlayer.setVolume({ audioId: AUDIO_ID, volume: options.volume });
     }
 
-    await AudioPlayer.initialize({ audioId: AUDIO_ID });
-    nativeInitialized = true;
+    if (AudioPlayer) {
+      await AudioPlayer.initialize({ audioId: AUDIO_ID });
+      nativeInitialized = true;
+    }
   } catch (err) {
     console.error('[NativeAudio] load error:', err);
   }
@@ -263,7 +277,7 @@ export const useUnifiedAudio = () => {
   );
 
   const play = useCallback(() => {
-    if (isNative) {
+    if (isNative && AudioPlayer) {
       AudioPlayer.play({ audioId: AUDIO_ID })
         .then(() => {
           broadcastNativeState({ isPlaying: true });
@@ -279,7 +293,7 @@ export const useUnifiedAudio = () => {
   }, [isNative]);
 
   const pause = useCallback(() => {
-    if (isNative) {
+    if (isNative && AudioPlayer) {
       AudioPlayer.pause({ audioId: AUDIO_ID })
         .then(() => {
           broadcastNativeState({ isPlaying: false });
@@ -294,7 +308,7 @@ export const useUnifiedAudio = () => {
   }, [isNative]);
 
   const stop = useCallback(() => {
-    if (isNative) {
+    if (isNative && AudioPlayer) {
       AudioPlayer.stop({ audioId: AUDIO_ID })
         .then(() => {
           broadcastNativeState({ isPlaying: false, duration: 0 });
@@ -319,12 +333,14 @@ export const useUnifiedAudio = () => {
   const seek = useCallback(
     (time: number) => {
       if (isNative) {
-        skipPositionUpdate = true;
-        nativeCurrentTime = time;
-        AudioPlayer.seek({ audioId: AUDIO_ID, timeInSeconds: time }).catch(() => {});
-        setTimeout(() => {
-          skipPositionUpdate = false;
-        }, 300);
+        if (AudioPlayer) {
+          skipPositionUpdate = true;
+          nativeCurrentTime = time;
+          AudioPlayer.seek({ audioId: AUDIO_ID, timeInSeconds: time }).catch(() => {});
+          setTimeout(() => {
+            skipPositionUpdate = false;
+          }, 300);
+        }
       } else {
         if (!persistentAudio) return;
         persistentAudio.currentTime = time;
@@ -341,7 +357,7 @@ export const useUnifiedAudio = () => {
   const setVolume = useCallback(
     (v: number) => {
       setVolumeState(v);
-      if (isNative) {
+      if (isNative && AudioPlayer) {
         nativeVolumeGlobal = v;
         AudioPlayer.setVolume({ audioId: AUDIO_ID, volume: v }).catch(() => {});
       } else {
