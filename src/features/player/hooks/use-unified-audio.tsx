@@ -47,6 +47,8 @@ export const useUnifiedAudio = () => {
     if (!persistentAudio) {
       persistentAudio = new Audio();
       persistentAudio.preload = 'metadata';
+      (persistentAudio as HTMLAudioElement & { playsInline: boolean }).playsInline = true;
+      persistentAudio.crossOrigin = 'anonymous';
     }
     
     const audio = persistentAudio;
