@@ -60,6 +60,7 @@ let nativeVolumeGlobal = 1;
 let nativeInitialized = false;
 let nativeOnEndCallback: (() => void) | null = null;
 let nativePollingTimer: ReturnType<typeof setInterval> | null = null;
+let skipPositionUpdate = false;
 
 function broadcastNativeState(updates: { isPlaying?: boolean; duration?: number }): void {
   if (updates.isPlaying !== undefined) nativeIsPlayingGlobal = updates.isPlaying;
@@ -71,6 +72,7 @@ function startNativePolling(): void {
   if (nativePollingTimer) return;
   nativePollingTimer = setInterval(async () => {
     if (!nativeInitialized) return;
+    if (skipPositionUpdate) return;
     try {
       const { currentTime } = await AudioPlayer.getCurrentTime({ audioId: AUDIO_ID });
       nativeCurrentTime = currentTime;
@@ -317,8 +319,12 @@ export const useUnifiedAudio = () => {
   const seek = useCallback(
     (time: number) => {
       if (isNative) {
+        skipPositionUpdate = true;
         nativeCurrentTime = time;
         AudioPlayer.seek({ audioId: AUDIO_ID, timeInSeconds: time }).catch(() => {});
+        setTimeout(() => {
+          skipPositionUpdate = false;
+        }, 300);
       } else {
         if (!persistentAudio) return;
         persistentAudio.currentTime = time;
