@@ -25,9 +25,9 @@ const usePlayerStore = create<PlayerStore>()((set, get) => ({
     nextSong: () => {
       const { currentSong, songs } = get();
 
-      // Don't allow going to next song if we're at the last song
-      if (!currentSong || songs.indexOf(currentSong) === songs.length - 1)
+      if (!currentSong || songs.indexOf(currentSong) === songs.length - 1) {
         return;
+      }
 
       const currentIndex = songs.findIndex(
         (song) => song.id === currentSong?.id,

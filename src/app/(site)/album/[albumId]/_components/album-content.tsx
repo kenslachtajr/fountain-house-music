@@ -3,7 +3,6 @@
 import { LikeButton } from '~/components/like-button';
 import { useSetSongsToState } from '~/features/player/hooks/use-set-songs-to-state';
 import { usePlayerStoreActions, usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
-import { useAudioPlayerContext } from 'react-use-audio-player';
 import { useTheme } from '~/features/layout/components/theme-context';
 import { Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
@@ -36,7 +35,6 @@ interface AlbumItemProps {
 function AlbumItem({ song }: AlbumItemProps) {
   const { setCurrentSong } = usePlayerStoreActions();
   const currentSong = usePlayerCurrentSongSelect();
-  const { isPlaying: audioIsPlaying } = useAudioPlayerContext();
   const isCurrent = currentSong?.id === song.id;
   const { primaryColor } = useTheme();
 

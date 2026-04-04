@@ -4,8 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { SimpleSlider } from '~/components/ui/slider';
 import { useLoadImage } from '~/hooks/use-load-image';
 import { isNativeApp } from '~/utils/platform';
-import { createClient } from '~/utils/supabase/client';
-import { useAudioPlayerContext } from 'react-use-audio-player';
 import { PlayerControls } from './components/player-controls';
 import { PlayerDetails } from './components/player-details';
 import { PlayerSettings } from './components/player-settings';
@@ -19,87 +17,49 @@ import {
 } from './providers/native-media-session';
 import {
   usePlayerCurrentSongSelect,
+  usePlayerSongsSelect,
   usePlayerStoreActions,
   getPlayerState,
 } from './store/player.store';
 
 export function PlayerFeature() {
   const { load, seek, play, pause, isPlaying, setVolume } = useUnifiedAudio();
-  const { nextSong, previousSong } = usePlayerStoreActions();
-  const audioPlayer = useAudioPlayerContext();
+  const { nextSong, previousSong, setSongs } = usePlayerStoreActions();
 
   const currentSong = usePlayerCurrentSongSelect();
+  const songs = usePlayerSongsSelect();
   const songUrl = useLoadSongUrl(currentSong);
   const songImage = useLoadImage(currentSong);
 
   const loadRef = useRef(load);
-  const playRef = useRef(play);
-  const pauseRef = useRef(pause);
-  const seekRef = useRef(seek);
+  const setVolumeRef = useRef(setVolume);
   const nextSongRef = useRef(nextSong);
-  const previousSongRef = useRef(previousSong);
-  const audioElementRef = useRef<HTMLAudioElement | null>(null);
-  let supabaseClient: ReturnType<typeof createClient> | null = null;
-  function getSupabase() {
-    if (!supabaseClient) supabaseClient = createClient();
-    return supabaseClient;
-  }
+
+  useEffect(() => {
+    loadRef.current = load;
+  }, [load]);
+  useEffect(() => {
+    setVolumeRef.current = setVolume;
+  }, [setVolume]);
+  useEffect(() => {
+    nextSongRef.current = nextSong;
+  }, [nextSong]);
 
   const handleEnded = useCallback(() => {
-    const { songs, currentSong } = getPlayerState();
-    const currentIndex = songs.findIndex((s) => s.id === currentSong?.id);
-    const next = songs[currentIndex + 1];
-
-    if (next?.song_path) {
-      const { data } = getSupabase().storage.from('songs').getPublicUrl(next.song_path);
-      loadRef.current(data.publicUrl, {
-        html5: true,
-        format: 'mp3',
-        onend: handleEnded,
-      });
-      playRef.current();
-    }
-
     nextSongRef.current();
-  }, [getSupabase]);
-
-  useEffect(() => {
-    // @ts-ignore - react-use-audio-player's internal structure
-    if (audioPlayer && (audioPlayer as any)._howl?._sounds?.[0]?._node) {
-      audioElementRef.current = (audioPlayer as any)._howl._sounds[0]._node;
-    }
-  }, [audioPlayer]);
-
-  useEffect(() => {
-    if (!audioElementRef.current) return;
-
-    audioElementRef.current!.addEventListener('ended', handleEnded);
-    return () => {
-      audioElementRef.current!.removeEventListener('ended', handleEnded);
-    };
-  }, [handleEnded]);
-
-  useEffect(() => { loadRef.current = load; }, [load]);
-  useEffect(() => { playRef.current = play; }, [play]);
-  useEffect(() => { pauseRef.current = pause; }, [pause]);
-  useEffect(() => { seekRef.current = seek; }, [seek]);
-  useEffect(() => { nextSongRef.current = nextSong; }, [nextSong]);
-  useEffect(() => { previousSongRef.current = previousSong; }, [previousSong]);
-
-  const handleNextSong = useCallback(() => nextSongRef.current(), []);
-  const handlePreviousSong = useCallback(() => previousSongRef.current(), []);
+  }, []);
 
   useEffect(() => {
     if (!navigator?.mediaSession) return;
 
-    navigator.mediaSession.setActionHandler('play', () => playRef.current());
-    navigator.mediaSession.setActionHandler('pause', () => pauseRef.current());
-    navigator.mediaSession.setActionHandler('nexttrack', () => nextSongRef.current());
-    navigator.mediaSession.setActionHandler('previoustrack', () => previousSongRef.current());
+    navigator.mediaSession.setActionHandler('play', () => play());
+    navigator.mediaSession.setActionHandler('pause', () => pause());
+    navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
+    navigator.mediaSession.setActionHandler('previoustrack', () => previousSong());
     navigator.mediaSession.setActionHandler('seekto', (s) => {
-      if (s.seekTime != null) seekRef.current(s.seekTime);
+      if (s.seekTime != null) seek(s.seekTime);
     });
-  }, []);
+  }, [play, pause, nextSong, previousSong, seek]);
 
   useEffect(() => {
     if (!currentSong || !songImage || songImage.length === 0) return;
@@ -124,13 +84,13 @@ export function PlayerFeature() {
       songImage,
     );
     setNativeActionHandlers({
-      play: () => playRef.current(),
-      pause: () => pauseRef.current(),
-      next: () => nextSongRef.current(),
-      previous: () => previousSongRef.current(),
-      seekto: (time: number) => seekRef.current(time),
+      play: () => play(),
+      pause: () => pause(),
+      next: () => nextSong(),
+      previous: () => previousSong(),
+      seekto: (time: number) => seek(time),
     });
-  }, [currentSong, songImage]);
+  }, [currentSong, songImage, play, pause, nextSong, previousSong, seek]);
 
   useEffect(() => {
     if (isNativeApp()) {
@@ -139,54 +99,22 @@ export function PlayerFeature() {
   }, [isPlaying]);
 
   useEffect(() => {
-    if (!songUrl) return;
+    if (!songUrl) {
+      return;
+    }
 
     const userVolume = parseFloat(
       localStorage.getItem('player-volume') || '0.7',
     );
-    setVolume(userVolume);
+    setVolumeRef.current(userVolume);
 
-    load(songUrl, {
+    loadRef.current(songUrl, {
       autoplay: true,
       html5: true,
       format: 'mp3',
       onend: handleEnded,
     });
-    play();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [songUrl]);
-
-  useEffect(() => {
-    const audio = document.querySelector('audio');
-    if (!audio) return;
-
-    const updatePositionState = () => {
-      if (!navigator?.mediaSession || !audio.duration || !isFinite(audio.duration)) return;
-      try {
-        navigator.mediaSession.setPositionState({
-          duration: audio.duration,
-          position: audio.currentTime,
-          playbackRate: audio.playbackRate,
-        });
-      } catch {}
-    };
-
-    const handlePlay = () => updatePositionState();
-    const handlePause = () => updatePositionState();
-    const handleTimeUpdate = () => updatePositionState();
-
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('playing', handlePlay);
-    audio.addEventListener('pause', handlePause);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-
-    return () => {
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('playing', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-    };
-  }, [currentSong]);
 
   if (!currentSong) return null;
 

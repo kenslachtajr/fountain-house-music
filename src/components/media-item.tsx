@@ -3,7 +3,6 @@
 import Image from 'next/image';
 
 import { usePlayerStoreActions, usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
-import { useAudioPlayerContext } from 'react-use-audio-player';
 import { useLoadImage } from '~/hooks/use-load-image';
 import { Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
@@ -17,7 +16,6 @@ interface MediaItemProps {
 export const MediaItem: React.FC<MediaItemProps> = ({ data }) => {
   const { setCurrentSong } = usePlayerStoreActions();
   const currentSong = usePlayerCurrentSongSelect();
-  const { isPlaying: audioIsPlaying } = useAudioPlayerContext();
   const imageUrl = useLoadImage(data);
   const isCurrent = currentSong?.id === data.id;
   const { primaryColor } = useTheme();

@@ -2,7 +2,6 @@
 
 import { LikeButton } from '~/components/like-button';
 import { usePlayerStoreActions, usePlayerCurrentSongSelect } from '~/features/player/store/player.store';
-import { useAudioPlayerContext } from 'react-use-audio-player';
 import { useTheme } from '~/features/layout/components/theme-context';
 import { Album, Song } from '~/types/types';
 import { formatDuration } from '~/utils/format-duration';
@@ -56,7 +55,6 @@ export function ArtistContent({ songs, albums }: ArtistContentProps) {
 function ArtistSongItem({ song, allSongs }: { song: Song; allSongs: Song[] }) {
   const { setCurrentSong, setSongs } = usePlayerStoreActions();
   const currentSong = usePlayerCurrentSongSelect();
-  const { isPlaying: audioIsPlaying } = useAudioPlayerContext();
   const isCurrent = currentSong?.id === song.id;
   const { primaryColor } = useTheme();
 
