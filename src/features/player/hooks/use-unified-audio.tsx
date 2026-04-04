@@ -74,8 +74,9 @@ function startNativePolling(): void {
     try {
       const { currentTime } = await AudioPlayer.getCurrentTime({ audioId: AUDIO_ID });
       nativeCurrentTime = currentTime;
+      broadcastNativeState({ isPlaying: nativeIsPlayingGlobal, duration: nativeDurationGlobal });
     } catch (_) {}
-  }, 250);
+  }, 100);
 }
 
 function stopNativePolling(): void {
