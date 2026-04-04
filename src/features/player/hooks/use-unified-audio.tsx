@@ -339,7 +339,8 @@ export const useUnifiedAudio = () => {
           AudioPlayer.seek({ audioId: AUDIO_ID, timeInSeconds: time }).catch(() => {});
           setTimeout(() => {
             skipPositionUpdate = false;
-          }, 300);
+            nativeCurrentTime = time;
+          }, 500);
         }
       } else {
         if (!persistentAudio) return;
