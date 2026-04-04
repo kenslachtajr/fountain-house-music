@@ -4,6 +4,14 @@ import { isNativeApp } from '~/utils/platform';
 
 const AUDIO_ID = 'main-player';
 
+const isNativePlatform = (): boolean => {
+  try {
+    return isNativeApp() && typeof AudioPlayer !== 'undefined';
+  } catch {
+    return false;
+  }
+};
+
 interface LoadOptions {
   autoplay?: boolean;
   html5?: boolean;
@@ -151,7 +159,7 @@ export const useUnifiedAudio = () => {
   const [volume, setVolumeState] = useState(1);
   const onEndRef = useRef<(() => void) | null>(null);
 
-  const isNative = isNativeApp();
+  const isNative = isNativePlatform();
 
   useEffect(() => {
     if (isNative) return;
