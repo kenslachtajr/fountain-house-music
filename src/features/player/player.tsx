@@ -14,6 +14,7 @@ import {
   setNativeMediaMetadata,
   setNativePlaybackState,
   setNativeActionHandlers,
+  updateNativePositionState,
 } from './providers/native-media-session';
 import {
   usePlayerCurrentSongSelect,
@@ -97,6 +98,20 @@ export function PlayerFeature() {
       setNativePlaybackState(isPlaying ? 'playing' : 'paused');
     }
   }, [isPlaying]);
+
+  const { duration, getPosition } = useUnifiedAudio();
+
+  useEffect(() => {
+    if (!isNativeApp()) return;
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      const pos = getPosition();
+      updateNativePositionState(duration, pos, 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, duration, getPosition]);
 
   useEffect(() => {
     if (!songUrl) {
