@@ -71,6 +71,18 @@ let nativeOnEndCallback: (() => void) | null = null;
 let nativePollingTimer: ReturnType<typeof setInterval> | null = null;
 let skipPositionUpdate = false;
 
+// Rapid track changes (e.g. mashing lock-screen next/prev) can call
+// loadNativeAudio again before the previous destroy/create/initialize chain
+// for the fixed AUDIO_ID has finished, and the native side rejects a create()
+// for an ID that still exists. That left stale callbacks registered against
+// whatever track actually won the race, showing the wrong title/artwork and
+// sometimes failing to auto-advance. Each load() call captures the current
+// generation and every step after an await bails out if a newer load has
+// since started, and calls are chained through loadQueue so destroy/create
+// for one request always finishes before the next request's begins.
+let loadGeneration = 0;
+let loadQueue: Promise<void> = Promise.resolve();
+
 function broadcastNativeState(updates: { isPlaying?: boolean; duration?: number }): void {
   if (updates.isPlaying !== undefined) nativeIsPlayingGlobal = updates.isPlaying;
   if (updates.duration !== undefined) nativeDurationGlobal = updates.duration;
@@ -98,9 +110,12 @@ function stopNativePolling(): void {
   }
 }
 
-async function loadNativeAudio(url: string, options: LoadOptions): Promise<void> {
+async function loadNativeAudioNow(url: string, options: LoadOptions): Promise<void> {
   if (!AudioPlayer) return;
-  
+
+  const generation = ++loadGeneration;
+  const isCurrent = () => generation === loadGeneration;
+
   if (nativeInitialized) {
     stopNativePolling();
     try {
@@ -109,6 +124,8 @@ async function loadNativeAudio(url: string, options: LoadOptions): Promise<void>
     nativeInitialized = false;
     nativeCurrentTime = 0;
   }
+
+  if (!isCurrent()) return;
 
   if (options.onend) {
     nativeOnEndCallback = options.onend;
@@ -122,24 +139,42 @@ async function loadNativeAudio(url: string, options: LoadOptions): Promise<void>
       artistName: options.artist ?? '',
       artworkSource: options.artwork ?? '',
       useForNotification: true,
+      // iOS only ever shows one set of secondary lock-screen transport
+      // buttons: either prev/next track OR skip +/-N seconds, never both.
+      // We want prev/next (wired via @capgo/capacitor-media-session) for
+      // playlist navigation, so the skip buttons must be disabled here or
+      // iOS hides prev/next in favor of them.
+      showSeekBackward: false,
+      showSeekForward: false,
     });
 
+    if (!isCurrent()) {
+      // A newer load has already started; give up this AUDIO_ID cleanly so
+      // its create() doesn't linger and collide with the next one.
+      await AudioPlayer.destroy({ audioId: AUDIO_ID }).catch(() => {});
+      return;
+    }
+
     AudioPlayer.onAudioReady({ audioId: AUDIO_ID }, async () => {
+      if (!isCurrent()) return;
       try {
         const { duration } = await AudioPlayer!.getDuration({ audioId: AUDIO_ID });
-        broadcastNativeState({ duration });
+        if (isCurrent()) broadcastNativeState({ duration });
       } catch (_) {}
 
-      if (options.autoplay) {
+      if (options.autoplay && isCurrent()) {
         try {
           await AudioPlayer!.play({ audioId: AUDIO_ID });
-          broadcastNativeState({ isPlaying: true });
-          startNativePolling();
+          if (isCurrent()) {
+            broadcastNativeState({ isPlaying: true });
+            startNativePolling();
+          }
         } catch (_) {}
       }
     });
 
     AudioPlayer.onAudioEnd({ audioId: AUDIO_ID }, () => {
+      if (!isCurrent()) return;
       broadcastNativeState({ isPlaying: false });
       stopNativePolling();
       nativeCurrentTime = 0;
@@ -147,6 +182,7 @@ async function loadNativeAudio(url: string, options: LoadOptions): Promise<void>
     });
 
     AudioPlayer.onPlaybackStatusChange({ audioId: AUDIO_ID }, ({ status }) => {
+      if (!isCurrent()) return;
       const playing = status === 'playing';
       broadcastNativeState({ isPlaying: playing });
       if (playing) {
@@ -161,13 +197,17 @@ async function loadNativeAudio(url: string, options: LoadOptions): Promise<void>
       await AudioPlayer.setVolume({ audioId: AUDIO_ID, volume: options.volume });
     }
 
-    if (AudioPlayer) {
+    if (AudioPlayer && isCurrent()) {
       await AudioPlayer.initialize({ audioId: AUDIO_ID });
-      nativeInitialized = true;
+      if (isCurrent()) nativeInitialized = true;
     }
   } catch (err) {
     console.error('[NativeAudio] load error:', err);
   }
+}
+
+function loadNativeAudio(url: string, options: LoadOptions): void {
+  loadQueue = loadQueue.then(() => loadNativeAudioNow(url, options));
 }
 
 export const useUnifiedAudio = () => {
@@ -334,12 +374,21 @@ export const useUnifiedAudio = () => {
     (time: number) => {
       if (isNative) {
         if (AudioPlayer) {
+          // Native iOS bridge (Capacitor's getInt) requires a true Int and
+          // has no Double fallback, so fractional seconds are silently
+          // rejected (AudioPlayerError.invalidSeekTime) and the seek is a
+          // no-op. Always send a whole number of seconds.
+          const seekSeconds = Math.round(time);
           skipPositionUpdate = true;
-          nativeCurrentTime = time;
-          AudioPlayer.seek({ audioId: AUDIO_ID, timeInSeconds: time }).catch(() => {});
+          nativeCurrentTime = seekSeconds;
+          AudioPlayer.seek({ audioId: AUDIO_ID, timeInSeconds: seekSeconds }).catch(
+            (err) => {
+              console.error('[NativeAudio] seek error:', err);
+            },
+          );
           setTimeout(() => {
             skipPositionUpdate = false;
-            nativeCurrentTime = time;
+            nativeCurrentTime = seekSeconds;
           }, 500);
         }
       } else {

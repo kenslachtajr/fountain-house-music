@@ -1,0 +1,119 @@
+diff --git a/node_modules/@mediagrid/capacitor-native-audio/Package.resolved b/node_modules/@mediagrid/capacitor-native-audio/Package.resolved
+new file mode 100644
+index 0000000..d0e3661
+--- /dev/null
++++ b/node_modules/@mediagrid/capacitor-native-audio/Package.resolved
+@@ -0,0 +1,14 @@
++{
++  "pins" : [
++    {
++      "identity" : "capacitor-swift-pm",
++      "kind" : "remoteSourceControl",
++      "location" : "https://github.com/ionic-team/capacitor-swift-pm.git",
++      "state" : {
++        "revision" : "9b9fb0af76b2b653f6e9b999f658adc132b9ab4c",
++        "version" : "8.4.2"
++      }
++    }
++  ],
++  "version" : 2
++}
+diff --git a/node_modules/@mediagrid/capacitor-native-audio/ios/Sources/AudioPlayerPlugin/AudioSource.swift b/node_modules/@mediagrid/capacitor-native-audio/ios/Sources/AudioPlayerPlugin/AudioSource.swift
+index 5a65e69..e9d6e62 100644
+--- a/node_modules/@mediagrid/capacitor-native-audio/ios/Sources/AudioPlayerPlugin/AudioSource.swift
++++ b/node_modules/@mediagrid/capacitor-native-audio/ios/Sources/AudioPlayerPlugin/AudioSource.swift
+@@ -172,15 +172,9 @@ public class AudioSource: NSObject, AVAudioPlayerDelegate {
+ 
+         player.seek(to: getCmTime(seconds: timeInSeconds))
+ 
+-        if fromUi {
+-            removeRemoteTransportControls()
+-            removeNowPlaying()
+-
+-            setupNowPlaying()
+-            setupRemoteTransportControls()
+-        } else {
+-            setNowPlayingCurrentTime()
+-        }
++        // Seeking only changes elapsed time, so only that Now Playing key
++        // needs updating; title/artwork/commands are untouched.
++        setNowPlayingCurrentTime()
+     }
+ 
+     func stop() {
+@@ -498,28 +492,13 @@ public class AudioSource: NSObject, AVAudioPlayerDelegate {
+     }
+ 
+     private func setupNowPlaying() {
+-        if !useForNotification {
+-            return
+-        }
+-
+-        let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
+-        var nowPlayingInfo = [String: Any]()
+-
+-        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = audioMetadata.albumTitle
+-        nowPlayingInfo[MPMediaItemPropertyArtist] = audioMetadata.artistName
+-        nowPlayingInfo[MPMediaItemPropertyTitle] = audioMetadata.songTitle
+-        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = getDuration()
+-        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] =
+-            getCurrentTime()
+-        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = player.rate
+-
+-        let artwork = getNowPlayingArtwork()
+-
+-        if artwork != nil {
+-            nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+-        }
+-
+-        nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
++        // Now Playing metadata (title/artist/artwork/position) is owned
++        // exclusively by @capgo/capacitor-media-session on the JS side, so
++        // this plugin's own copy of that info is never written to
++        // MPNowPlayingInfoCenter. Two plugins independently overwriting the
++        // same system singleton raced each other and produced stale/blank
++        // titles and artwork after quick track changes.
++        return
+     }
+ 
+     private func setNowPlayingInfoKey(for key: String, value: Any?) {
+@@ -604,30 +583,21 @@ public class AudioSource: NSObject, AVAudioPlayerDelegate {
+     }
+ 
+     private func setNowPlayingCurrentTime() {
+-        if !useForNotification {
+-            return
+-        }
+-
+-        setNowPlayingInfoKey(
+-            for: MPNowPlayingInfoPropertyElapsedPlaybackTime,
+-            value: getCurrentTime()
+-        )
++        // Elapsed time is reported through @capgo/capacitor-media-session's
++        // setPositionState instead; see setupNowPlaying above.
++        return
+     }
+ 
+     private func removeNowPlaying() {
+-        if !useForNotification {
+-            return
+-        }
+-
+-        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
++        // Now Playing info is owned by @capgo/capacitor-media-session; see
++        // setupNowPlaying above.
++        return
+     }
+ 
+     private func setNowPlayingPlaybackState(state: MPNowPlayingPlaybackState) {
+-        if !useForNotification {
+-            return
+-        }
+-
+-        MPNowPlayingInfoCenter.default().playbackState = state
++        // Playback state is reported through @capgo/capacitor-media-session's
++        // setPlaybackState instead; see setupNowPlaying above.
++        return
+     }
+ 
+     private func getCmTime(seconds: Int64) -> CMTime {

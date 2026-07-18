@@ -1,0 +1,91 @@
+diff --git a/node_modules/@capgo/capacitor-media-session/Package.resolved b/node_modules/@capgo/capacitor-media-session/Package.resolved
+new file mode 100644
+index 0000000..d0e3661
+--- /dev/null
++++ b/node_modules/@capgo/capacitor-media-session/Package.resolved
+@@ -0,0 +1,14 @@
++{
++  "pins" : [
++    {
++      "identity" : "capacitor-swift-pm",
++      "kind" : "remoteSourceControl",
++      "location" : "https://github.com/ionic-team/capacitor-swift-pm.git",
++      "state" : {
++        "revision" : "9b9fb0af76b2b653f6e9b999f658adc132b9ab4c",
++        "version" : "8.4.2"
++      }
++    }
++  ],
++  "version" : 2
++}
+diff --git a/node_modules/@capgo/capacitor-media-session/ios/Sources/MediaSessionPlugin/MediaSessionPlugin.swift b/node_modules/@capgo/capacitor-media-session/ios/Sources/MediaSessionPlugin/MediaSessionPlugin.swift
+index 32b2739..9d56045 100644
+--- a/node_modules/@capgo/capacitor-media-session/ios/Sources/MediaSessionPlugin/MediaSessionPlugin.swift
++++ b/node_modules/@capgo/capacitor-media-session/ios/Sources/MediaSessionPlugin/MediaSessionPlugin.swift
+@@ -90,50 +90,66 @@ public class MediaSessionPlugin: CAPPlugin, CAPBridgedPlugin {
+         DispatchQueue.main.async {
+             let commandCenter = MPRemoteCommandCenter.shared()
+ 
++            // addTarget is additive: calling setActionHandler again for the
++            // same action (e.g. on every track change, since the JS side
++            // re-registers handlers whenever the current song changes) would
++            // otherwise stack up one closure per call. A single remote-
++            // control tap then replayed the action once per stacked target,
++            // which looked like next/previous cascading through several
++            // tracks at once. removeTarget(nil) clears every existing target
++            // for that command first so there is always exactly one.
+             switch action {
+             case "play":
++                commandCenter.playCommand.removeTarget(nil)
+                 commandCenter.playCommand.isEnabled = true
+                 commandCenter.playCommand.addTarget { [weak self] _ in
+                     self?.notifyListeners("actionHandler", data: ["action": "play"])
+                     return .success
+                 }
+             case "pause":
++                commandCenter.pauseCommand.removeTarget(nil)
+                 commandCenter.pauseCommand.isEnabled = true
+                 commandCenter.pauseCommand.addTarget { [weak self] _ in
+                     self?.notifyListeners("actionHandler", data: ["action": "pause"])
+                     return .success
+                 }
+             case "nexttrack":
++                commandCenter.nextTrackCommand.removeTarget(nil)
+                 commandCenter.nextTrackCommand.isEnabled = true
+                 commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+                     self?.notifyListeners("actionHandler", data: ["action": "nexttrack"])
+                     return .success
+                 }
+             case "previoustrack":
++                commandCenter.previousTrackCommand.removeTarget(nil)
+                 commandCenter.previousTrackCommand.isEnabled = true
+                 commandCenter.previousTrackCommand.addTarget { [weak self] _ in
+                     self?.notifyListeners("actionHandler", data: ["action": "previoustrack"])
+                     return .success
+                 }
+             case "seekforward":
++                commandCenter.skipForwardCommand.removeTarget(nil)
+                 commandCenter.skipForwardCommand.isEnabled = true
+                 commandCenter.skipForwardCommand.addTarget { [weak self] _ in
+                     self?.notifyListeners("actionHandler", data: ["action": "seekforward"])
+                     return .success
+                 }
+             case "seekbackward":
++                commandCenter.skipBackwardCommand.removeTarget(nil)
+                 commandCenter.skipBackwardCommand.isEnabled = true
+                 commandCenter.skipBackwardCommand.addTarget { [weak self] _ in
+                     self?.notifyListeners("actionHandler", data: ["action": "seekbackward"])
+                     return .success
+                 }
+             case "stop":
++                commandCenter.stopCommand.removeTarget(nil)
+                 commandCenter.stopCommand.isEnabled = true
+                 commandCenter.stopCommand.addTarget { [weak self] _ in
+                     self?.notifyListeners("actionHandler", data: ["action": "stop"])
+                     return .success
+                 }
+             case "seekto":
++                commandCenter.changePlaybackPositionCommand.removeTarget(nil)
+                 commandCenter.changePlaybackPositionCommand.isEnabled = true
+                 commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
+                     guard let positionEvent = event as? MPChangePlaybackPositionCommandEvent else {
