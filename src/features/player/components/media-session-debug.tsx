@@ -118,6 +118,7 @@ export function MediaSessionDebugOverlay() {
   const [enabled, setEnabled] = useState(false);
   const [, setTick] = useState(0);
   const [showLog, setShowLog] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
 
   useEffect(() => {
     setEnabled(isDebugEnabled());
@@ -197,20 +198,54 @@ export function MediaSessionDebugOverlay() {
         >
           clear log
         </button>
+        <button
+          type="button"
+          onClick={async () => {
+            const text = log.join('\n');
+            try {
+              await navigator.clipboard.writeText(text);
+              setCopyStatus('copied!');
+            } catch {
+              setCopyStatus('copy failed, use text box below');
+            }
+            setTimeout(() => setCopyStatus(null), 2000);
+          }}
+          style={{
+            color: '#ff0',
+            background: 'none',
+            border: '1px solid #ff0',
+            borderRadius: 4,
+            padding: '2px 6px',
+            fontSize: '10px',
+          }}
+        >
+          copy log
+        </button>
       </div>
+      {copyStatus && <div style={{ color: '#ff0' }}>{copyStatus}</div>}
       {showLog && (
         <div
           style={{ marginTop: 6, borderTop: '1px solid #333', paddingTop: 6 }}
         >
-          {log.length === 0 && <div>(empty)</div>}
-          {log
-            .slice()
-            .reverse()
-            .map((line, i) => (
-              <div key={i} style={{ wordBreak: 'break-all' }}>
-                {line}
-              </div>
-            ))}
+          {/* A plain <textarea> is the most reliable way to get this text off
+              an iOS device: tap inside it, "Select All" from the popup menu,
+              then Copy - works even if the Clipboard API above is blocked or
+              unavailable in this PWA context. */}
+          <textarea
+            readOnly
+            value={log.slice().reverse().join('\n')}
+            style={{
+              width: '100%',
+              height: '120px',
+              background: '#111',
+              color: '#0f0',
+              fontFamily: 'monospace',
+              fontSize: '10px',
+              border: '1px solid #333',
+              borderRadius: 4,
+            }}
+            onFocus={(e) => e.currentTarget.select()}
+          />
         </div>
       )}
     </div>
