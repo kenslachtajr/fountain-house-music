@@ -101,7 +101,12 @@ export function recordMediaSessionState(
 
 // Enabled via ?debug=media on the URL, persisted to localStorage so it
 // survives navigation without needing Safari Web Inspector, which has been
-// unreliable to pair with this project's target devices.
+// unreliable to pair with this project's target devices. A home-screen PWA
+// icon is a separate storage context from Safari though (no shared
+// localStorage/cookies even for the same site), so ?debug=media set via
+// Safari's address bar never reaches the installed app - toggleDebugMode
+// below is the way to enable it directly inside that context, no URL
+// access needed.
 function isDebugEnabled(): boolean {
   if (typeof window === 'undefined') return false;
   const params = new URLSearchParams(window.location.search);
@@ -111,6 +116,22 @@ function isDebugEnabled(): boolean {
   if (params.get('debug') === 'off') {
     localStorage.removeItem('media-session-debug');
   }
+  return localStorage.getItem('media-session-debug') === '1';
+}
+
+export function toggleDebugMode() {
+  if (typeof window === 'undefined') return;
+  const next = localStorage.getItem('media-session-debug') !== '1';
+  if (next) {
+    localStorage.setItem('media-session-debug', '1');
+  } else {
+    localStorage.removeItem('media-session-debug');
+  }
+  notify();
+}
+
+export function isDebugModeOn(): boolean {
+  if (typeof window === 'undefined') return false;
   return localStorage.getItem('media-session-debug') === '1';
 }
 
