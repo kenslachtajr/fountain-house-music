@@ -2,6 +2,9 @@
   "name": "fountain-music-streaming-app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "build:css": "postcss ./src/styles/globals.css -o ./dist/styles.css",
     "dev": "next dev",
