@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SimpleSlider } from '~/components/ui/slider';
 import { useLoadImage } from '~/hooks/use-load-image';
+import { createClient } from '~/utils/supabase/client';
 import { isNativeApp } from '~/utils/platform';
 import { PlayerControls } from './components/player-controls';
 import { PlayerDetails } from './components/player-details';
@@ -28,6 +29,55 @@ import {
   recordMediaSessionState,
 } from './components/media-session-debug';
 
+// iOS restricts decoding new remote images once the page is backgrounded or
+// locked, so setting MediaMetadata artwork to a URL that hasn't already been
+// decoded shows as a blank box on the lock screen after the proactive
+// auto-advance workaround (further down) fires there. This caches each
+// track's artwork as an already-decoded data: URL, keyed by the Supabase
+// public URL, so MediaMetadata can be set from data already resident in
+// memory instead of a URL requiring a fresh fetch + decode.
+const decodedArtworkCache = new Map<string, string>();
+
+// iOS only ever renders one artwork size on the lock screen regardless of
+// how many are provided, and multi-megabyte/multi-thousand-pixel source
+// images (some album covers here are 3000px+, several MB) appear to fail
+// that render entirely rather than just being downscaled. Resizing to a
+// fixed, small target here avoids depending on iOS to do that resize
+// itself.
+const ARTWORK_TARGET_SIZE = 512;
+
+async function decodeArtwork(url: string): Promise<string | null> {
+  if (decodedArtworkCache.has(url)) return decodedArtworkCache.get(url)!;
+
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const bitmap = await createImageBitmap(blob);
+    const canvas = document.createElement('canvas');
+    canvas.width = ARTWORK_TARGET_SIZE;
+    canvas.height = ARTWORK_TARGET_SIZE;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.drawImage(
+      bitmap,
+      0,
+      0,
+      bitmap.width,
+      bitmap.height,
+      0,
+      0,
+      ARTWORK_TARGET_SIZE,
+      ARTWORK_TARGET_SIZE,
+    );
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    decodedArtworkCache.set(url, dataUrl);
+    return dataUrl;
+  } catch (err) {
+    console.error('[MediaSession] artwork decode failed:', err);
+    return null;
+  }
+}
+
 export function PlayerFeature() {
   const { load, seek, play, pause, isPlaying, setVolume } = useUnifiedAudio();
   const { nextSong, previousSong, setSongs } = usePlayerStoreActions();
@@ -36,10 +86,19 @@ export function PlayerFeature() {
   const songs = usePlayerSongsSelect();
   const songUrl = useLoadSongUrl(currentSong);
   const songImage = useLoadImage(currentSong);
+  const [artworkForMetadata, setArtworkForMetadata] = useState<string | null>(
+    null,
+  );
 
   const loadRef = useRef(load);
   const setVolumeRef = useRef(setVolume);
   const nextSongRef = useRef(nextSong);
+  const currentSongRef = useRef(currentSong);
+  // Tracks which song id has already triggered an advance, shared between
+  // the "ended" event handler below and the proactive lock-screen workaround
+  // further down, so a track can only ever advance once regardless of which
+  // path notices it finished first.
+  const advancedForSongRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     loadRef.current = load;
@@ -50,8 +109,14 @@ export function PlayerFeature() {
   useEffect(() => {
     nextSongRef.current = nextSong;
   }, [nextSong]);
+  useEffect(() => {
+    currentSongRef.current = currentSong;
+  }, [currentSong]);
 
   const handleEnded = useCallback(() => {
+    const songId = currentSongRef.current?.id;
+    if (songId && advancedForSongRef.current === songId) return;
+    advancedForSongRef.current = songId;
     nextSongRef.current();
   }, []);
 
@@ -90,20 +155,53 @@ export function PlayerFeature() {
   }, [isPlaying, play, pause, nextSong, previousSong, seek]);
 
   useEffect(() => {
-    if (!currentSong || !songImage || songImage.length === 0) return;
+    if (!songImage) {
+      setArtworkForMetadata(null);
+      return;
+    }
+
+    let cancelled = false;
+    decodeArtwork(songImage).then((decoded) => {
+      if (!cancelled) setArtworkForMetadata(decoded ?? songImage);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [songImage]);
+
+  useEffect(() => {
+    if (!currentSong || !artworkForMetadata) return;
     if (!navigator?.mediaSession) return;
 
     navigator.mediaSession.metadata = new MediaMetadata({
       title: currentSong.title ?? '',
       artist: currentSong.author ?? '',
       album: currentSong.album ?? '',
-      artwork: [{ src: songImage, sizes: '512x512', type: 'image/jpeg' }],
+      artwork: [
+        { src: artworkForMetadata, sizes: '512x512', type: 'image/jpeg' },
+      ],
     });
     recordMediaSessionState({
       metadataTitle: currentSong.title ?? '',
-      metadataArtwork: songImage,
+      metadataArtwork: artworkForMetadata,
     });
-  }, [currentSong, songImage]);
+  }, [currentSong, artworkForMetadata]);
+
+  useEffect(() => {
+    if (isNativeApp() || !currentSong || songs.length === 0) return;
+
+    const currentIndex = songs.findIndex((s) => s.id === currentSong.id);
+    const next = songs.at(currentIndex + 1);
+    if (!next?.image_path) return;
+
+    const { data } = createClient()
+      .storage.from('images')
+      .getPublicUrl(next.image_path);
+    if (!data.publicUrl) return;
+
+    decodeArtwork(data.publicUrl);
+  }, [currentSong, songs]);
 
   useEffect(() => {
     if (!currentSong || !songImage) return;
@@ -165,10 +263,29 @@ export function PlayerFeature() {
         });
         recordMediaSessionState({ duration, position: pos });
       } catch (_) {}
+
+      // iOS suspends a backgrounded/locked tab's JS runloop shortly after
+      // audio goes silent, which means <audio>'s "ended" event frequently
+      // never fires once the screen is locked (this is a long-standing,
+      // widely-reported WebKit limitation affecting every iOS browser,
+      // Chrome included, since they all run on WebKit). This interval is
+      // already proven to keep running while locked (it drives the working
+      // lock-screen scrubber), so use it to advance the track proactively,
+      // just before the current one actually ends, instead of waiting on
+      // "ended" to fire. Guarded per-song so it can only fire once even if
+      // "ended" also ends up firing normally.
+      if (
+        currentSong &&
+        advancedForSongRef.current !== currentSong.id &&
+        pos >= duration - 0.5
+      ) {
+        advancedForSongRef.current = currentSong.id;
+        nextSongRef.current();
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isPlaying, duration, getPosition]);
+  }, [isPlaying, duration, getPosition, currentSong]);
 
   useEffect(() => {
     if (!songUrl) {
