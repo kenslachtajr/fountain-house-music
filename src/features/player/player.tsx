@@ -22,6 +22,11 @@ import {
   usePlayerStoreActions,
   getPlayerState,
 } from './store/player.store';
+import {
+  MediaSessionDebugOverlay,
+  recordMediaSessionAction,
+  recordMediaSessionState,
+} from './components/media-session-debug';
 
 export function PlayerFeature() {
   const { load, seek, play, pause, isPlaying, setVolume } = useUnifiedAudio();
@@ -51,16 +56,38 @@ export function PlayerFeature() {
   }, []);
 
   useEffect(() => {
+    recordMediaSessionState({ hasMediaSession: !!navigator?.mediaSession });
     if (!navigator?.mediaSession) return;
 
-    navigator.mediaSession.setActionHandler('play', () => play());
-    navigator.mediaSession.setActionHandler('pause', () => pause());
-    navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
-    navigator.mediaSession.setActionHandler('previoustrack', () => previousSong());
+    // iOS Safari only shows the "nexttrack"/"previoustrack" lock-screen
+    // buttons if those handlers are registered after playback has actually
+    // started; registering them at mount time (before the first play)
+    // makes it silently fall back to its default +/-10s skip buttons
+    // instead, even though the handlers are set correctly. Re-registering
+    // once isPlaying flips true is a widely-confirmed workaround.
+    if (!isPlaying) return;
+
+    navigator.mediaSession.setActionHandler('play', () => {
+      recordMediaSessionAction('play');
+      play();
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      recordMediaSessionAction('pause');
+      pause();
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      recordMediaSessionAction('nexttrack');
+      nextSong();
+    });
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      recordMediaSessionAction('previoustrack');
+      previousSong();
+    });
     navigator.mediaSession.setActionHandler('seekto', (s) => {
+      recordMediaSessionAction(`seekto:${s.seekTime}`);
       if (s.seekTime != null) seek(s.seekTime);
     });
-  }, [play, pause, nextSong, previousSong, seek]);
+  }, [isPlaying, play, pause, nextSong, previousSong, seek]);
 
   useEffect(() => {
     if (!currentSong || !songImage || songImage.length === 0) return;
@@ -71,6 +98,10 @@ export function PlayerFeature() {
       artist: currentSong.author ?? '',
       album: currentSong.album ?? '',
       artwork: [{ src: songImage, sizes: '512x512', type: 'image/jpeg' }],
+    });
+    recordMediaSessionState({
+      metadataTitle: currentSong.title ?? '',
+      metadataArtwork: songImage,
     });
   }, [currentSong, songImage]);
 
@@ -96,18 +127,44 @@ export function PlayerFeature() {
   useEffect(() => {
     if (isNativeApp()) {
       setNativePlaybackState(isPlaying ? 'playing' : 'paused');
+    } else if (navigator?.mediaSession) {
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
     }
+    recordMediaSessionState({
+      playbackState: isPlaying ? 'playing' : 'paused',
+      isPlaying,
+    });
   }, [isPlaying]);
 
   const { duration, getPosition } = useUnifiedAudio();
 
   useEffect(() => {
-    if (!isNativeApp()) return;
     if (!isPlaying) return;
+
+    if (isNativeApp()) {
+      const interval = setInterval(() => {
+        const pos = getPosition();
+        updateNativePositionState(duration, pos, 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+
+    // Safari's lock-screen/Control Center scrubber and time labels rely on
+    // setPositionState; without it the transport UI has no duration/position
+    // to render (this mirrors the native fix for the same underlying gap).
+    if (!navigator?.mediaSession?.setPositionState) return;
+    if (!duration || !isFinite(duration)) return;
 
     const interval = setInterval(() => {
       const pos = getPosition();
-      updateNativePositionState(duration, pos, 1);
+      try {
+        navigator.mediaSession.setPositionState({
+          duration,
+          position: Math.min(pos, duration),
+          playbackRate: 1,
+        });
+        recordMediaSessionState({ duration, position: pos });
+      } catch (_) {}
     }, 1000);
 
     return () => clearInterval(interval);
@@ -134,7 +191,8 @@ export function PlayerFeature() {
   if (!currentSong) return null;
 
   return (
-    <div className="w-full h-20 bg-black">
+    <div className="h-20 w-full bg-black">
+      <MediaSessionDebugOverlay />
       <SeekSlider />
       <div className="px-4 py-2">
         <div className="grid h-full grid-cols-2 md:grid-cols-3">
