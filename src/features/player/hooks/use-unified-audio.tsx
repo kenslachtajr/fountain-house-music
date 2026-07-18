@@ -1,5 +1,6 @@
 import { createContext, useEffect, useRef, useState, useCallback } from 'react';
 import { isNativeApp } from '~/utils/platform';
+import { logMediaEvent } from '~/features/player/components/media-session-debug';
 
 const AUDIO_ID = 'main-player';
 
@@ -231,19 +232,36 @@ export const useUnifiedAudio = () => {
     const audio = persistentAudio;
 
     const handleEnded = () => {
+      logMediaEvent('persistentAudio "ended" event');
       setIsPlaying(false);
       if (onEndRef.current) onEndRef.current();
     };
     const handleLoadedMetadata = () => setDuration(audio.duration || 0);
     const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-    const handleError = (_e: Event) => {};
+    const handlePause = () => {
+      logMediaEvent(
+        `persistentAudio "pause" event visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'}`,
+      );
+      setIsPlaying(false);
+    };
+    const handleError = () => {
+      const err = audio.error;
+      logMediaEvent(
+        `persistentAudio "error" event code=${err?.code} message=${err?.message}`,
+      );
+    };
+    const handleStalled = () => logMediaEvent('persistentAudio "stalled" event');
+    const handleWaiting = () => logMediaEvent('persistentAudio "waiting" event');
+    const handleSuspend = () => logMediaEvent('persistentAudio "suspend" event');
 
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
     audio.addEventListener('error', handleError);
+    audio.addEventListener('stalled', handleStalled);
+    audio.addEventListener('waiting', handleWaiting);
+    audio.addEventListener('suspend', handleSuspend);
 
     return () => {
       audio.removeEventListener('ended', handleEnded);
@@ -251,6 +269,9 @@ export const useUnifiedAudio = () => {
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('error', handleError);
+      audio.removeEventListener('stalled', handleStalled);
+      audio.removeEventListener('waiting', handleWaiting);
+      audio.removeEventListener('suspend', handleSuspend);
     };
   }, [isNative]);
 
@@ -290,21 +311,35 @@ export const useUnifiedAudio = () => {
           setVolumeState(options.volume);
         }
 
+        const isBlobUrl = url.startsWith('blob:');
         persistentAudio.src = url;
         persistentAudio.load();
+        logMediaEvent(
+          `persistentAudio.load() isBlobUrl=${isBlobUrl} readyState=${persistentAudio.readyState} visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'}`,
+        );
 
         if (options.autoplay) {
           const tryPlay = () => {
+            logMediaEvent(
+              `persistentAudio.play() attempt readyState=${persistentAudio!.readyState} visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'}`,
+            );
             persistentAudio!
               .play()
-              .then(() => setIsPlaying(true))
-              .catch(() => setIsPlaying(false));
+              .then(() => {
+                logMediaEvent('persistentAudio.play() resolved');
+                setIsPlaying(true);
+              })
+              .catch((err) => {
+                logMediaEvent(`persistentAudio.play() rejected: ${err}`);
+                setIsPlaying(false);
+              });
           };
 
           if (persistentAudio.readyState >= 2) {
             tryPlay();
           } else {
             const onCanPlay = () => {
+              logMediaEvent('persistentAudio canplay event fired');
               persistentAudio!.removeEventListener('canplay', onCanPlay);
               tryPlay();
             };

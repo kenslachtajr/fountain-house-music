@@ -27,6 +27,7 @@ import {
   MediaSessionDebugOverlay,
   recordMediaSessionAction,
   recordMediaSessionState,
+  logMediaEvent,
 } from './components/media-session-debug';
 
 // iOS restricts decoding new remote images once the page is backgrounded or
@@ -153,10 +154,39 @@ export function PlayerFeature() {
   }, [currentSong]);
 
   const handleEnded = useCallback(() => {
+    logMediaEvent(`ended event fired for song=${currentSongRef.current?.id}`);
     const songId = currentSongRef.current?.id;
     if (songId && advancedForSongRef.current === songId) return;
     advancedForSongRef.current = songId;
     nextSongRef.current();
+  }, []);
+
+  // These fire around the exact moment iOS suspends/resumes a locked page's
+  // JS runloop, which is the boundary we need visibility into to diagnose
+  // intermittent lock-screen stalls - logged to the persistent event log
+  // (see media-session-debug.tsx) since in-memory state doesn't survive
+  // that suspension.
+  useEffect(() => {
+    const onVisibility = () =>
+      logMediaEvent(`visibilitychange -> ${document.visibilityState}`);
+    const onPageHide = () => logMediaEvent('pagehide');
+    const onPageShow = () => logMediaEvent('pageshow');
+    const onFreeze = () => logMediaEvent('freeze');
+    const onResume = () => logMediaEvent('resume');
+
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', onPageHide);
+    window.addEventListener('pageshow', onPageShow);
+    document.addEventListener('freeze', onFreeze);
+    document.addEventListener('resume', onResume);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', onPageHide);
+      window.removeEventListener('pageshow', onPageShow);
+      document.removeEventListener('freeze', onFreeze);
+      document.removeEventListener('resume', onResume);
+    };
   }, []);
 
   useEffect(() => {
@@ -334,6 +364,9 @@ export function PlayerFeature() {
         pos >= duration - 0.5
       ) {
         advancedForSongRef.current = currentSong.id;
+        logMediaEvent(
+          `proactive advance triggered: song=${currentSong.id} pos=${pos.toFixed(2)} duration=${duration.toFixed(2)} visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'}`,
+        );
         nextSongRef.current();
       }
     }, 1000);
@@ -357,7 +390,12 @@ export function PlayerFeature() {
     // download-vs-lock-suspend race entirely. Falls back to the real URL
     // (a normal network fetch) when nothing was prefetched, e.g. the very
     // first track or after skipping around the playlist.
+    const usedPrefetchedBlob = prefetchedAudioCache.has(songUrl);
     const playbackUrl = prefetchedAudioCache.get(songUrl) ?? songUrl;
+
+    logMediaEvent(
+      `load() song=${currentSongRef.current?.id} prefetched=${usedPrefetchedBlob} visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'}`,
+    );
 
     loadRef.current(playbackUrl, {
       autoplay: true,

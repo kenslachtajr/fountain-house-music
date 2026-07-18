@@ -2,6 +2,42 @@
 
 import { useEffect, useState } from 'react';
 
+// A timestamped ring buffer written to localStorage on every relevant
+// event. In-memory-only debug state (the snapshot below) is lost the
+// instant iOS suspends or reloads a locked page - which is exactly the
+// scenario we need to inspect - so this persists across that boundary and
+// can be read back after unlocking to reconstruct what actually happened
+// leading up to a stall.
+const EVENT_LOG_KEY = 'media-session-event-log';
+const MAX_LOG_ENTRIES = 200;
+
+export function logMediaEvent(event: string) {
+  if (typeof window === 'undefined') return;
+  try {
+    const raw = localStorage.getItem(EVENT_LOG_KEY);
+    const log: string[] = raw ? JSON.parse(raw) : [];
+    log.push(`${new Date().toISOString()} ${event}`);
+    if (log.length > MAX_LOG_ENTRIES)
+      log.splice(0, log.length - MAX_LOG_ENTRIES);
+    localStorage.setItem(EVENT_LOG_KEY, JSON.stringify(log));
+  } catch (_) {}
+}
+
+export function readMediaEventLog(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(EVENT_LOG_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+export function clearMediaEventLog() {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(EVENT_LOG_KEY);
+}
+
 interface DebugSnapshot {
   hasMediaSession: boolean;
   metadataTitle: string | null;
@@ -81,6 +117,7 @@ function isDebugEnabled(): boolean {
 export function MediaSessionDebugOverlay() {
   const [enabled, setEnabled] = useState(false);
   const [, setTick] = useState(0);
+  const [showLog, setShowLog] = useState(false);
 
   useEffect(() => {
     setEnabled(isDebugEnabled());
@@ -92,6 +129,8 @@ export function MediaSessionDebugOverlay() {
   }, []);
 
   if (!enabled) return null;
+
+  const log = readMediaEventLog();
 
   return (
     <div
@@ -108,9 +147,8 @@ export function MediaSessionDebugOverlay() {
         lineHeight: 1.4,
         padding: '8px',
         borderRadius: '8px',
-        maxHeight: '35vh',
+        maxHeight: '60vh',
         overflowY: 'auto',
-        pointerEvents: 'none',
       }}
     >
       <div>mediaSession API: {String(snapshot.hasMediaSession)}</div>
@@ -127,6 +165,54 @@ export function MediaSessionDebugOverlay() {
         last error: {snapshot.lastError ?? '—'}
       </div>
       <div>updated: {snapshot.updatedAt}</div>
+      <div style={{ marginTop: 6, display: 'flex', gap: 8 }}>
+        <button
+          type="button"
+          onClick={() => setShowLog((v) => !v)}
+          style={{
+            color: '#0ff',
+            background: 'none',
+            border: '1px solid #0ff',
+            borderRadius: 4,
+            padding: '2px 6px',
+            fontSize: '10px',
+          }}
+        >
+          {showLog ? 'hide log' : `show log (${log.length})`}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            clearMediaEventLog();
+            setTick((t) => t + 1);
+          }}
+          style={{
+            color: '#f66',
+            background: 'none',
+            border: '1px solid #f66',
+            borderRadius: 4,
+            padding: '2px 6px',
+            fontSize: '10px',
+          }}
+        >
+          clear log
+        </button>
+      </div>
+      {showLog && (
+        <div
+          style={{ marginTop: 6, borderTop: '1px solid #333', paddingTop: 6 }}
+        >
+          {log.length === 0 && <div>(empty)</div>}
+          {log
+            .slice()
+            .reverse()
+            .map((line, i) => (
+              <div key={i} style={{ wordBreak: 'break-all' }}>
+                {line}
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 }
