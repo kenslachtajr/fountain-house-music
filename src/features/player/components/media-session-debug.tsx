@@ -143,7 +143,15 @@ export function MediaSessionDebugOverlay() {
 
   useEffect(() => {
     setEnabled(isDebugEnabled());
-    const listener = () => setTick((t) => t + 1);
+    // toggleDebugMode() (triggered by the 5-tap gesture on the artwork)
+    // calls notify() same as every other state update here, so re-check the
+    // localStorage flag on every notification too - otherwise the panel's
+    // `enabled` state stays stuck at whatever it was on mount and toggling
+    // it later has no visible effect until a full page reload.
+    const listener = () => {
+      setEnabled(isDebugEnabled());
+      setTick((t) => t + 1);
+    };
     listeners.add(listener);
     return () => {
       listeners.delete(listener);
