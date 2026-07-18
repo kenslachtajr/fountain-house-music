@@ -204,6 +204,32 @@ export function PlayerFeature() {
   }, [currentSong, songs]);
 
   useEffect(() => {
+    if (isNativeApp() || !currentSong || songs.length === 0) return;
+    if (typeof window === 'undefined' || !('caches' in window)) return;
+
+    const currentIndex = songs.findIndex((s) => s.id === currentSong.id);
+    const next = songs.at(currentIndex + 1);
+    if (!next?.song_path) return;
+
+    const { data } = createClient()
+      .storage.from('songs')
+      .getPublicUrl(next.song_path);
+    if (!data.publicUrl) return;
+
+    // Auto-advance triggers nextSong() -> a brand-new <audio> src -> a
+    // network fetch that has to finish before .play() can be called, all
+    // while the page may already be locked. If that fetch is still pending
+    // when iOS suspends the page's JS, playback stalls until the next
+    // unlock resumes it (matches the "sometimes waits for unlock" reports).
+    // sw.ts registers a runtime cache for audio file extensions, but it's
+    // populated on first request rather than ahead of time; fetching the
+    // next track's URL here while still in the foreground warms that cache
+    // so the real fetch during lock resolves locally instead of over the
+    // network.
+    fetch(data.publicUrl).catch(() => {});
+  }, [currentSong, songs]);
+
+  useEffect(() => {
     if (!currentSong || !songImage) return;
     if (!isNativeApp()) return;
 
