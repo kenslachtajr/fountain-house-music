@@ -78,6 +78,45 @@ async function decodeArtwork(url: string): Promise<string | null> {
   }
 }
 
+// Song files are served with `Cache-Control: no-cache` and no file
+// extension on their URL, so neither the browser's HTTP cache nor sw.ts's
+// extension-matched runtime cache ever actually stores them - every load is
+// a real multi-MB network fetch. Combined with auto-advance needing that
+// fetch to finish before .play() can run, a locked page can get suspended
+// mid-download, leaving playback stalled until the next unlock resumes it.
+// Downloading the next track into an in-memory Blob ahead of time and
+// handing the player a local blob: URL sidesteps the network entirely, so
+// playing it requires no fetch that could be interrupted.
+const prefetchedAudioCache = new Map<string, string>();
+// Song files run several MB each; only ever needing "current" and "next"
+// realistically, but capping a bit higher covers quick back-and-forth
+// skipping without unbounded blob: URL / memory growth over a long session.
+const MAX_PREFETCHED_AUDIO = 3;
+
+async function prefetchAudioBlob(url: string): Promise<string | null> {
+  if (prefetchedAudioCache.has(url)) return prefetchedAudioCache.get(url)!;
+
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+
+    if (prefetchedAudioCache.size >= MAX_PREFETCHED_AUDIO) {
+      const oldestKey = prefetchedAudioCache.keys().next().value;
+      if (oldestKey) {
+        URL.revokeObjectURL(prefetchedAudioCache.get(oldestKey)!);
+        prefetchedAudioCache.delete(oldestKey);
+      }
+    }
+
+    prefetchedAudioCache.set(url, blobUrl);
+    return blobUrl;
+  } catch (err) {
+    console.error('[Player] audio prefetch failed:', err);
+    return null;
+  }
+}
+
 export function PlayerFeature() {
   const { load, seek, play, pause, isPlaying, setVolume } = useUnifiedAudio();
   const { nextSong, previousSong, setSongs } = usePlayerStoreActions();
@@ -205,7 +244,6 @@ export function PlayerFeature() {
 
   useEffect(() => {
     if (isNativeApp() || !currentSong || songs.length === 0) return;
-    if (typeof window === 'undefined' || !('caches' in window)) return;
 
     const currentIndex = songs.findIndex((s) => s.id === currentSong.id);
     const next = songs.at(currentIndex + 1);
@@ -216,17 +254,7 @@ export function PlayerFeature() {
       .getPublicUrl(next.song_path);
     if (!data.publicUrl) return;
 
-    // Auto-advance triggers nextSong() -> a brand-new <audio> src -> a
-    // network fetch that has to finish before .play() can be called, all
-    // while the page may already be locked. If that fetch is still pending
-    // when iOS suspends the page's JS, playback stalls until the next
-    // unlock resumes it (matches the "sometimes waits for unlock" reports).
-    // sw.ts registers a runtime cache for audio file extensions, but it's
-    // populated on first request rather than ahead of time; fetching the
-    // next track's URL here while still in the foreground warms that cache
-    // so the real fetch during lock resolves locally instead of over the
-    // network.
-    fetch(data.publicUrl).catch(() => {});
+    prefetchAudioBlob(data.publicUrl);
   }, [currentSong, songs]);
 
   useEffect(() => {
@@ -323,7 +351,15 @@ export function PlayerFeature() {
     );
     setVolumeRef.current(userVolume);
 
-    loadRef.current(songUrl, {
+    // Prefer an already-downloaded blob: URL (see prefetchAudioBlob above)
+    // if this exact track was prefetched as the previous track's "next"
+    // one; a blob: URL needs no network access to play, avoiding the
+    // download-vs-lock-suspend race entirely. Falls back to the real URL
+    // (a normal network fetch) when nothing was prefetched, e.g. the very
+    // first track or after skipping around the playlist.
+    const playbackUrl = prefetchedAudioCache.get(songUrl) ?? songUrl;
+
+    loadRef.current(playbackUrl, {
       autoplay: true,
       html5: true,
       format: 'mp3',
