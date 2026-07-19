@@ -74,6 +74,13 @@ function notify() {
 export function recordMediaSessionAction(action: string) {
   snapshot.lastAction = action;
   notify();
+  // This used to only update the in-memory snapshot above, which is lost
+  // the instant iOS suspends/reloads a locked page - so there was no way to
+  // tell whether a lock-screen widget tap (routed through
+  // navigator.mediaSession.setActionHandler) actually fired versus iOS
+  // pausing the <audio> element directly on its own. Logging it here too
+  // closes that blind spot.
+  logMediaEvent(`mediaSession action: ${action}`);
 }
 
 export function recordMediaSessionError(error: string) {
