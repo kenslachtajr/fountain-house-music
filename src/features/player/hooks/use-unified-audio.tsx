@@ -144,6 +144,7 @@ let nativeInitialized = false;
 let nativeOnEndCallback: (() => void) | null = null;
 let nativePollingTimer: ReturnType<typeof setInterval> | null = null;
 let skipPositionUpdate = false;
+let webSeekTargetTime = 0;
 
 // Rapid track changes (e.g. mashing lock-screen next/prev) can call
 // loadNativeAudio again before the previous destroy/create/initialize chain
@@ -537,7 +538,19 @@ const useUnifiedAudioImpl = () => {
         }
       } else {
         if (!persistentAudio) return;
+        // Setting currentTime on an <audio> element isn't instant - the
+        // browser has to seek internally (especially over a network stream)
+        // and can briefly read back stale/intermediate values while that
+        // settles. Reading position via getPosition() right after a seek
+        // (which the slider's polling loop does the moment it stops
+        // dragging) could show the seek visibly bouncing before it
+        // stabilizes. Mirrors the native path's skipPositionUpdate guard.
+        skipPositionUpdate = true;
+        webSeekTargetTime = time;
         persistentAudio.currentTime = time;
+        setTimeout(() => {
+          skipPositionUpdate = false;
+        }, 500);
       }
     },
     [isNative],
@@ -545,6 +558,7 @@ const useUnifiedAudioImpl = () => {
 
   const getPosition = useCallback(() => {
     if (isNative) return nativeCurrentTime;
+    if (skipPositionUpdate) return webSeekTargetTime;
     return persistentAudio?.currentTime ?? 0;
   }, [isNative]);
 
