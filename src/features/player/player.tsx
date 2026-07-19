@@ -139,6 +139,9 @@ export function PlayerFeature() {
   // further down, so a track can only ever advance once regardless of which
   // path notices it finished first.
   const advancedForSongRef = useRef<string | undefined>(undefined);
+  // Latches true the first time playback starts; see the media session
+  // action handler effect below for why this matters.
+  const hasEverPlayedRef = useRef(false);
 
   useEffect(() => {
     loadRef.current = load;
@@ -197,9 +200,17 @@ export function PlayerFeature() {
     // buttons if those handlers are registered after playback has actually
     // started; registering them at mount time (before the first play)
     // makes it silently fall back to its default +/-10s skip buttons
-    // instead, even though the handlers are set correctly. Re-registering
-    // once isPlaying flips true is a widely-confirmed workaround.
-    if (!isPlaying) return;
+    // instead, even though the handlers are set correctly. Only wait for
+    // that FIRST play, though - this used to re-run (and bail via an early
+    // return) on every isPlaying change, which meant pausing from the lock
+    // screen tore every handler down and never re-registered them, since
+    // the effect immediately returned early with isPlaying now false. That
+    // left play/pause/nexttrack/etc completely dead on the lock screen
+    // after the first pause - tapping play produced no audible sound
+    // because there was no longer a live handler routing that tap to the
+    // real persistentAudio element at all.
+    if (!isPlaying && !hasEverPlayedRef.current) return;
+    hasEverPlayedRef.current = true;
 
     navigator.mediaSession.setActionHandler('play', () => {
       recordMediaSessionAction('play');
