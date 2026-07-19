@@ -146,6 +146,21 @@ let nativePollingTimer: ReturnType<typeof setInterval> | null = null;
 let skipPositionUpdate = false;
 let webSeekTargetTime = 0;
 
+// The event log showed the <audio> element's "pause" event firing
+// repeatedly while backgrounded, with none of it traceable to our own
+// pause()/mediaSession-pause calls (no matching user action logged nearby).
+// This means iOS itself is force-pausing the element directly at the
+// WebKit layer, most likely as part of periodically re-validating whether
+// a backgrounded page still deserves to hold background-audio occupancy -
+// our JS only observes the pause event as a consequence after the fact,
+// never the cause. Once that happens there's no "ended"/track-change event
+// to hang a recovery off of, so nothing else in this file would ever
+// resume it on its own; webIntendsPlayingRef (set in play()/pause() only,
+// i.e. actual user/mediaSession intent - never by the DOM "pause" handler
+// itself) plus the auto-resume logic in handlePause are what detect and
+// recover from this.
+let webIntendsPlaying = false;
+
 // Rapid track changes (e.g. mashing lock-screen next/prev) can call
 // loadNativeAudio again before the previous destroy/create/initialize chain
 // for the fixed AUDIO_ID has finished, and the native side rejects a create()
@@ -341,9 +356,23 @@ const useUnifiedAudioImpl = () => {
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => {
       logMediaEvent(
-        `persistentAudio "pause" event visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'}`,
+        `persistentAudio "pause" event visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'} webIntendsPlaying=${webIntendsPlaying}`,
       );
       setIsPlaying(false);
+
+      // audio.ended fires its own "ended" event immediately before "pause"
+      // for a genuine track completion, so audio.ended distinguishes that
+      // (expected, handled by handleEnded) from iOS force-pausing the
+      // element out from under us while we still intend to be playing -
+      // the latter needs an explicit resume or playback just stays dead
+      // with no further events to react to.
+      if (webIntendsPlaying && !audio.ended) {
+        logMediaEvent('unexpected pause detected, attempting auto-resume');
+        audio
+          .play()
+          .then(() => logMediaEvent('auto-resume play() resolved'))
+          .catch((err) => logMediaEvent(`auto-resume play() rejected: ${err}`));
+      }
     };
     const handleError = () => {
       const err = audio.error;
@@ -407,6 +436,8 @@ const useUnifiedAudioImpl = () => {
           return;
         }
 
+        webIntendsPlaying = !!options.autoplay;
+
         if (options.volume !== undefined) {
           persistentAudio.volume = options.volume;
           setVolumeState(options.volume);
@@ -466,6 +497,7 @@ const useUnifiedAudioImpl = () => {
         })
         .catch(() => {});
     } else {
+      webIntendsPlaying = true;
       persistentAudio
         ?.play()
         .then(() => setIsPlaying(true))
@@ -483,6 +515,7 @@ const useUnifiedAudioImpl = () => {
         .catch(() => {});
     } else {
       if (!persistentAudio) return;
+      webIntendsPlaying = false;
       persistentAudio.pause();
       setIsPlaying(false);
     }
@@ -499,6 +532,7 @@ const useUnifiedAudioImpl = () => {
         .catch(() => {});
     } else {
       if (!persistentAudio) return;
+      webIntendsPlaying = false;
       persistentAudio.pause();
       persistentAudio.currentTime = 0;
       setIsPlaying(false);
