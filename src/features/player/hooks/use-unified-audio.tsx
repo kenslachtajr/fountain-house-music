@@ -1,4 +1,4 @@
-import { createContext, useEffect, useRef, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { isNativeApp } from '~/utils/platform';
 import { logMediaEvent } from '~/features/player/components/media-session-debug';
 
@@ -50,13 +50,29 @@ interface UnifiedAudioPlayer {
 const UnifiedAudioContext = createContext<UnifiedAudioPlayer | null>(null);
 
 export const UnifiedAudioProvider = ({ children }: { children: React.ReactNode }) => {
-  const player = useUnifiedAudio();
+  const player = useUnifiedAudioImpl();
 
   return (
     <UnifiedAudioContext.Provider value={player}>
       {children}
     </UnifiedAudioContext.Provider>
   );
+};
+
+// Every consumer used to call useUnifiedAudioImpl() (as useUnifiedAudio())
+// directly instead of reading it from UnifiedAudioProvider's context, so
+// each of the ~7 call sites created its own independent instance of the
+// hook below - each attaching its own full set of <audio> event listeners
+// to the one shared persistentAudio element. That meant every play/pause/
+// stall/etc event fired the listener body 7x redundantly on every state
+// change, all session. This is the real hook every component should use;
+// it reads the single shared instance the Provider already creates.
+export const useUnifiedAudio = (): UnifiedAudioPlayer => {
+  const ctx = useContext(UnifiedAudioContext);
+  if (!ctx) {
+    throw new Error('useUnifiedAudio must be used within a UnifiedAudioProvider');
+  }
+  return ctx;
 };
 
 let persistentAudio: HTMLAudioElement | null = null;
@@ -211,7 +227,7 @@ function loadNativeAudio(url: string, options: LoadOptions): void {
   loadQueue = loadQueue.then(() => loadNativeAudioNow(url, options));
 }
 
-export const useUnifiedAudio = () => {
+const useUnifiedAudioImpl = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(1);
