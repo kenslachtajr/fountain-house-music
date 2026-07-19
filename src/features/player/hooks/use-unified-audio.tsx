@@ -381,12 +381,24 @@ const useUnifiedAudioImpl = () => {
       if (onEndRef.current) onEndRef.current();
     };
     const handleLoadedMetadata = () => setDuration(audio.duration || 0);
-    const handlePlay = () => setIsPlaying(true);
+    const handlePlay = () => {
+      setIsPlaying(true);
+      // Setting this from a React effect that reads isPlaying (as
+      // player.tsx used to do exclusively) isn't reliable while
+      // backgrounded: useEffect callbacks are explicitly deferred/scheduled
+      // by React and that scheduling can stall for an extended period on a
+      // hidden page, so the lock-screen widget could go on showing the
+      // wrong icon well after a real play/pause DOM event already fired.
+      // Setting it directly here, in the actual DOM event handler, isn't
+      // subject to that deferral.
+      if (navigator.mediaSession) navigator.mediaSession.playbackState = 'playing';
+    };
     const handlePause = () => {
       logMediaEvent(
         `persistentAudio "pause" event visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'} webIntendsPlaying=${webIntendsPlaying}`,
       );
       setIsPlaying(false);
+      if (navigator.mediaSession) navigator.mediaSession.playbackState = 'paused';
 
       // audio.ended fires its own "ended" event immediately before "pause"
       // for a genuine track completion, so audio.ended distinguishes that
