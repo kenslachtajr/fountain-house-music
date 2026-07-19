@@ -245,6 +245,30 @@ const useUnifiedAudioImpl = () => {
       persistentAudio.crossOrigin = 'anonymous';
     }
 
+    // WebKit bug 261554: without this, a backgrounded/locked page's <audio>
+    // keeps running - play() resolves, currentTime advances, "ended"/
+    // "canplay"/etc events all fire normally - but produces literally no
+    // sound, because WebKit doesn't know this page intends persistent
+    // background audio (vs. e.g. a one-off UI sound effect) unless told so
+    // explicitly. Matches the exact symptom reported: track advances and
+    // the position UI updates, but nothing plays until the page is
+    // foregrounded again.
+    const nav = navigator as Navigator & {
+      audioSession?: { type: string };
+    };
+    if (nav.audioSession) {
+      try {
+        nav.audioSession.type = 'playback';
+        logMediaEvent(
+          `navigator.audioSession.type set to "playback" (was "${nav.audioSession.type}")`,
+        );
+      } catch (err) {
+        logMediaEvent(`navigator.audioSession.type set failed: ${err}`);
+      }
+    } else {
+      logMediaEvent('navigator.audioSession API not available');
+    }
+
     const audio = persistentAudio;
 
     const handleEnded = () => {
