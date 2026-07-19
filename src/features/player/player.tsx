@@ -359,6 +359,20 @@ export function PlayerFeature() {
         recordMediaSessionState({ duration, position: pos });
       } catch (_) {}
 
+      // The lock-screen widget's play/pause icon can silently drift out of
+      // sync with the real audio state during a long backgrounded session
+      // (observed: audio kept playing correctly the whole time, but the
+      // widget showed "play" instead of "pause") even though this
+      // component's own isPlaying state and the effect that sets
+      // mediaSession.playbackState from it were both correct throughout -
+      // nothing in that effect re-ran because isPlaying genuinely never
+      // changed. Re-asserting playbackState here on every tick, not just
+      // when isPlaying transitions, corrects that drift without needing to
+      // detect it.
+      if (navigator.mediaSession) {
+        navigator.mediaSession.playbackState = 'playing';
+      }
+
       // iOS suspends a backgrounded/locked tab's JS runloop shortly after
       // audio goes silent, which means <audio>'s "ended" event frequently
       // never fires once the screen is locked (this is a long-standing,
