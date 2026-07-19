@@ -77,6 +77,63 @@ export const useUnifiedAudio = (): UnifiedAudioPlayer => {
 
 let persistentAudio: HTMLAudioElement | null = null;
 
+// iOS drops a page's background-audio "occupancy" the moment its <audio>
+// element goes fully silent (e.g. the "ended" event), and won't grant it
+// back for a brand-new source loaded afterward - even a source that's
+// already downloaded as an in-memory Blob with zero network dependency.
+// That gap between one track ending and the next one's play() actually
+// resolving is exactly when the real symptoms happen: sometimes the new
+// track's audio pipeline just never finishes initializing until the page
+// is unlocked (frozen at readyState 0), other times play() succeeds but
+// produces no audible output at all. This second, silent, looping <audio>
+// element is started the instant the real track ends and stopped once the
+// next real track's play() has resolved, keeping the page continuously
+// "occupied" so the gap never has a chance to open. This is the same
+// technique independently converged on by multiple other iOS web music
+// players (e.g. SoundWheel) for this exact WebKit limitation.
+const SILENT_AUDIO_SRC =
+  'data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+
+let silentBridgeAudio: HTMLAudioElement | null = null;
+let silentBridgeCount = 0;
+
+function getSilentBridgeAudio(): HTMLAudioElement {
+  if (!silentBridgeAudio) {
+    silentBridgeAudio = new Audio(SILENT_AUDIO_SRC);
+    silentBridgeAudio.loop = true;
+    (
+      silentBridgeAudio as HTMLAudioElement & { playsInline: boolean }
+    ).playsInline = true;
+  }
+  return silentBridgeAudio;
+}
+
+function startSilentBridge(): void {
+  silentBridgeCount += 1;
+  if (silentBridgeCount > 1) return;
+  const audio = getSilentBridgeAudio();
+  audio.play().catch(() => {});
+  logMediaEvent('silentBridge started');
+
+  // Safety backstop: if the next real track's load()/play() never resolves
+  // for some unrelated reason (network failure, corrupt file, etc.), don't
+  // leave the silent bridge looping indefinitely draining battery.
+  setTimeout(() => {
+    if (silentBridgeCount > 0) {
+      logMediaEvent('silentBridge safety timeout - forcing stop');
+      silentBridgeCount = 0;
+      silentBridgeAudio?.pause();
+    }
+  }, 30000);
+}
+
+function stopSilentBridge(): void {
+  silentBridgeCount = Math.max(0, silentBridgeCount - 1);
+  if (silentBridgeCount > 0) return;
+  silentBridgeAudio?.pause();
+  logMediaEvent('silentBridge stopped');
+}
+
 type NativeStateCallback = (updates: { isPlaying?: boolean; duration?: number }) => void;
 const nativeSubscribers = new Set<NativeStateCallback>();
 let nativeCurrentTime = 0;
@@ -274,6 +331,9 @@ const useUnifiedAudioImpl = () => {
     const handleEnded = () => {
       logMediaEvent('persistentAudio "ended" event');
       setIsPlaying(false);
+      // Bridge the gap until the next track's load()/play() call stops it
+      // (see startSilentBridge/stopSilentBridge above).
+      startSilentBridge();
       if (onEndRef.current) onEndRef.current();
     };
     const handleLoadedMetadata = () => setDuration(audio.duration || 0);
@@ -368,6 +428,11 @@ const useUnifiedAudioImpl = () => {
               .then(() => {
                 logMediaEvent('persistentAudio.play() resolved');
                 setIsPlaying(true);
+                // Real playback is confirmed running now; the bridge (if it
+                // was running for this transition - safe to call
+                // unconditionally, see stopSilentBridge above) is no longer
+                // needed.
+                stopSilentBridge();
               })
               .catch((err) => {
                 logMediaEvent(`persistentAudio.play() rejected: ${err}`);
@@ -437,6 +502,10 @@ const useUnifiedAudioImpl = () => {
       persistentAudio.currentTime = 0;
       setIsPlaying(false);
       setDuration(0);
+      // An explicit stop (e.g. sign-out) should never leave the silent
+      // bridge looping in the background.
+      silentBridgeCount = 0;
+      silentBridgeAudio?.pause();
     }
   }, [isNative]);
 
