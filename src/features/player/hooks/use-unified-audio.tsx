@@ -498,10 +498,29 @@ const useUnifiedAudioImpl = () => {
         .catch(() => {});
     } else {
       webIntendsPlaying = true;
+      // A user-initiated resume (e.g. lock-screen play after an intentional
+      // pause) is the same underlying gap as a track transition: iOS can
+      // drop background-audio occupancy while paused/hidden, and calling
+      // play() on the existing (already fully loaded) element doesn't
+      // reliably produce audible output in that state either. Bridge it
+      // the same way transitions are bridged, stopping once real playback
+      // is confirmed.
+      startSilentBridge();
+      logMediaEvent(
+        `persistentAudio direct play() attempt readyState=${persistentAudio?.readyState} visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'}`,
+      );
       persistentAudio
         ?.play()
-        .then(() => setIsPlaying(true))
-        .catch(() => setIsPlaying(false));
+        .then(() => {
+          logMediaEvent('persistentAudio direct play() resolved');
+          setIsPlaying(true);
+          stopSilentBridge();
+        })
+        .catch((err) => {
+          logMediaEvent(`persistentAudio direct play() rejected: ${err}`);
+          setIsPlaying(false);
+          stopSilentBridge();
+        });
     }
   }, [isNative]);
 
