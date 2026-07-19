@@ -329,7 +329,7 @@ export function PlayerFeature() {
     });
   }, [isPlaying]);
 
-  const { duration, getPosition } = useUnifiedAudio();
+  const { duration, getPosition, isCurrentlyPlaying } = useUnifiedAudio();
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -362,15 +362,19 @@ export function PlayerFeature() {
       // The lock-screen widget's play/pause icon can silently drift out of
       // sync with the real audio state during a long backgrounded session
       // (observed: audio kept playing correctly the whole time, but the
-      // widget showed "play" instead of "pause") even though this
-      // component's own isPlaying state and the effect that sets
-      // mediaSession.playbackState from it were both correct throughout -
-      // nothing in that effect re-ran because isPlaying genuinely never
-      // changed. Re-asserting playbackState here on every tick, not just
-      // when isPlaying transitions, corrects that drift without needing to
-      // detect it.
+      // widget showed "play" instead of "pause"), so this re-asserts
+      // playbackState on every tick rather than only when isPlaying
+      // transitions. Checking isCurrentlyPlaying() (live DOM/native state)
+      // instead of the isPlaying closed over when this effect was set up
+      // is essential here, not just a nicety: this interval's own already-
+      // scheduled tick can still fire once right after a pause() call sets
+      // isPlaying to false but before React re-runs this effect to clear
+      // it, and would otherwise force the widget straight back to
+      // "playing" a moment after a real, correct pause.
       if (navigator.mediaSession) {
-        navigator.mediaSession.playbackState = 'playing';
+        navigator.mediaSession.playbackState = isCurrentlyPlaying()
+          ? 'playing'
+          : 'paused';
       }
 
       // iOS suspends a backgrounded/locked tab's JS runloop shortly after
@@ -397,7 +401,7 @@ export function PlayerFeature() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isPlaying, duration, getPosition, currentSong]);
+  }, [isPlaying, duration, getPosition, isCurrentlyPlaying, currentSong]);
 
   useEffect(() => {
     if (!songUrl) {

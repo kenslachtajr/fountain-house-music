@@ -41,6 +41,7 @@ interface UnifiedAudioPlayer {
   togglePlayPause(): void;
   seek(time: number): void;
   getPosition(): number;
+  isCurrentlyPlaying(): boolean;
   isPlaying: boolean;
   duration: number;
   volume: number;
@@ -690,6 +691,18 @@ const useUnifiedAudioImpl = () => {
     return persistentAudio?.currentTime ?? 0;
   }, [isNative]);
 
+  // Reads live DOM/native state directly instead of the isPlaying React
+  // state, which always lags the real state by at least one render cycle.
+  // A setInterval callback (e.g. the lock-screen playbackState re-assertion
+  // in player.tsx) that closed over a stale isPlaying value could still be
+  // mid-flight from before a pause() call and briefly overwrite a correct
+  // pause back to "playing" on the lock-screen widget - checking this at
+  // the moment the tick actually fires avoids that race entirely.
+  const isCurrentlyPlaying = useCallback(() => {
+    if (isNative) return nativeIsPlayingGlobal;
+    return !!persistentAudio && !persistentAudio.paused;
+  }, [isNative]);
+
   const setVolume = useCallback(
     (v: number) => {
       setVolumeState(v);
@@ -711,6 +724,7 @@ const useUnifiedAudioImpl = () => {
     togglePlayPause,
     seek,
     getPosition,
+    isCurrentlyPlaying,
     isPlaying,
     duration: duration ?? 0,
     volume,
