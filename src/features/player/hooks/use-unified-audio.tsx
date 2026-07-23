@@ -41,7 +41,6 @@ interface UnifiedAudioPlayer {
   togglePlayPause(): void;
   seek(time: number): void;
   getPosition(): number;
-  isCurrentlyPlaying(): boolean;
   isPlaying: boolean;
   duration: number;
   volume: number;
@@ -118,12 +117,9 @@ function startSilentBridge(): void {
 
   // Safety backstop: if the next real track's load()/play() never resolves
   // for some unrelated reason (network failure, corrupt file, etc.), don't
-  // leave the silent bridge looping indefinitely draining battery. Skipped
-  // while a paused-bridge session is active (see startPausedBridge below),
-  // since that one is expected to run for an indefinite, user-controlled
-  // duration and has its own release path.
+  // leave the silent bridge looping indefinitely draining battery.
   setTimeout(() => {
-    if (silentBridgeCount > 0 && !pausedBridgeActive) {
+    if (silentBridgeCount > 0) {
       logMediaEvent('silentBridge safety timeout - forcing stop');
       silentBridgeCount = 0;
       silentBridgeAudio?.pause();
@@ -138,30 +134,6 @@ function stopSilentBridge(): void {
   logMediaEvent('silentBridge stopped');
 }
 
-// A user-initiated pause while hidden can last indefinitely, unlike a
-// track-transition gap - so this reuses the same silent bridge element but
-// with no safety timeout, releasing instead when the page returns to
-// visible (see the visibilitychange listener below, inside
-// useUnifiedAudioImpl) or when a real play() resumes and stops it via the
-// normal startSilentBridge/stopSilentBridge pair. Tracked separately from
-// silentBridgeCount so a stray stopSilentBridge() call elsewhere can't
-// accidentally end a paused-bridge session meant to run indefinitely.
-let pausedBridgeActive = false;
-
-function startPausedBridge(): void {
-  if (pausedBridgeActive) return;
-  pausedBridgeActive = true;
-  startSilentBridge();
-  logMediaEvent('pausedBridge started');
-}
-
-function stopPausedBridge(): void {
-  if (!pausedBridgeActive) return;
-  pausedBridgeActive = false;
-  stopSilentBridge();
-  logMediaEvent('pausedBridge stopped');
-}
-
 type NativeStateCallback = (updates: { isPlaying?: boolean; duration?: number }) => void;
 const nativeSubscribers = new Set<NativeStateCallback>();
 let nativeCurrentTime = 0;
@@ -173,21 +145,6 @@ let nativeOnEndCallback: (() => void) | null = null;
 let nativePollingTimer: ReturnType<typeof setInterval> | null = null;
 let skipPositionUpdate = false;
 let webSeekTargetTime = 0;
-
-// The event log showed the <audio> element's "pause" event firing
-// repeatedly while backgrounded, with none of it traceable to our own
-// pause()/mediaSession-pause calls (no matching user action logged nearby).
-// This means iOS itself is force-pausing the element directly at the
-// WebKit layer, most likely as part of periodically re-validating whether
-// a backgrounded page still deserves to hold background-audio occupancy -
-// our JS only observes the pause event as a consequence after the fact,
-// never the cause. Once that happens there's no "ended"/track-change event
-// to hang a recovery off of, so nothing else in this file would ever
-// resume it on its own; webIntendsPlayingRef (set in play()/pause() only,
-// i.e. actual user/mediaSession intent - never by the DOM "pause" handler
-// itself) plus the auto-resume logic in handlePause are what detect and
-// recover from this.
-let webIntendsPlaying = false;
 
 // Rapid track changes (e.g. mashing lock-screen next/prev) can call
 // loadNativeAudio again before the previous destroy/create/initialize chain
@@ -381,47 +338,12 @@ const useUnifiedAudioImpl = () => {
       if (onEndRef.current) onEndRef.current();
     };
     const handleLoadedMetadata = () => setDuration(audio.duration || 0);
-    const handlePlay = () => {
-      setIsPlaying(true);
-      // Setting this from a React effect that reads isPlaying (as
-      // player.tsx used to do exclusively) isn't reliable while
-      // backgrounded: useEffect callbacks are explicitly deferred/scheduled
-      // by React and that scheduling can stall for an extended period on a
-      // hidden page, so the lock-screen widget could go on showing the
-      // wrong icon well after a real play/pause DOM event already fired.
-      // Setting it directly here, in the actual DOM event handler, isn't
-      // subject to that deferral.
-      if (navigator.mediaSession) navigator.mediaSession.playbackState = 'playing';
-    };
+    const handlePlay = () => setIsPlaying(true);
     const handlePause = () => {
       logMediaEvent(
-        `persistentAudio "pause" event visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'} webIntendsPlaying=${webIntendsPlaying}`,
+        `persistentAudio "pause" event visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'}`,
       );
       setIsPlaying(false);
-      if (navigator.mediaSession) navigator.mediaSession.playbackState = 'paused';
-
-      // audio.ended fires its own "ended" event immediately before "pause"
-      // for a genuine track completion, so audio.ended distinguishes that
-      // (expected, handled by handleEnded) from iOS force-pausing the
-      // element out from under us while we still intend to be playing -
-      // the latter needs an explicit resume or playback just stays dead
-      // with no further events to react to.
-      if (webIntendsPlaying && !audio.ended) {
-        logMediaEvent('unexpected pause detected, attempting auto-resume');
-        // Same occupancy gap play() above works around; bridge this
-        // recovery attempt the same way.
-        startSilentBridge();
-        audio
-          .play()
-          .then(() => {
-            logMediaEvent('auto-resume play() resolved');
-            stopSilentBridge();
-          })
-          .catch((err) => {
-            logMediaEvent(`auto-resume play() rejected: ${err}`);
-            stopSilentBridge();
-          });
-      }
     };
     const handleError = () => {
       const err = audio.error;
@@ -442,16 +364,6 @@ const useUnifiedAudioImpl = () => {
     audio.addEventListener('waiting', handleWaiting);
     audio.addEventListener('suspend', handleSuspend);
 
-    // If the user unlocks/foregrounds the page without tapping play again
-    // (e.g. just checking the phone, or the lock-screen widget itself), a
-    // paused-bridge session started by pause() (see above) would otherwise
-    // keep looping with nothing left to release it, since it has no timeout
-    // by design.
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') stopPausedBridge();
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
     return () => {
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
@@ -461,7 +373,6 @@ const useUnifiedAudioImpl = () => {
       audio.removeEventListener('stalled', handleStalled);
       audio.removeEventListener('waiting', handleWaiting);
       audio.removeEventListener('suspend', handleSuspend);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [isNative]);
 
@@ -495,8 +406,6 @@ const useUnifiedAudioImpl = () => {
         if (persistentAudio.src === url && options.autoplay && !persistentAudio.paused) {
           return;
         }
-
-        webIntendsPlaying = !!options.autoplay;
 
         if (options.volume !== undefined) {
           persistentAudio.volume = options.volume;
@@ -557,43 +466,10 @@ const useUnifiedAudioImpl = () => {
         })
         .catch(() => {});
     } else {
-      webIntendsPlaying = true;
-      // A user-initiated resume (e.g. lock-screen play after an intentional
-      // pause) is the same underlying gap as a track transition: iOS can
-      // drop background-audio occupancy while paused/hidden, and calling
-      // play() on the existing (already fully loaded) element doesn't
-      // reliably produce audible output in that state either. If pause()
-      // already started a paused-bridge session for this (see pause()
-      // below), reuse and release that one instead of starting a second,
-      // separately-tracked bridge reference here - otherwise fall back to
-      // the transition-style bridge for any other case (e.g. the very
-      // first play, or resuming a pause that happened while visible).
-      const wasPausedBridge = pausedBridgeActive;
-      if (wasPausedBridge) {
-        // Keep it running through this play() attempt; release below once
-        // we know whether real playback actually started.
-      } else {
-        startSilentBridge();
-      }
-      logMediaEvent(
-        `persistentAudio direct play() attempt readyState=${persistentAudio?.readyState} visibility=${typeof document !== 'undefined' ? document.visibilityState : '?'}`,
-      );
       persistentAudio
         ?.play()
-        .then(() => {
-          logMediaEvent('persistentAudio direct play() resolved');
-          setIsPlaying(true);
-          if (wasPausedBridge) stopPausedBridge();
-          else stopSilentBridge();
-        })
-        .catch((err) => {
-          logMediaEvent(`persistentAudio direct play() rejected: ${err}`);
-          setIsPlaying(false);
-          // Don't release the paused bridge on a failed attempt - occupancy
-          // still needs to be held for whatever retry happens next (e.g.
-          // the auto-resume in handlePause, or another lock-screen tap).
-          if (!wasPausedBridge) stopSilentBridge();
-        });
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
     }
   }, [isNative]);
 
@@ -607,24 +483,8 @@ const useUnifiedAudioImpl = () => {
         .catch(() => {});
     } else {
       if (!persistentAudio) return;
-      webIntendsPlaying = false;
       persistentAudio.pause();
       setIsPlaying(false);
-
-      // Starting the silent bridge only at the moment of the resume attempt
-      // (see play() above) was one step too late: a user pause can sit
-      // paused indefinitely while hidden, and iOS can drop background-audio
-      // occupancy at any point during that gap, not just right as play() is
-      // called - a play() promise resolving in tens of milliseconds after
-      // that lapse still produced no audible sound. If paused while hidden,
-      // start the bridge immediately so occupancy is held for the entire
-      // paused duration, not just the transition; startPausedBridge below
-      // releases it on visibility returning (no longer needed once
-      // foregrounded) rather than a short timeout, since an intentional
-      // pause has no fixed duration.
-      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
-        startPausedBridge();
-      }
     }
   }, [isNative]);
 
@@ -639,7 +499,6 @@ const useUnifiedAudioImpl = () => {
         .catch(() => {});
     } else {
       if (!persistentAudio) return;
-      webIntendsPlaying = false;
       persistentAudio.pause();
       persistentAudio.currentTime = 0;
       setIsPlaying(false);
@@ -703,18 +562,6 @@ const useUnifiedAudioImpl = () => {
     return persistentAudio?.currentTime ?? 0;
   }, [isNative]);
 
-  // Reads live DOM/native state directly instead of the isPlaying React
-  // state, which always lags the real state by at least one render cycle.
-  // A setInterval callback (e.g. the lock-screen playbackState re-assertion
-  // in player.tsx) that closed over a stale isPlaying value could still be
-  // mid-flight from before a pause() call and briefly overwrite a correct
-  // pause back to "playing" on the lock-screen widget - checking this at
-  // the moment the tick actually fires avoids that race entirely.
-  const isCurrentlyPlaying = useCallback(() => {
-    if (isNative) return nativeIsPlayingGlobal;
-    return !!persistentAudio && !persistentAudio.paused;
-  }, [isNative]);
-
   const setVolume = useCallback(
     (v: number) => {
       setVolumeState(v);
@@ -736,7 +583,6 @@ const useUnifiedAudioImpl = () => {
     togglePlayPause,
     seek,
     getPosition,
-    isCurrentlyPlaying,
     isPlaying,
     duration: duration ?? 0,
     volume,

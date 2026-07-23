@@ -329,7 +329,7 @@ export function PlayerFeature() {
     });
   }, [isPlaying]);
 
-  const { duration, getPosition, isCurrentlyPlaying } = useUnifiedAudio();
+  const { duration, getPosition } = useUnifiedAudio();
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -359,24 +359,6 @@ export function PlayerFeature() {
         recordMediaSessionState({ duration, position: pos });
       } catch (_) {}
 
-      // The lock-screen widget's play/pause icon can silently drift out of
-      // sync with the real audio state during a long backgrounded session
-      // (observed: audio kept playing correctly the whole time, but the
-      // widget showed "play" instead of "pause"), so this re-asserts
-      // playbackState on every tick rather than only when isPlaying
-      // transitions. Checking isCurrentlyPlaying() (live DOM/native state)
-      // instead of the isPlaying closed over when this effect was set up
-      // is essential here, not just a nicety: this interval's own already-
-      // scheduled tick can still fire once right after a pause() call sets
-      // isPlaying to false but before React re-runs this effect to clear
-      // it, and would otherwise force the widget straight back to
-      // "playing" a moment after a real, correct pause.
-      if (navigator.mediaSession) {
-        navigator.mediaSession.playbackState = isCurrentlyPlaying()
-          ? 'playing'
-          : 'paused';
-      }
-
       // iOS suspends a backgrounded/locked tab's JS runloop shortly after
       // audio goes silent, which means <audio>'s "ended" event frequently
       // never fires once the screen is locked (this is a long-standing,
@@ -401,7 +383,7 @@ export function PlayerFeature() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isPlaying, duration, getPosition, isCurrentlyPlaying, currentSong]);
+  }, [isPlaying, duration, getPosition, currentSong]);
 
   useEffect(() => {
     if (!songUrl) {
