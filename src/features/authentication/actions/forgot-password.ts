@@ -1,7 +1,6 @@
 'use server';
 
 import { ValidationErrors } from 'next-safe-action';
-import { headers } from 'next/headers';
 import { z } from 'zod';
 import { actionClient, ActionError } from '~/lib/safe-action';
 import { createClient } from '~/utils/supabase/server';
@@ -19,12 +18,16 @@ export const forgotPassword = actionClient
   .metadata({ shouldAuth: false })
   .action(async ({ parsedInput: { email } }) => {
     const supabase = await createClient();
-    const origin = (await headers()).get('origin');
 
-    if (!origin) return;
+    // Canonical base URL (set this in Vercel to https://fountainhousemusic.com)
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fountainhousemusic.com';
+
+    // Build a correct, slash-safe redirect URL for Supabase confirmation emails
+    const redirectTo = new URL('/auth/confirm', baseUrl).toString();
 
     const { error, data } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: origin,
+      redirectTo,
     });
 
     if (error) {
